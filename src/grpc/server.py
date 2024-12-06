@@ -1,4 +1,3 @@
-from src.db.database import Database
 from src.grpc.generated.user_pb2 import (
     Response,
     User,
@@ -9,16 +8,17 @@ from src.grpc.generated.user_pb2 import (
 )
 from src.grpc.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
+from src.grpc.user_crud import UserCrud
 
 
 class UserManagement(UserManagementServicer):
-    def __init__(self, database: Database):
-        self.database = database
+    def __init__(self, user_crud: UserCrud):
+        self.user_crud = user_crud
 
     async def create(self, request: User, context) -> Response:
         print("Got request to create user: \n" + str(request))
         try:
-            result = await self.database.create(request)
+            result = await self.user_crud.create(request)
             if result == "success":
                 return Response(message=f"Created user {request.username}")
             return Response(message=result)
@@ -28,7 +28,7 @@ class UserManagement(UserManagementServicer):
 
     async def read(self, request: Id, context) -> UserDetails:
         print("Got request to get user with: \n" + str(request))
-        user = await self.database.read(request.id)
+        user = await self.user_crud.read(request.id)
         if user:
             username = user.username
             email = user.email
@@ -37,12 +37,12 @@ class UserManagement(UserManagementServicer):
 
     async def update_password(self, request: UpdatePassword, context) -> Response:
         print(f"Got request to update password of user : {request.user_id.id}")
-        user = await self.database.read(request.user_id.id)
+        user = await self.user_crud.read(request.user_id.id)
         if user is None:
             return Response(message="User not found.")
         else:
             if request.old_password == user.password:
-                await self.database.update_password(user.id, request.new_password)
+                await self.user_crud.update_password(user.id, request.new_password)
                 return Response(
                     message=f"Password successfully updated for user with ID {request.user_id.id}"
                 )
@@ -50,12 +50,12 @@ class UserManagement(UserManagementServicer):
 
     async def delete(self, request: DeleteUser, context) -> Response:
         print(f"Got request to delete user with id {request.user_id.id}")
-        user = await self.database.read(request.user_id.id)
+        user = await self.user_crud.read(request.user_id.id)
         conf = request.confirm_delete
         if user is None:
             return Response(message="User not found.")
         if conf:
-            await self.database.delete(user.id)
+            await self.user_crud.delete(user.id)
             return Response(
                 message=f"User with Id {request.user_id.id} was deleted successfully."
             )
