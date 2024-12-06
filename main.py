@@ -5,9 +5,9 @@ from src.grpc.server import UserManagement
 
 from src.db.database import Database
 from src.grpc.generated import user_pb2_grpc
+import config
 
-DB_URL = "postgresql+asyncpg://test:test123@postgres:5432/user_management"
-
+DB_URL = config.DB_URL
 
 async def init_db():
     database = Database(database_url=DB_URL)
