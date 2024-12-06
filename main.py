@@ -1,8 +1,8 @@
 import asyncio
 import os
 from dotenv import load_dotenv
-from src.grpc.server import start_grpc_server
 from src.db.database import init_db
+from src.grpc.start_grpc_server import start_grpc_server
 
 load_dotenv()
 
