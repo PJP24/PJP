@@ -1,0 +1,43 @@
+services:
+  postgresql_service:
+    image: postgres
+    container_name: postgresql_container
+    environment:
+      POSTGRES_PASSWORD: my_secret_password
+      POSTGRES_DB: grpc_database_max
+      POSTGRES_USER: maxim
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U maxim -d grpc_database_max"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - grpc_network
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data 
+
+  grpc_server_service:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: grpc-server
+    container_name: grpc_server_container
+    ports:
+      - 50051:50051
+    depends_on:
+      postgresql_service:
+        condition: service_healthy
+    restart: always
+    networks:
+      - grpc_network
+
+networks:
+  grpc_network:
+    name: grpc_network
+
+volumes:
+  postgresql_data:
+    name: grpc_volume
