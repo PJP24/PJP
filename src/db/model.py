@@ -1,9 +1,7 @@
 from sqlalchemy.orm import declarative_base
 import sqlalchemy as sa
 
-
 Base = declarative_base()
-
 
 class Subscription(Base):
     __tablename__ = 'subscriptions'
