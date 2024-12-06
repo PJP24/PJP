@@ -1,6 +1,7 @@
 import asyncio
 import grpc
 from src.grpc.server import UserManagement
+from src.grpc.user_crud import UserCrud
 
 
 from src.db.database import Database
@@ -18,8 +19,9 @@ async def init_db():
 
 async def serve(db: Database):
     server = grpc.aio.server()
+    user_crud = UserCrud(db)
     user_pb2_grpc.add_UserManagementServicer_to_server(
-        UserManagement(database=db), server
+        UserManagement(user_crud=user_crud), server
     )
     server.add_insecure_port("0.0.0.0:50051")
     print("Starting server on localhost:50051")
