@@ -5,9 +5,13 @@ tree:
 
 grpc:
 	@python -m grpc_tools.protoc -I=proto --python_out=grpc_gen/generated --grpc_python_out=grpc_gen/generated proto/user.proto
+	@python -m grpc_tools.protoc -I=proto --python_out=grpc_gen/generated --grpc_python_out=grpc_gen/generated proto/subscription.proto
 
-main:
+install:
+	@pip install -r requirements.txt
+
+api:
 	@python main.py
 
-server:
-	@python server.py
+servers:
+	@python servers.py
