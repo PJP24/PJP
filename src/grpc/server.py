@@ -15,25 +15,25 @@ class SubscriptionService(SubscriptionServiceServicer):
         self.database = database
 
     async def CreateSubscription(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await create_subscription(session, request.email, request.subscription_type)
 
     async def GetSubscriptions(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await get_subscriptions(session)
 
     async def ChangeSubscription(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await change_subscription(session, request.email, request.subscription_type)
 
     async def DeleteSubscription(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await delete_subscription(session, request.email)
 
     async def ActivateSubscription(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await activate_subscription(session, request.email)
 
     async def DeactivateSubscription(self, request, context):
-        async with self.database.async_session() as session:
+        async with self.database.session_scope() as session:
             return await deactivate_subscription(session, request.email)
