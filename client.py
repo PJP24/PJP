@@ -26,8 +26,8 @@ class SubscriptionClient:
     def get_subscriptions(self):
         request = GetSubscriptionsRequest()
         response = self.stub.GetSubscriptions(request)
-
-        if response.subscriptions:
+        
+        if len(response.subscriptions) > 0:
             print("\nCurrent Subscriptions:")
             for sub in response.subscriptions:
                 print(f"Email: {sub.email}, Type: {sub.subscription_type}, Is active: {sub.is_active}")
