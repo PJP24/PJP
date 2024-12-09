@@ -7,49 +7,44 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 class UserCrud:
     def __init__(self, db: Database):
-        self.db=db
+        self.db = db
 
     async def read(self, user_id: int):
         try:
-            db = await self.db.get_db()
-            user = await db.scalar(select(User).where(User.id == user_id))
-            return user
-        except SQLAlchemyError:
-            raise
+            async with self.db.session_scope() as session:
+                user = await session.scalar(select(User).where(User.id == user_id))
+                return user
+        except SQLAlchemyError as e:
+            raise e
         # How to handle this on server side?
 
     async def create(self, user):
-        db = await self.get_db()
         try:
-            user_db = User(
-                username=user.username,
-                email=user.email,
-                password=user.password,
-            )
-            db.add(user_db)
-            await db.commit()
-            await db.refresh(user_db)
-            return "success"
+            async with self.db.session_scope() as session:
+                user_db = User(
+                    username=user.username,
+                    email=user.email,
+                    password=user.password,
+                )
+                session.add(user_db)
+                return "success"
         except IntegrityError:
-            await db.rollback()
             return "Account already exists with this username/email."
-        except SQLAlchemyError:
-            raise
+        except SQLAlchemyError as e:
+            raise e
 
     async def update_password(self, user_id: int, new_password: str):
         try:
-            db = await self.get_db()
-            await db.execute(
-                update(User).values(password=new_password).where(User.id == user_id)
-            )
-            await db.commit()
-        except SQLAlchemyError:
-            raise
+            async with self.db.session_scope() as session:
+                await session.execute(
+                    update(User).values(password=new_password).where(User.id == user_id)
+                )
+        except SQLAlchemyError as e:
+            raise e
 
     async def delete(self, user_id: int):
         try:
-            db = await self.get_db()
-            await db.execute(delete(User).where(User.id == user_id))
-            await db.commit()
-        except SQLAlchemyError:
-            raise
+            async with self.db.session_scope() as session:
+                await session.execute(delete(User).where(User.id == user_id))
+        except SQLAlchemyError as e:
+            raise e

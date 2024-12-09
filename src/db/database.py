@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from src.db.models import Base
+from contextlib import asynccontextmanager
 
 
 class Database:
@@ -15,7 +16,14 @@ class Database:
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    async def get_db(self):
-        async with self.async_session() as db:
-            return db
-        
+    @asynccontextmanager
+    async def session_scope(self):
+        async with self.async_session() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+            finally:
+                await session.close()
