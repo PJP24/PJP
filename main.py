@@ -10,12 +10,6 @@ import config
 
 DB_URL = config.DB_URL
 
-async def init_db():
-    database = Database(database_url=DB_URL)
-    await database.init_database()
-
-    return database
-
 
 async def serve(db: Database):
     server = grpc.aio.server()
@@ -31,7 +25,7 @@ async def serve(db: Database):
 
 
 async def main():
-    db = await init_db()
+    db = Database(database_url=DB_URL)
     await serve(db=db)
 
 
