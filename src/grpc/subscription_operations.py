@@ -30,10 +30,8 @@ async def create_subscription(session: AsyncSession, email: str, subscription_ty
     session.add(Subscription(email=email, subscription_type=subscription_type))
 
     try:
-        await session.commit()
         return CreateSubscriptionResponse(message="\nSubscription created")
     except SQLAlchemyError as e:
-        await session.rollback()
         return CreateSubscriptionResponse(message=f"\nFailed to create subscription: {str(e)}")
 
 async def get_subscriptions(session: AsyncSession):
@@ -55,12 +53,10 @@ async def change_subscription(session: AsyncSession, email: str, new_subscriptio
     subscription.subscription_type = new_subscription
 
     try:
-        await session.commit()
         return ChangeSubscriptionResponse(
             message=f"\nSubscription for {email} updated to {new_subscription}."
         )
     except SQLAlchemyError as e:
-        await session.rollback()
         return ChangeSubscriptionResponse(message=f"\nFailed to change subscription: {str(e)}")
 
 async def delete_subscription(session: AsyncSession, email: str):
@@ -74,10 +70,8 @@ async def delete_subscription(session: AsyncSession, email: str):
     await session.delete(subscription)
 
     try:
-        await session.commit()
         return DeleteSubscriptionResponse(message="\nSubscription deleted.")
     except SQLAlchemyError as e:
-        await session.rollback()
         return DeleteSubscriptionResponse(message=f"\nFailed to delete subscription: {str(e)}")
 
 async def activate_subscription(session: AsyncSession, email: str):
@@ -94,10 +88,8 @@ async def activate_subscription(session: AsyncSession, email: str):
     subscription.is_active = True
 
     try:
-        await session.commit()
         return ActivateSubscriptionResponse(message=f"\nSubscription for email {email} was activated.")
     except SQLAlchemyError as e:
-        await session.rollback()
         return ActivateSubscriptionResponse(message=f"\nFailed to activate subscription: {str(e)}")
 
 async def deactivate_subscription(session: AsyncSession, email: str):
@@ -114,8 +106,6 @@ async def deactivate_subscription(session: AsyncSession, email: str):
     subscription.is_active = False
 
     try:
-        await session.commit()
         return DeactivateSubscriptionResponse(message=f"\nSubscription for email {email} was deactivated.")
     except SQLAlchemyError as e:
-        await session.rollback()
         return DeactivateSubscriptionResponse(message=f"\nFailed to deactivate subscription: {str(e)}")
