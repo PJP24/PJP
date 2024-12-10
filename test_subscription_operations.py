@@ -9,6 +9,8 @@ from src.grpc.subscription_operations import (
     get_subscriptions,
     change_subscription,
     delete_subscription,
+    activate_subscription,
+    deactivate_subscription,
 )
 
 # Create
@@ -161,7 +163,105 @@ async def test_delete_subscription_with_database_error_expect_failure():
     assert response.message == "\nFailed to delete subscription: Database error."
 
 
-
-# TODO
 # Activate
+@pytest.mark.asyncio
+async def test_activate_subscription_with_no_subscription_found_expect_no_subscription_message():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = None
+    mock_session.execute.return_value = mock_execute
+    
+    response = await activate_subscription(mock_session, "any@email.com")
+        
+    assert response.message == "\nNo subscription with this email."    
+
+@pytest.mark.asyncio
+async def test_activate_subscription_with_active_subscription_found_expect_subscription_already_active_message():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = Subscription(email="doesnt@matter.com", subscription_type="who_cares", is_active=True)
+    mock_session.execute.return_value = mock_execute
+    
+    response = await activate_subscription(mock_session, "doesnt@matter.com")
+        
+    assert response.message == "\nThe subscription for this email is already active."    
+
+@pytest.mark.asyncio
+async def test_activate_subscription_with_non_active_existing_subscription_found_expect_success_message_subscription_activated():
+
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = Subscription(email="doesnt@matter.com", subscription_type="who_cares", is_active=False)
+    mock_session.execute.return_value = mock_execute
+    
+    response = await activate_subscription(mock_session, "doesnt@matter.com")
+        
+    assert response.message == "\nSubscription for email doesnt@matter.com was activated."    
+    
+    assert mock_session.execute.call_count == 2
+
+@pytest.mark.asyncio
+async def test_activate_subscription_with_database_error_expect_failure():
+    mock_session = MagicMock(spec=AsyncSession)
+    mock_execute = MagicMock()
+    mock_session.execute.return_value = mock_execute
+    mock_session.execute.side_effect = SQLAlchemyError("Database error")
+
+    response = await activate_subscription(mock_session, "valid@email.com")
+
+    assert response.message == "\nFailed to activate subscription: Database error."
+
+
 # Deactivate
+@pytest.mark.asyncio
+async def test_deactivate_subscription_with_no_subscription_found_expect_no_subscription_message():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = None
+    mock_session.execute.return_value = mock_execute
+    
+    response = await deactivate_subscription(mock_session, "any@email.com")
+        
+    assert response.message == "\nNo subscription with this email."   
+
+
+@pytest.mark.asyncio
+async def test_deactivate_subscription_with_not_active_subscription_expect_no_subscription_message():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = Subscription(email="doesnt@matter.com", subscription_type="who_cares", is_active=False)
+    mock_session.execute.return_value = mock_execute
+    
+    response = await deactivate_subscription(mock_session, "any@email.com")
+
+    assert response.message == "\nThe subscription for this email is not active."   
+
+@pytest.mark.asyncio
+async def test_deactivate_subscription_with_active_subscription_expect_success_message_and_subscription_deactivated():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = Subscription(email="doesnt@matter.com", subscription_type="who_cares", is_active=True)
+    mock_session.execute.return_value = mock_execute
+    
+    response = await deactivate_subscription(mock_session, "any@email.com")
+
+    assert response.message == "\nSubscription for email any@email.com was deactivated."
+
+    assert mock_session.execute.call_count == 2
+
+@pytest.mark.asyncio
+async def test_deactivate_subscription_with_database_error_expect_failure():
+    mock_session = MagicMock(spec=AsyncSession)
+    mock_execute = MagicMock()
+    mock_session.execute.return_value = mock_execute
+    mock_session.execute.side_effect = SQLAlchemyError("Database error")
+
+    response = await deactivate_subscription(mock_session, "valid@email.com")
+
+    assert response.message == "\nFailed to deactivate subscription: Database error."
