@@ -49,11 +49,10 @@ async def change_subscription(session: AsyncSession, email: str, new_subscriptio
             await session.execute(sa.select(Subscription).filter_by(email=email))
         ).scalars().first()
 
-        if not subscription:
+        if subscription is None:
             return ChangeSubscriptionResponse(message="\nNo subscription with this email.")
 
         subscription.subscription_type = new_subscription
-
 
         return ChangeSubscriptionResponse(
             message=f"\nSubscription for {email} updated to {new_subscription}."
