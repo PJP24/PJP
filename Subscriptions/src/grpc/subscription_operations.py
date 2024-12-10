@@ -86,17 +86,21 @@ async def activate_subscription(session: AsyncSession, email: str):
             await session.execute(sa.select(Subscription).filter_by(email=email))
         ).scalars().first()
 
-        if not subscription:
+        if subscription is None:
             return ActivateSubscriptionResponse(message="\nNo subscription with this email.")
 
         if subscription.is_active:
             return ActivateSubscriptionResponse(message="\nThe subscription for this email is already active.")
 
-        subscription.is_active = True
+        await session.execute(
+            sa.update(Subscription)
+            .where(Subscription.email == email)
+            .values(is_active=True)
+        )
 
         return ActivateSubscriptionResponse(message=f"\nSubscription for email {email} was activated.")
     except SQLAlchemyError as e:
-        return ActivateSubscriptionResponse(message=f"\nFailed to activate subscription: {str(e)}")
+        return ActivateSubscriptionResponse(message=f"\nFailed to activate subscription: {str(e)}.")
 
 async def deactivate_subscription(session: AsyncSession, email: str):
     try:
@@ -104,14 +108,19 @@ async def deactivate_subscription(session: AsyncSession, email: str):
             await session.execute(sa.select(Subscription).filter_by(email=email))
         ).scalars().first()
 
-        if not subscription:
+        if subscription is None:
             return DeactivateSubscriptionResponse(message="\nNo subscription with this email.")
 
         if not subscription.is_active:
             return DeactivateSubscriptionResponse(message="\nThe subscription for this email is not active.")
 
-        subscription.is_active = False
+        await session.execute(
+            sa.update(Subscription)
+            .where(Subscription.email == email)
+            .values(is_active=False)
+        )
+
         return DeactivateSubscriptionResponse(message=f"\nSubscription for email {email} was deactivated.")
     
     except SQLAlchemyError as e:
-        return DeactivateSubscriptionResponse(message=f"\nFailed to deactivate subscription: {str(e)}")
+        return DeactivateSubscriptionResponse(message=f"\nFailed to deactivate subscription: {str(e)}.")
