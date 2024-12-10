@@ -52,13 +52,17 @@ async def change_subscription(session: AsyncSession, email: str, new_subscriptio
         if subscription is None:
             return ChangeSubscriptionResponse(message="\nNo subscription with this email.")
 
-        subscription.subscription_type = new_subscription
+        await session.execute(
+            sa.update(Subscription)
+            .where(Subscription.email == email)
+            .values(subscription_type=new_subscription)
+        )
 
         return ChangeSubscriptionResponse(
             message=f"\nSubscription for {email} updated to {new_subscription}."
         )
     except SQLAlchemyError as e:
-        return ChangeSubscriptionResponse(message=f"\nFailed to change subscription: {str(e)}")
+        return ChangeSubscriptionResponse(message=f"\nFailed to change subscription: {str(e)}.")
 
 async def delete_subscription(session: AsyncSession, email: str):
     try:
@@ -74,7 +78,7 @@ async def delete_subscription(session: AsyncSession, email: str):
         return DeleteSubscriptionResponse(message="\nSubscription deleted.")
     
     except SQLAlchemyError as e:
-        return DeleteSubscriptionResponse(message=f"\nFailed to delete subscription: {str(e)}")
+        return DeleteSubscriptionResponse(message=f"\nFailed to delete subscription: {str(e)}.")
 
 async def activate_subscription(session: AsyncSession, email: str):
     try:
