@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, AsyncMock
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.model import Subscription
 from sqlalchemy.exc import SQLAlchemyError
@@ -8,9 +8,10 @@ from src.grpc.subscription_operations import (
     create_subscription,
     get_subscriptions,
     change_subscription,
+    delete_subscription,
 )
 
-
+# Create
 @pytest.mark.asyncio
 async def test_create_subscription_with_existing_email_expect_subscription_exists_error():
     mock_session = MagicMock(spec=AsyncSession)
@@ -36,7 +37,6 @@ async def test_create_subscription_with_invalid_email_expect_invalid_email_error
         
     assert response.message == "\nInvalid email format."
     mock_validate_email.assert_called_once_with("@invalid@email.com")
-
 
 @pytest.mark.asyncio
 async def test_create_subscription_with_valid_email_expect_success():
@@ -66,6 +66,7 @@ async def test_create_subscription_with_database_error_expect_failure():
     assert response.message == "\nFailed to create subscription: Database error."
 
 
+# Read
 @pytest.mark.asyncio
 async def test_get_subscriptions_expect_success():
     mock_session = MagicMock(spec=AsyncSession)
@@ -82,6 +83,7 @@ async def test_get_subscriptions_expect_success():
     assert len(response.subscriptions) == 2
 
 
+# Update
 @pytest.mark.asyncio
 async def test_change_subscription_with_no_subscription_found_expect_no_subscription_message():
     mock_session = MagicMock(spec=AsyncSession)
@@ -94,38 +96,72 @@ async def test_change_subscription_with_no_subscription_found_expect_no_subscrip
     
     assert response.message == "\nNo subscription with this email."
 
-
 @pytest.mark.asyncio
-async def test_change_subscription_with_existing_subscription_expect_subscription_deleted_success_message():
+async def test_change_subscription_with_existing_subscription_expect_subscription_changed_success_message():
     mock_session = MagicMock(spec=AsyncSession)
     
     mock_execute = MagicMock()
     mock_execute.scalars.return_value.first.return_value = Subscription(email="some@email.com", subscription_type="monthly")
-    mock_session.execute.return_value = mock_execute
-
+    mock_session.execute = AsyncMock(return_value=mock_execute)
+    
     response = await change_subscription(mock_session, "some@email.com", "yearly")
     
     assert response.message == "\nSubscription for some@email.com updated to yearly."
-
-    # Maybe we need to assert there is an actual change in the database. But how?
-
+    assert mock_session.execute.call_count == 2
 
 @pytest.mark.asyncio
 async def test_change_subscription_with_database_error_expect_failure():
+    mock_session = MagicMock(spec=AsyncSession)
+    mock_execute = MagicMock()
+    mock_session.execute.return_value = mock_execute
+    mock_session.execute.side_effect = SQLAlchemyError("Database error")
+
+    response = await change_subscription(mock_session, "valid@email.com", "yearly")
+
+    assert response.message == "\nFailed to change subscription: Database error."
+
+
+# Delete
+@pytest.mark.asyncio
+async def test_delete_subscription_with_no_subscription_found_expect_no_subscription_message():
+    
     mock_session = MagicMock(spec=AsyncSession)
     
     mock_execute = MagicMock()
     mock_execute.scalars.return_value.first.return_value = None
     mock_session.execute.return_value = mock_execute
 
-    mock_session.add.side_effect = SQLAlchemyError("Database error")
+    response = await delete_subscription(mock_session, "nonexistent@email.com")
+    
+    assert response.message == "\nNo subscription with this email."
 
-    response = await create_subscription(mock_session, "valid@email.com", "monthly")
+@pytest.mark.asyncio
+async def test_delete_subscription_with_existing_subscription_expect_subscription_deleted_success_message():
+    mock_session = MagicMock(spec=AsyncSession)
+    
+    mock_execute = MagicMock()
+    mock_execute.scalars.return_value.first.return_value = Subscription(email="some@email.com", subscription_type="monthly")
+    mock_session.execute.return_value = mock_execute
 
-    assert response.message == "\nFailed to create subscription: Database error."
+    response = await delete_subscription(mock_session, "some@email.com")
+    
+    assert response.message == "\nSubscription deleted."
+
+    mock_session.delete.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_delete_subscription_with_database_error_expect_failure():
+    mock_session = MagicMock(spec=AsyncSession)
+    mock_execute = MagicMock()
+    mock_session.execute.return_value = mock_execute
+    mock_session.execute.side_effect = SQLAlchemyError("Database error")
+
+    response = await delete_subscription(mock_session, "valid@email.com")
+
+    assert response.message == "\nFailed to delete subscription: Database error."
+
 
 
 # TODO
-# Delete
 # Activate
 # Deactivate
