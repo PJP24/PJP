@@ -15,3 +15,7 @@ api:
 
 servers:
 	@python servers.py
+
+test:
+	@coverage run --omit="grpc_gen/*,api_services/*" -m unittest discover
+	@coverage report

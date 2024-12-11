@@ -13,10 +13,13 @@ class UserServiceAPI:
                 stub = UserServiceStub(channel)
                 request = UserRequest(user_id=user_id)
                 response = await stub.GetUserDetails(request)
-                if response.user_id:
+
+                if response.user_id is not None and response.user_id != "":
                     return {'user_id': response.user_id, 'name': response.name, 'email': response.email}
                 return {"error": "User not found"}
+
         except grpc.aio.AioRpcError as e:
             return {"error": f"An error occurred while fetching user data: No such User ID"}
+
         except Exception as e:
             return {"error": f"Unexpected error: {str(e)}"}

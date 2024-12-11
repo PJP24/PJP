@@ -13,10 +13,12 @@ class SubscriptionServiceAPI:
                 stub = SubscriptionServiceStub(channel)
                 request = SubscriptionRequest(user_id=user_id)
                 response = await stub.GetSubscriptionDetails(request)
-                if response.user_id:
+                if response.user_id is not None and response.user_id != "":
                     return {'subscription_type': response.subscription_type, 'period': response.period}
                 return {"error": "Subscription not found"}
+
         except grpc.aio.AioRpcError as e:
             return {"error": f"An error occurred while fetching subscription data: {e.details()}"}
+
         except Exception as e:
             return {"error": f"Unexpected error: {str(e)}"}

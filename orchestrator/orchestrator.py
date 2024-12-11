@@ -7,14 +7,24 @@ class Orchestrator:
         self.get_subscription_service_api = get_subscription_service_api()
 
     async def execute(self, user_id: str) -> Dict[str, Union[str, Dict[str, str]]]:
-        user_data = await self.get_user_service_api.fetch_user_data(user_id)
-        subscription_data = await self.get_subscription_service_api.fetch_subscription_data(user_id)
+        errors = []
 
-        if 'error' in user_data:
-            return {"error": user_data['error']}
+        try:
+            user_data = await self.get_user_service_api.fetch_user_data(user_id)
+            if 'error' in user_data:
+                errors.append(user_data['error'])
+        except Exception as e:
+            errors.append(f"An error occurred while fetching user data: {str(e)}")
 
-        if 'error' in subscription_data:
-            return {"error": subscription_data['error']}
+        try:
+            subscription_data = await self.get_subscription_service_api.fetch_subscription_data(user_id)
+            if 'error' in subscription_data:
+                errors.append(subscription_data['error'])
+        except Exception as e:
+            errors.append(f"An error occurred while fetching subscription data: {str(e)}")
+
+        if errors:
+            return {"error": " | ".join(errors)}
 
         combined_response = {
             "user_id": user_data['user_id'],

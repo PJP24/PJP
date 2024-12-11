@@ -13,7 +13,7 @@ class UserService(user_pb2_grpc.UserServiceServicer):
         user_id = request.user_id
         user_data = USER_DB.get(user_id)
 
-        if user_data:
+        if user_data is not None and user_data != {}:
             return user_pb2.UserResponse(
                 user_id=user_data["user_id"],
                 name=user_data["name"],
@@ -32,7 +32,7 @@ class SubscriptionService(subscription_pb2_grpc.SubscriptionServiceServicer):
         user_id = request.user_id
         subscription_data = SUBSCRIPTIONS_DB.get(user_id)
 
-        if subscription_data:
+        if subscription_data is not None and subscription_data != {}:
             return subscription_pb2.SubscriptionResponse(
                 user_id=subscription_data["user_id"],
                 subscription_type=subscription_data["subscription_type"],

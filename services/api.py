@@ -8,8 +8,11 @@ app = Flask(__name__)
 @app.route('/orchestrate', methods=['POST'])
 async def orchestrate() -> Response:
     data = request.json
+    if data is None:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
     user_id = data.get('user_id')
-    if not user_id:
+    if user_id is None or user_id == '':
         return jsonify({'error': 'user_id is required'}), 400
 
     orchestrator = Orchestrator()
