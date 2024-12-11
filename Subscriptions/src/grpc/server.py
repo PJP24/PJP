@@ -41,7 +41,7 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Cancel your subscription anytime to stop future charges.\n"
             "1. Press 5\n"
             "2. Enter thr email you subscribed with\n"
-            "Done ! Activate your subscription again any time."
+            "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
 
