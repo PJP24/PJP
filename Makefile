@@ -10,7 +10,7 @@ test:
 	@coverage report
 
 docker_stop:
-	@docker-compose down --remove-orphans
+	@/bin/sh clear_docker_data.sh
 
 docker_start:
-	@docker compose up --build
+	@docker-compose up --build
