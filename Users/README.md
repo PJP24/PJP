@@ -1,11 +1,7 @@
 # Steps to start the users server
 
-### Create and start venv:
-```make init ```
-
-### Install requirements:
-```pip3 install -r requirements.txt```
-
+### Set Users directory
+```cd Users ```
 
 ### Run the containers which will start the DB and the users server:
 ``` docker-compose up --build -d ```
