@@ -13,6 +13,7 @@ Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg:/
 ## 3. Build and Start Docker Containers:
 ```bash
 make containers (docker-compose up --build -d)
+```
 
 ## 4. Run Alembic Migrations:
 ```bash
