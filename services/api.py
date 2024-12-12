@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route('/orchestrate', methods=['POST'])
 async def orchestrate() -> Response:
+
     data = request.json
     if data is None:
         return jsonify({'error': 'Request body must be JSON'}), 400
@@ -15,12 +16,16 @@ async def orchestrate() -> Response:
     if user_id is None or user_id == '':
         return jsonify({'error': 'user_id is required'}), 400
 
+
     orchestrator = Orchestrator()
+
+
     try:
         result = await orchestrator.execute(user_id)
         if 'error' in result:
             return jsonify(result), 400
         return jsonify(result)
+
     except Exception as e:
         return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
 

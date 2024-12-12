@@ -13,7 +13,7 @@ class TestFactories(unittest.TestCase):
         result = get_user_service_api()
 
         self.assertEqual(result, mock_instance)
-        MockUserServiceAPI.assert_called_once_with(host="localhost:50051")
+        MockUserServiceAPI.assert_called_once_with(host="user_service:50051")
 
     @patch('orchestrator.factories.SubscriptionServiceAPI')
     def test_get_subscription_service_api(self, MockSubscriptionServiceAPI):
@@ -23,7 +23,7 @@ class TestFactories(unittest.TestCase):
         result = get_subscription_service_api()
 
         self.assertEqual(result, mock_instance)
-        MockSubscriptionServiceAPI.assert_called_once_with(host="localhost:50052")
+        MockSubscriptionServiceAPI.assert_called_once_with(host="subscription_service:50052")
 
 
 if __name__ == '__main__':
