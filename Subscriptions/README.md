@@ -1,6 +1,7 @@
-Terminal Commands to Run Subscriptions Service
+###Terminal Commands to Run Subscriptions Service
 
-1. Navigate to Subscriptions Directory:
+## 1. Navigate to Subscriptions Directory:
+```bash
 cd Subscriptions
 
 2. Add .env File:
