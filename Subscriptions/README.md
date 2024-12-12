@@ -16,7 +16,7 @@ pip3 install -r requirements.txt
 Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgresql_service:5432/grpc_database_max
 
 6. Build and Start Docker Containers:
-docker-compose up --build -d
+make containers (docker-compose up --build -d)
 
 7. Run Alembic Migrations:
 alembic upgrade head
