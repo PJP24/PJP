@@ -3,6 +3,7 @@
 ## 1. Navigate to Subscriptions Directory:
 ```bash
 cd Subscriptions
+```
 
 2. Add .env File:
 Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgresql_service:5432/grpc_database_max
