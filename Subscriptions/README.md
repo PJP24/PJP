@@ -7,7 +7,12 @@ add .env with: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgr
 
 make containers (docker-compose up --build -d)
 
-make client
+
+alembic revision --autogenerate -m "create subscriptions table"
+
+alembic upgrade head
+
+make client (python client.py)
 
 
 
