@@ -1,34 +1,22 @@
-Terminal commands to run Subscriptions service:
+Terminal Commands to Run Subscriptions Service
 
-
+1. Navigate to Subscriptions Directory:
 cd Subscriptions
 
-add .env with: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgresql_service:5432/grpc_database_max
+2. Create Virtual Environment:
+python3 -m venv venv
 
-make containers (docker-compose up --build -d)
+3. Activate the Virtual Environment:
+source venv/bin/activate
 
+4. Install Required Dependencies:
+pip3 install -r requirements.txt
 
-alembic revision --autogenerate -m "create subscriptions table"
+5. Add .env File:
+Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgresql_service:5432/grpc_database_max
 
+6. Build and Start Docker Containers:
+docker-compose up --build -d
+
+7. Run Alembic Migrations:
 alembic upgrade head
-
-make client (python client.py)
-
-
-
-If needed:
-
-Create the db from PGAdmin
-
-Login to PDAdmin using those credentials:
-email: admin@admin.com
-password: admin_password
-
-
-Create a server:
-Use any server name (for example: Server 1)
-
-Host name/address: postgresql_service
-Port: 5432
-Username: maxim
-Password: my_secret_password
