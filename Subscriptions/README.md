@@ -7,7 +7,7 @@ cd Subscriptions
 
 ## 2. Add .env File:
 ```bash
-Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg://maxim:my_secret_password@postgresql_service:5432/grpc_database_max
+Create a .env file with the following content: DATABASE_URL=postgresql+asyncpg://user_1:my_secret_password@postgresql_service:5432/grpc_database
 ```
 
 ## 3. Build and Start Docker Containers:
