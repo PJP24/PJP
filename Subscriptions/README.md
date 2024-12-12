@@ -1,4 +1,4 @@
-### Terminal Commands to Run Subscriptions Service
+# Terminal Commands to Run Subscriptions Service
 
 ## 1. Navigate to Subscriptions Directory:
 ```bash
