@@ -6,6 +6,7 @@ service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
   rpc ChangeSubscription (ChangeSubscriptionRequest) returns (ChangeSubscriptionResponse);
+  rpc OptOutPolicy (OptOutPolicyRequest) returns (OptOutPolicyResponse);
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
@@ -50,6 +51,12 @@ message ActivateSubscriptionRequest {
 }
 message ActivateSubscriptionResponse {
   string message = 1;
+}
+
+// OptOutPolicy
+message OptOutPolicyRequest {}
+message OptOutPolicyResponse {
+  string policy = 1;
 }
 
 // Deactivate

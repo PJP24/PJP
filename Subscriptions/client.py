@@ -5,6 +5,7 @@ from src.grpc.generated.subscription_pb2 import (
     ChangeSubscriptionRequest,
     DeleteSubscriptionRequest,
     ActivateSubscriptionRequest, 
+    OptOutPolicyRequest,
     DeactivateSubscriptionRequest,
 )
 from src.grpc.generated.subscription_pb2_grpc import SubscriptionServiceStub
@@ -58,6 +59,12 @@ class SubscriptionClient:
         response = self.stub.ActivateSubscription(request)
 
         print(response.message)
+    
+    def opt_out_policy(self):
+        request = OptOutPolicyRequest()
+        response = self.stub.OptOutPolicy(request)
+
+        print(response.policy)
 
     def deactivate_subscription(self):
         email = input("Enter email to deactivate subscription: ")
@@ -75,10 +82,11 @@ class SubscriptionClient:
             print("3. Change existing subscription")
             print("4. Delete existing subscription")
             print("5. Activate subscription")
-            print("6. Deactivate subscription")
-            print("7. Exit\n")
+            print("6. Opt-Out Policy")
+            print("7. Deactivate subscription")
+            print("8. Exit\n")
 
-            choice = input("Enter your choice (1/2/3/4/5/6/7): ")
+            choice = input("Enter your choice (1/2/3/4/5/6/7/8): ")
 
             if choice == '1':
                 self.create_subscription()
@@ -91,12 +99,14 @@ class SubscriptionClient:
             elif choice == '5':
                 self.activate_subscription()
             elif choice == '6':
-                self.deactivate_subscription()
+                self.opt_out_policy()
             elif choice == '7':
+                self.deactivate_subscription()
+            elif choice == '8':
                 print("Exiting...")
                 break
             else:
-                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6 or 7.\n")
+                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6, 7 or 8.\n")
 
 if __name__ == '__main__':
     client = SubscriptionClient()
