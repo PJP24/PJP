@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package subscription_service;
+
+service SubscriptionService {
+    rpc GetSubscriptionDetails(SubscriptionRequest) returns (SubscriptionResponse);
+}
+
+message SubscriptionRequest {
+    string user_id = 1;
+}
+
+message SubscriptionResponse {
+    string user_id = 1;
+    string subscription_type = 2;
+    string period = 3;
+}
