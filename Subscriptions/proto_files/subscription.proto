@@ -10,6 +10,7 @@ service SubscriptionService {
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
+  rpc GetSubscriptionsDynamoDB (GetSubscriptionsDynamoDBRequest) returns (GetSubscriptionsDynamoDBResponse);
 }
 
 // Create
@@ -71,4 +72,10 @@ message Subscription {
   string email = 1;
   string subscription_type = 2;
   bool is_active = 3;
+}
+
+// Read DynamoDB
+message GetSubscriptionsDynamoDBRequest {}
+message GetSubscriptionsDynamoDBResponse {
+  repeated Subscription subscriptions = 1;
 }

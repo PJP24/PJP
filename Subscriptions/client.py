@@ -7,6 +7,7 @@ from src.grpc.generated.subscription_pb2 import (
     ActivateSubscriptionRequest, 
     OptOutPolicyRequest,
     DeactivateSubscriptionRequest,
+    GetSubscriptionsDynamoDBRequest,
 )
 from src.grpc.generated.subscription_pb2_grpc import SubscriptionServiceStub
 
@@ -73,6 +74,18 @@ class SubscriptionClient:
         response = self.stub.DeactivateSubscription(request)
 
         print(response.message)
+    
+    def get_subscriptions_dynamodb(self):
+        request = GetSubscriptionsDynamoDBRequest()
+        response = self.stub.GetSubscriptionsDynamoDB(request)
+
+        if len(response.subscriptions) > 0:
+            print("\nCurrent Subscriptions:")
+            for sub in response.subscriptions:
+                print(f"Email: {sub.email}, Type: {sub.subscription_type}, Is active: {sub.is_active}")
+        else:
+            print("No subscriptions found.")
+
 
     def main(self):
         while True:
@@ -84,9 +97,10 @@ class SubscriptionClient:
             print("5. Activate subscription")
             print("6. Opt-Out Policy")
             print("7. Deactivate subscription")
-            print("8. Exit\n")
+            print("8. View all subscriptions (DynamoDB)")
+            print("9. Exit\n")
 
-            choice = input("Enter your choice (1/2/3/4/5/6/7/8): ")
+            choice = input("Enter your choice (1/2/3/4/5/6/7/8/9): ")
 
             if choice == '1':
                 self.create_subscription()
@@ -102,11 +116,15 @@ class SubscriptionClient:
                 self.opt_out_policy()
             elif choice == '7':
                 self.deactivate_subscription()
+
             elif choice == '8':
+                self.get_subscriptions_dynamodb()
+
+            elif choice == '9':
                 print("Exiting...")
                 break
             else:
-                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6, 7 or 8.\n")
+                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6, 7, 8 or 9.\n")
 
 if __name__ == '__main__':
     client = SubscriptionClient()

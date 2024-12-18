@@ -10,6 +10,28 @@ from src.grpc.generated.subscription_pb2 import (
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
+    GetSubscriptionsDynamoDBResponse
+)
+
+import asyncio
+import os
+from dotenv import load_dotenv
+from src.db.database import Database
+import boto3
+from src.db.model import Subscription
+
+load_dotenv()
+
+AWS_REGION = os.getenv("AWS_REGION")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+# Connect to DynamoDB
+dynamodb = boto3.resource(
+    'dynamodb',
+    region_name=AWS_REGION,
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
 )
 
 def validate_email(email: str) -> bool:
@@ -124,3 +146,16 @@ async def deactivate_subscription(session: AsyncSession, email: str):
     
     except SQLAlchemyError as e:
         return DeactivateSubscriptionResponse(message=f"\nFailed to deactivate subscription: {str(e)}.")
+
+
+async def get_subscriptions_dynamodb(session: AsyncSession):
+    subscriptions_table = dynamodb.Table('Subscriptions')
+
+    response = subscriptions_table.scan()
+
+    subscriptions = [Subscription(**item) for item in response['Items']]
+
+    response = GetSubscriptionsDynamoDBResponse()
+    for sub in subscriptions:
+        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active)
+    return response
