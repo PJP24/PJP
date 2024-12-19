@@ -10,7 +10,7 @@ from src.grpc.generated.subscription_pb2 import (
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
-    GetSubscriptionsDynamoDBResponse
+    GetSubscriptionsDynamoDBResponse,
 )
 
 import asyncio
@@ -159,3 +159,13 @@ async def get_subscriptions_dynamodb(session: AsyncSession):
     for sub in subscriptions:
         response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active)
     return response
+
+async def create_subscription_dynamodb(session: AsyncSession, email: str, subscription_type: str, is_active: bool):
+    subscriptions_table = dynamodb.Table('Subscriptions')
+    try:
+        subscriptions_table.put_item(Item={'email': email, 'subscription_type': subscription_type, 'is_active': is_active})
+        return CreateSubscriptionResponse(message=f"Subscription for {email} created successfully in DynamoDB.")
+    except Exception as e:
+        return CreateSubscriptionResponse(message=f"Error creating subscription: {str(e)}")
+
+    
