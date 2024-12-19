@@ -85,6 +85,9 @@ class SubscriptionClient:
                 print(f"Email: {sub.email}, Type: {sub.subscription_type}, Is active: {sub.is_active}")
         else:
             print("No subscriptions found.")
+        
+    def create_subscription_dynamodb(self):
+        pass
 
 
     def main(self):
@@ -98,9 +101,10 @@ class SubscriptionClient:
             print("6. Opt-Out Policy")
             print("7. Deactivate subscription")
             print("8. View all subscriptions (DynamoDB)")
-            print("9. Exit\n")
+            print("9. Create new subscription (DynamoDB)")
+            print("Type 'exit' to return to the terminal.\n")
 
-            choice = input("Enter your choice (1/2/3/4/5/6/7/8/9): ")
+            choice = input("Enter your choice (1/2/3/4/5/6/7/8/9/exit): ")
 
             if choice == '1':
                 self.create_subscription()
@@ -121,10 +125,13 @@ class SubscriptionClient:
                 self.get_subscriptions_dynamodb()
 
             elif choice == '9':
+                self.create_subscription_dynamodb()
+
+            elif choice == 'exit':
                 print("Exiting...")
                 break
             else:
-                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6, 7, 8 or 9.\n")
+                print("Invalid choice. Please choose 1, 2, 3, 4, 5, 6, 7, 8, 9 or exit.\n")
 
 if __name__ == '__main__':
     client = SubscriptionClient()

@@ -21,4 +21,4 @@ clear_docker_data:
 	@/bin/sh scripts/clear_docker_data.sh
 
 containers:
-	docker-compose up --build -d
+	cd docker && docker-compose up --build -d
