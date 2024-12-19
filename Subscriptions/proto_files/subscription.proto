@@ -11,6 +11,7 @@ service SubscriptionService {
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
   rpc GetSubscriptionsDynamoDB (GetSubscriptionsDynamoDBRequest) returns (GetSubscriptionsDynamoDBResponse);
+  rpc CreateSubscriptionDynamoDB (CreateSubscriptionDynamoDBRequest) returns (CreateSubscriptionDynamoDBResponse);
 }
 
 // Create
@@ -78,4 +79,14 @@ message Subscription {
 message GetSubscriptionsDynamoDBRequest {}
 message GetSubscriptionsDynamoDBResponse {
   repeated Subscription subscriptions = 1;
+}
+
+// Create in DynamoDB
+message CreateSubscriptionDynamoDBRequest {
+  string email = 1;
+  string subscription_type = 2;
+  bool is_active = 3;
+}
+message CreateSubscriptionDynamoDBResponse {
+  string message = 1;
 }

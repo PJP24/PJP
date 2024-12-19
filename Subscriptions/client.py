@@ -8,6 +8,7 @@ from src.grpc.generated.subscription_pb2 import (
     OptOutPolicyRequest,
     DeactivateSubscriptionRequest,
     GetSubscriptionsDynamoDBRequest,
+    CreateSubscriptionDynamoDBRequest,
 )
 from src.grpc.generated.subscription_pb2_grpc import SubscriptionServiceStub
 
@@ -87,7 +88,16 @@ class SubscriptionClient:
             print("No subscriptions found.")
         
     def create_subscription_dynamodb(self):
-        pass
+        email = input("Enter email: ")
+        subscription_type = input("Enter subscription type (monthly/yearly): ")
+        is_active_str = input("Enter activity status (True/False): ")
+
+        is_active = is_active_str.lower() == 'true'
+
+        request = CreateSubscriptionDynamoDBRequest(email=email, subscription_type=subscription_type, is_active=is_active)
+        response = self.stub.CreateSubscriptionDynamoDB(request)
+        
+        print(response.message)
 
 
     def main(self):
