@@ -9,6 +9,13 @@ from src.grpc.generated.user_pb2 import (
 from src.grpc.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
 from src.grpc.user_crud import UserCrud
+from src.db.dynamodb import (
+    create_activity_log,
+    get_activity_log,
+    create_user,
+    update_user,
+    delete_user,
+)
 
 
 class UserManagement(UserManagementServicer):
@@ -20,6 +27,14 @@ class UserManagement(UserManagementServicer):
         try:
             result = await self.user_crud.create(request)
             if result == "success":
+                await create_activity_log(
+                    username=request.username, event_type="Create User"
+                )
+                await create_user(
+                    username=request.username,
+                    email=request.email,
+                    password=request.password,
+                )
                 return Response(message=f"Created user {request.username}")
             return Response(message=result)
         except RpcError as e:
@@ -32,6 +47,9 @@ class UserManagement(UserManagementServicer):
         if user:
             username = user.username
             email = user.email
+            log_history = await get_activity_log(username)
+            print(log_history)
+            await create_activity_log(username=username, event_type="Read User")
             return UserDetails(username=username, email=email)
         return UserDetails(username="", email="")
 
@@ -43,6 +61,10 @@ class UserManagement(UserManagementServicer):
         else:
             if request.old_password == user.password:
                 await self.user_crud.update_password(user.id, request.new_password)
+                await create_activity_log(
+                    username=user.username, event_type="Update User's Password"
+                )
+                await update_user(username=user.username, password=request.new_password)
                 return Response(
                     message=f"Password successfully updated for user with ID {request.user_id.id}"
                 )
@@ -56,6 +78,8 @@ class UserManagement(UserManagementServicer):
             return Response(message="User not found.")
         if conf:
             await self.user_crud.delete(user.id)
+            await create_activity_log(username=user.username, event_type="Delete User")
+            await delete_user(username=user.username)
             return Response(
                 message=f"User with Id {request.user_id.id} was deleted successfully."
             )
