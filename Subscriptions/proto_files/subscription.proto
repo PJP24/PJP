@@ -12,6 +12,8 @@ service SubscriptionService {
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
   rpc GetSubscriptionsDynamoDB (GetSubscriptionsDynamoDBRequest) returns (GetSubscriptionsDynamoDBResponse);
   rpc CreateSubscriptionDynamoDB (CreateSubscriptionDynamoDBRequest) returns (CreateSubscriptionDynamoDBResponse);
+  rpc DeleteSubscriptionDynamoDB (DeleteSubscriptionDynamoDBRequest) returns (DeleteSubscriptionDynamoDBResponse);  
+  rpc ChangeSubscriptionTypeDynamoDB (ChangeSubscriptionTypeDynamoDBRequest) returns (ChangeSubscriptionTypeDynamoDBResponse);
 }
 
 // Create
@@ -69,12 +71,6 @@ message DeactivateSubscriptionResponse {
   string message = 1;
 }
 
-message Subscription {
-  string email = 1;
-  string subscription_type = 2;
-  bool is_active = 3;
-}
-
 // Read DynamoDB
 message GetSubscriptionsDynamoDBRequest {}
 message GetSubscriptionsDynamoDBResponse {
@@ -89,4 +85,27 @@ message CreateSubscriptionDynamoDBRequest {
 }
 message CreateSubscriptionDynamoDBResponse {
   string message = 1;
+}
+
+// Delete in DynamoDB
+message DeleteSubscriptionDynamoDBRequest {
+  string email = 1;
+}
+message DeleteSubscriptionDynamoDBResponse {
+  string message = 1;
+}
+
+// Edit in DynamoDB 
+message ChangeSubscriptionTypeDynamoDBRequest {
+  string email = 1;
+  string new_subscription_type = 2;
+}
+message ChangeSubscriptionTypeDynamoDBResponse {
+  string message = 1;
+}
+
+message Subscription {
+  string email = 1;
+  string subscription_type = 2;
+  bool is_active = 3;
 }

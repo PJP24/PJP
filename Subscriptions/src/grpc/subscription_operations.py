@@ -11,6 +11,8 @@ from src.grpc.generated.subscription_pb2 import (
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
     GetSubscriptionsDynamoDBResponse,
+    DeleteSubscriptionDynamoDBResponse,
+    ChangeSubscriptionTypeDynamoDBResponse,
 )
 
 import asyncio
@@ -168,4 +170,35 @@ async def create_subscription_dynamodb(session: AsyncSession, email: str, subscr
     except Exception as e:
         return CreateSubscriptionResponse(message=f"Error creating subscription: {str(e)}")
 
+
+async def delete_subscription_dynamodb(session: AsyncSession, email: str):
+    subscriptions_table = dynamodb.Table('Subscriptions')
+    try:
+        item_search = subscriptions_table.get_item(Key={'email': email})
+        
+        if 'Item' not in item_search:
+            return DeleteSubscriptionDynamoDBResponse(message="No subscription found.")
+        
+        subscriptions_table.delete_item(Key={'email': email})
+
+        return DeleteSubscriptionDynamoDBResponse(message="\nSubscription deleted from DynamoDB.")
     
+    except Exception as e:
+        return DeleteSubscriptionDynamoDBResponse(message=f"\nFailed to delete subscription from DynamoDB: {str(e)}.")
+
+async def change_subscription_type_dynamodb(session: AsyncSession, email: str, new_subscription_type: str):
+
+    subscriptions_table = dynamodb.Table('Subscriptions')
+
+    item_search = subscriptions_table.get_item(Key={'email': email})
+        
+    if 'Item' not in item_search:
+        return ChangeSubscriptionTypeDynamoDBResponse(message="No subscription found.")
+        
+    subscriptions_table.update_item(
+        Key={'email': email},
+        UpdateExpression="set subscription_type = :s",
+        ExpressionAttributeValues={":s": new_subscription_type},
+    )
+
+    return ChangeSubscriptionTypeDynamoDBResponse(message=f"Subscription type for {email} updated in DynamoDB.")
