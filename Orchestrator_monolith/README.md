@@ -14,26 +14,19 @@ source venv/bin/activate
 Use the Makefile to install project dependencies:
 make install
 
-4. Generate gRPC Files
-Generate the necessary gRPC files using the Makefile:
-make grpc
+4. Start Colima
+Run 'colima start' in terminal, or install it first
 
-5. Start Docker Containers
-Start the required Docker containers:
-make docker_start
+5. Start Docker containers
+In terminal run 'make start' to start the app
 
-6. (Optional) Stop Docker Containers
-If you need to stop the Docker containers, you can use the following command:
-make docker_stop
-
-7. Test the endpoint in any client with a post request to http://localhost:5001/orchestrate in a json format {
-  "user_id": "1 to 10"
-}
-
+6. Run 'make stop' to stop the containers
 
 Notes
 - Ensure Docker is running on your machine before executing the make docker_start command.
 - This setup assumes you have make installed on your system. If not, install it via your package manager.
+- Run make test to run pytest, if you encounter any issues most likely it's due to the PYTHONPATH import. To fix run: 
+'export PYTHONPATH=$PYTHONPATH:$(pwd)' in current terminal window, then try again.
 
 ---
 
