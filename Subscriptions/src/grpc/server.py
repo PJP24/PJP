@@ -40,8 +40,8 @@ class SubscriptionService(SubscriptionServiceServicer):
         policy_text = (
             "Opt-Out Policy:\n"
             "Cancel your subscription anytime to stop future charges.\n"
-            "1. Press 5\n"
-            "2. Enter thr email you subscribed with\n"
+            "1. Press 7\n"
+            "2. Enter the email you subscribed with\n"
             "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
