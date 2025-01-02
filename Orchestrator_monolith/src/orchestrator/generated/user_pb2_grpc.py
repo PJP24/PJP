@@ -55,7 +55,7 @@ class UserManagementStub(object):
         self.delete = channel.unary_unary(
                 '/UserManagement/delete',
                 request_serializer=user__pb2.DeleteUser.SerializeToString,
-                response_deserializer=user__pb2.Response.FromString,
+                response_deserializer=user__pb2.DeleteResponse.FromString,
                 _registered_method=True)
 
 
@@ -107,7 +107,7 @@ def add_UserManagementServicer_to_server(servicer, server):
             'delete': grpc.unary_unary_rpc_method_handler(
                     servicer.delete,
                     request_deserializer=user__pb2.DeleteUser.FromString,
-                    response_serializer=user__pb2.Response.SerializeToString,
+                    response_serializer=user__pb2.DeleteResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -217,7 +217,7 @@ class UserManagement(object):
             target,
             '/UserManagement/delete',
             user__pb2.DeleteUser.SerializeToString,
-            user__pb2.Response.FromString,
+            user__pb2.DeleteResponse.FromString,
             options,
             channel_credentials,
             insecure,

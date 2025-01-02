@@ -5,6 +5,7 @@ from src.grpc.generated.user_pb2 import (
     UserDetails,
     UpdatePassword,
     DeleteUser,
+    DeleteResponse,
 )
 from src.grpc.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
@@ -49,17 +50,19 @@ class UserManagement(UserManagementServicer):
                 )
             return Response(message="Passwords do not match.")
 
-    async def delete(self, request: DeleteUser, context) -> Response:
+    async def delete(self, request: DeleteUser, context) -> DeleteResponse:
         print(f"Got request to delete user with id {request.user_id.id}")
         user = await self.user_crud.read(request.user_id.id)
         conf = request.confirm_delete
         if user is None:
-            return Response(message="User not found.")
+            return DeleteResponse(status="error", message="User not found.")
         if conf:
             await self.user_crud.delete(user.id)
-            return Response(
-                message=f"User with Id {request.user_id.id} was deleted successfully."
+            return DeleteResponse(
+                status="success",
+                message=f"User with Id {request.user_id.id} was deleted successfully.",
             )
-        return Response(
-            message="Delete confirmation was not received and could not delete user."
+        return DeleteResponse(
+            status="error",
+            message="Delete confirmation was not received and could not delete user.",
         )

@@ -4,7 +4,7 @@ service UserManagement {
     rpc create (User) returns (Response);
     rpc read (Id) returns (UserDetails); 
     rpc update_password (UpdatePassword) returns (Response);
-    rpc delete (DeleteUser) returns (Response);
+    rpc delete (DeleteUser) returns (DeleteResponse);
 
 }
 
@@ -39,3 +39,7 @@ message Response {
     string message = 1;
 }
 
+message DeleteResponse {
+    string status = 1;
+    string message = 2;
+}

@@ -16,12 +16,12 @@ class UserServiceAPI:
             stub = user_pb2_grpc.UserManagementStub(channel)
             try:
                 response = await getattr(stub, method)(request)
-                print(response)
-                return {
-                    # "user_id": response.user_id,
-                    "username": response.username,
-                    "email": response.email,
-                }
+                return response
+                # return {
+                #     # "user_id": response.user_id,
+                #     "username": response.username,
+                #     "email": response.email,
+                # }
             except grpc.RpcError as e:
                 return {"error": f"gRPC error: {e.code()} - {e.details()}"}
             except Exception as e:
@@ -30,17 +30,21 @@ class UserServiceAPI:
 
     async def fetch_user_data(self, user_id: str) -> Dict[str, str]:
         request = user_pb2.Id(id=int(user_id))
-        return await self._make_grpc_call('read', request)
-
+        response = await self._make_grpc_call('read', request)
+        if response.username: 
+            return {
+                    # "user_id": response.user_id,
+                    "username": response.username,
+                    "email": response.email,
+                }
     async def add_user(self, username: str, email: str, password: str) -> Dict[str, str]:
         request = user_pb2.User(username=username, email=email, password=password)
-
         return await self._make_grpc_call('create', request)
 
 #     async def update_user(self, user_id: str, name: str, email: str) -> Dict[str, str]:
 #         request = user_pb2.UserUpdateRequest(user_id=user_id, name=name, email=email)
 #         return await self._make_grpc_call('UpdateUser', request)
 
-#     async def delete_user(self, user_id: str) -> Dict[str, str]:
-#         request = user_pb2.UserRequest(user_id=user_id)
-#         return await self._make_grpc_call('DeleteUser', request)
+    async def delete_user(self, user_id: str, confirmation: bool) -> Dict[str, str]:
+        request = user_pb2.DeleteUser(user_id=(user_pb2.Id(id=int(user_id))), confirm_delete=confirmation)
+        return await self._make_grpc_call('delete', request)
