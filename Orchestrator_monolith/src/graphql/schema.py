@@ -2,11 +2,19 @@
 # from typing import List
 # import requests
 
+
 # @strawberry.type
 # class Subscription:
 #     email: str
 #     subscription_type: str
 #     is_active: str
+
+@strawberry.type
+class User:
+    # user_id: str
+    username: str
+    email: str
+
 
 # @strawberry.type
 # class Query:
@@ -51,20 +59,27 @@
 #         result_info = response.json().get("message", "Unknown result")
 #         return AddSubscriptionResponse(result_info=result_info)
 
-#     @strawberry.mutation
-#     async def change_subscription(self, email: str, subscription_type: str) -> UpdateSubscriptionResponse:
-#         response = requests.put(
-#             "http://fastapi_service:8000/subscriptions",
-#             json={"email": email, "subscription_type": subscription_type},
-#         )
-#         result_info = response.json().get("message", "Unknown result")
-#         return UpdateSubscriptionResponse(result_info=result_info)
 
-#     @strawberry.mutation
-#     async def delete_subscription(self, email: str) -> DeleteSubscriptionResponse:
-#         response = requests.delete(f"http://fastapi_service:8000/subscriptions/{email}")
-#         result_info = response.json().get("message", "Unknown result")
-#         return DeleteSubscriptionResponse(result_info=result_info)
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    async def add_user(self, username: str, email: str, password: str) -> AddUserResponse:
+        orchestrator = Orchestrator()
+        user_data = await orchestrator.add_user(username=username, email=email, password=password)
+
+        if "error" in user_data:
+            print(user_data)
+            return AddUserResponse(
+                status="error",
+                message=user_data.get("error", "An error occurred"),
+                user=None
+            )
+        return AddUserResponse(
+            status="success",
+            message="User successfully added",
+            user=User(**user_data)
+        )
+
 
 #     @strawberry.mutation
 #     async def activate_subscription(self, email: str) -> ActivateSubscriptionResponse:

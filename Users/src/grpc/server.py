@@ -21,6 +21,7 @@ class UserManagement(UserManagementServicer):
             result = await self.user_crud.create(request)
             if result == "success":
                 return Response(message=f"Created user {request.username}")
+            print(result)
             return Response(message=result)
         except RpcError as e:
             print(f"gRPC error: {e}")

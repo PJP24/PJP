@@ -11,12 +11,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH=/app/src/orchestrator/generated:$PYTHONPATH
 
+# ENV PYTHONPATH=/app/src/services/generated:$PYTHONPATH
+
 COPY ../ /app/
 COPY ./proto /app/proto
 
 ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+
 
 EXPOSE 5001
 
