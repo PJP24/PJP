@@ -28,8 +28,8 @@ class UserCrud:
                 )
                 session.add(user_db)
                 return "success"
-        except IntegrityError:
-            return "Account already exists with this username/email."
+        except IntegrityError as e:
+            raise e
         except SQLAlchemyError as e:
             raise e
 

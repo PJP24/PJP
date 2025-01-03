@@ -9,19 +9,6 @@ from src.generated.subscription_pb2 import (
     DeactivateSubscriptionRequest,
 )
 
-# import logging
-# from src.logger.logging_handler import DynamoDBLogHandler
-from src.orchestrator.factories import user_service_api as user_service_api_factory
-from src.orchestrator.factories import subscription_service_api as subscription_service_api_factory
-
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# dynamo_handler = DynamoDBLogHandler()
-# formatter = logging.Formatter('%(message)s')
-# dynamo_handler.setFormatter(formatter)
-# logger.addHandler(dynamo_handler)
-
-
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
         self.host = "subscription_server_container:50052"
@@ -128,8 +115,7 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
-       # import logging
-# from src.logger.logging_handler import DynamoDBLogHandler
+        
 import grpc
 from src.generated.user_pb2_grpc import UserManagementStub
 from src.generated.user_pb2 import Id, User, UpdatePassword
@@ -166,13 +152,11 @@ class Orchestrator:
                 stub = UserManagementStub(channel)
                 user_data = await stub.create(request)
             # if user_data.status == "error":
-            user_data = await self.user_service_api.add_user(username, email, password)
-            # if "error" in user_data:
             #     # logger.error(f"Error adding user: {user_data['error']}")
             #     return {"error": user_data["error"]}
 
             # logger.info(f"User added successfully: {user_data}")
-            return {
+                return {
                     "status": user_data.status,
                     "message": user_data.message,
                     "username": user_data.username,
@@ -202,6 +186,7 @@ class Orchestrator:
         except Exception as e:
             # logger.error(f"Error updating user with user_id {user_id}, name {name}, and email {email}: {e}")
             return {"error": f"Error updating user: {str(e)}"}
+
     async def delete_user(self, user_id: int):
         # logger.info(f"Deleting user with user_id: {user_id}")
         try:
@@ -214,43 +199,6 @@ class Orchestrator:
 
             # logger.info(f"User deleted successfully: {user_data}")
                 return {"status": response.status, "message": response.message}
-        except Exception as e:
-            # logger.error(f"Error deleting user with user_id {user_id}: {e}")
-            return {"error": f"Error deleting user: {str(e)}"}
-    # async def update_user(self, user_id: str, name: str, email: str):
-    #     logger.info(f"Updating user with user_id: {user_id}, name: {name}, email: {email}")
-    #     try:
-    #         user_data = await self.user_service_api.update_user(user_id, name, email)
-    #         if "error" in user_data:
-    #             logger.error(f"Error updating user: {user_data['error']}")
-    #             return {"error": user_data["error"]}
-
-    #         logger.info(f"User updated successfully: {user_data}")
-    #         return user_data
-    #     except Exception as e:
-    #         logger.error(f"Error updating user with user_id {user_id}, name {name}, and email {email}: {e}")
-    #         return {"error": f"Error updating user: {str(e)}"}
-
-    async def delete_user(self, user_id: str, confirmation: bool):
-        # logger.info(f"Deleting user with user_id: {user_id}")
-        try:
-            response = await self.user_service_api.delete_user(user_id, confirmation)
-            # if response.status == "error":
-            #     # logger.error(f"Error deleting user: {user_data['error']}")
-
-
-    #         logger.info(f"User deleted successfully: {user_data}")
-    #         return user_data
-    #     except Exception as e:
-    #         logger.error(f"Error deleting user with user_id {user_id}: {e}")
-    #         return {"error": f"Error deleting user: {str(e)}"}
-
-
-            # logger.info(f"User deleted successfully: {user_data}")
-            return {
-                "status": response.status,
-                "message": response.message
-            }
         except Exception as e:
             # logger.error(f"Error deleting user with user_id {user_id}: {e}")
             return {"error": f"Error deleting user: {str(e)}"}

@@ -17,19 +17,14 @@ class UserServiceAPI:
             try:
                 response = await getattr(stub, method)(request)
                 return response
-                # return {
-                #     # "user_id": response.user_id,
-                #     "username": response.username,
-                #     "email": response.email,
-                # }
             except grpc.RpcError as e:
                 return {"error": f"gRPC error: {e.code()} - {e.details()}"}
             except Exception as e:
                 print (e)
                 return {"error": str(e)}
 
-    async def fetch_user_data(self, user_id: str) -> Dict[str, str]:
-        request = user_pb2.Id(id=int(user_id))
+    async def fetch_user_data(self, user_id: int) -> Dict[str, str]:
+        request = user_pb2.Id(id=user_id)
         response = await self._make_grpc_call('read', request)
         if response.username: 
             return {
@@ -41,10 +36,10 @@ class UserServiceAPI:
         request = user_pb2.User(username=username, email=email, password=password)
         return await self._make_grpc_call('create', request)
 
-#     async def update_user(self, user_id: str, name: str, email: str) -> Dict[str, str]:
-#         request = user_pb2.UserUpdateRequest(user_id=user_id, name=name, email=email)
-#         return await self._make_grpc_call('UpdateUser', request)
+    async def update_user_password(self, user_id: int, old_password: str, new_password: str) -> Dict[str, str]:
+        request = user_pb2.UpdatePassword(user_id=(user_pb2.Id(id=user_id)), old_password=old_password, new_password=new_password)
+        return await self._make_grpc_call('update_password', request)
 
-    async def delete_user(self, user_id: str, confirmation: bool) -> Dict[str, str]:
-        request = user_pb2.DeleteUser(user_id=(user_pb2.Id(id=int(user_id))), confirm_delete=confirmation)
+    async def delete_user(self, user_id: int, confirmation: bool) -> Dict[str, str]:
+        request = user_pb2.DeleteUser(user_id=(user_pb2.Id(id=user_id)), confirm_delete=confirmation)
         return await self._make_grpc_call('delete', request)

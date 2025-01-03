@@ -11,9 +11,9 @@
 
 @strawberry.type
 class User:
-    # user_id: str
     username: str
     email: str
+
 
 
 
@@ -26,10 +26,24 @@ class User:
 #         return [Subscription(**sub) for sub in subscriptions]
 
 @strawberry.type
+class Subscription:
+    user_id: int
+    period: str
+    subscription_type: str
+
+
+@strawberry.type
 class AddUserResponse:
-    # status: str
+    status: str
     message: str
-    # user: Optional[User]
+    user: Optional[User]
+
+
+@strawberry.type
+class UpdateUserResponse:
+    status: str
+    message: str
+
 
 
 # @strawberry.type
@@ -53,12 +67,11 @@ class AddUserResponse:
 class DeleteUserResponse:
     status: str
     message: str
-    # user_id: Optional[str]
 
 @strawberry.type
 class Query:
     @strawberry.field
-    async def get_user_details(self, user_id: str) -> Optional[User]:
+    async def get_user_details(self, user_id: int) -> Optional[User]:
         try:
             orchestrator = Orchestrator()
             user_data = await orchestrator.get_user(user_id)
@@ -97,18 +110,18 @@ class Mutation:
     async def add_user(self, username: str, email: str, password: str) -> AddUserResponse:
         orchestrator = Orchestrator()
         user_data = await orchestrator.add_user(username=username, email=email, password=password)
+        print(user_data.status)
 
-        # if "error" in user_data:
-        #     print(user_data)
-        #     return AddUserResponse(
-        #         status="error",
-        #         message=user_data.get("error", "An error occurred"),
-        #         # user=None
-        #     )
+        if user_data.status == "error":
+            return AddUserResponse(
+                status="error",
+                message=user_data.message,
+                user=None
+            )
         return AddUserResponse(
-            # status="success",
-            message=user_data.message
-            # user=User(**user_data)
+            status="success",
+            message=user_data.message,
+            user=User(username=user_data.username, email=user_data.email)
         )
 
 
@@ -120,20 +133,13 @@ class Mutation:
 #         return ActivateSubscriptionResponse(result_info=result_info)
 
     @strawberry.mutation
-    async def update_user(self, user_id: str, name: str, email: str) -> UpdateUserResponse:
+    async def update_user_password(self, user_id: int, old_password: str, new_password: str) -> UpdateUserResponse:
         orchestrator = Orchestrator()
-        user_data = await orchestrator.update_user(user_id, name, email)
-        print(user_data)
-        if "error" in user_data:
-            return UpdateUserResponse(
-                status="error",
-                message=user_data.get("error", "An error occurred"),
-                user=None
-            )
+        response = await orchestrator.update_user_password(user_id, old_password, new_password)
+        print(response)
         return UpdateUserResponse(
-            status="success",
-            message="User successfully updated",
-            user=User(**user_data)
+            status=response.status,
+            message=response.message,
         )
 
 
@@ -163,7 +169,7 @@ class Mutation:
         )
 
     @strawberry.mutation
-    async def delete_user(self, user_id: str, confirmation: bool) -> DeleteUserResponse:
+    async def delete_user(self, user_id: int, confirmation: bool) -> DeleteUserResponse:
         orchestrator = Orchestrator()
         user_data = await orchestrator.delete_user(user_id, confirmation)
         return DeleteUserResponse(
