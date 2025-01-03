@@ -6,7 +6,7 @@ ORCHESTRATOR_OUT = $(REPO_ROOT)/Orchestrator_monolith/src/orchestrator/generated
 containers:
 	docker-compose up --build -d
 
-all:
+generate_all_protos_in_orchestrator:
 	@mkdir -p $(ORCHESTRATOR_OUT)
 	@python -m grpc_tools.protoc \
 		-I=$(PROTO_ROOT) \

@@ -9,7 +9,7 @@ async def start_grpc_server(db: Database) -> None:
     server = grpc.aio.server()
     add_SubscriptionServiceServicer_to_server(SubscriptionService(database=db), server)
 
-    server.add_insecure_port("0.0.0.0:50051")
+    server.add_insecure_port("[::]:50052")
     print("Starting server...")
     await server.start()
     await server.wait_for_termination()

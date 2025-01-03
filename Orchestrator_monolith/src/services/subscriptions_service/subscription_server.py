@@ -1,6 +1,6 @@
 import asyncio
 import grpc
-from src.services.generated import subscription_pb2, subscription_pb2_grpc
+from src.orchestrator.generated import subscription_pb2, subscription_pb2_grpc
 from src.database.subscription_repositories import SubscriptionRepository
 
 class SubscriptionService(subscription_pb2_grpc.SubscriptionServiceServicer):

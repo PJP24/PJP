@@ -1,4 +1,21 @@
 services:
+
+  orchestrator:
+    build:
+      context: ./Orchestrator_monolith
+      dockerfile: Docker/Dockerfile.orchestrator
+    ports:
+      - "5001:5001"
+    environment:
+      - USER_SERVICE_HOST=user_service:50051
+      - SUBSCRIPTION_SERVICE_HOST=subscription_service:50052
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    container_name: pjp-orchestrator
+    networks:
+      - grpc_network
+
   postgresql_service:
     image: postgres
     container_name: postgresql_container
@@ -17,16 +34,16 @@ services:
     networks:
       - grpc_network
     volumes:
-      - postgresql_data:/var/lib/postgresql/data 
+      - postgresql_data:/var/lib/postgresql/data
 
   grpc_server_service:
     build:
+      context: ./Subscriptions
       dockerfile: Dockerfile
-      context: .
     image: grpc-server
-    container_name: grpc_server_container
+    container_name: subscription_service
     ports:
-      - 50051:50051
+      - "50052:50052"
     depends_on:
       postgresql_service:
         condition: service_healthy

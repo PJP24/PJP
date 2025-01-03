@@ -15,6 +15,13 @@ class Orchestrator:
         self.user_service_api = user_service_api or user_service_api_factory()
         self.subscription_service_api = subscription_service_api or subscription_service_api_factory()
 
+    async def get_all_subscriptions(self):
+        try:
+            subscriptions = await self.subscription_service_api.fetch_all_subscriptions()
+            return subscriptions
+        except Exception as e:
+            return {'error': f"Error fetching subscriptions data: {str(e)}"}
+
     async def get_user(self, user_id: str):
         logger.info(f"Fetching user data for user_id: {user_id}")
         try:
@@ -24,16 +31,6 @@ class Orchestrator:
         except Exception as e:
             logger.error(f"Error fetching user data for user_id {user_id}: {e}")
             return {"error": f"Error fetching user data: {str(e)}"}
-
-    async def get_subscription(self, user_id: str):
-        logger.info(f"Fetching subscription data for user_id: {user_id}")
-        try:
-            subscription_data = await self.subscription_service_api.fetch_subscription_data(user_id)
-            logger.info(f"Received subscription data: {subscription_data}")
-            return subscription_data
-        except Exception as e:
-            logger.error(f"Error fetching subscription data for user_id {user_id}: {e}")
-            return {"error": f"Error fetching subscription data: {str(e)}"}
 
     async def add_user(self, name: str, email: str):
         logger.info(f"Adding user with name: {name}, email: {email}")
@@ -48,20 +45,6 @@ class Orchestrator:
         except Exception as e:
             logger.error(f"Error adding user with name {name} and email {email}: {e}")
             return {"error": f"Error adding user: {str(e)}"}
-
-    async def add_subscription(self, subscription_type: str, period: str):
-        logger.info(f"Adding subscription with type: {subscription_type}, period: {period}")
-        try:
-            subscription_data = await self.subscription_service_api.add_subscription(subscription_type=subscription_type, period=period)
-            if "error" in subscription_data:
-                logger.error(f"Error adding subscription: {subscription_data['error']}")
-                return {"error": subscription_data["error"]}
-
-            logger.info(f"Subscription added successfully: {subscription_data}")
-            return subscription_data
-        except Exception as e:
-            logger.error(f"Error adding subscription with type {subscription_type} and period {period}: {e}")
-            return {"error": f"Error adding subscription: {str(e)}"}
 
     async def update_user(self, user_id: str, name: str, email: str):
         logger.info(f"Updating user with user_id: {user_id}, name: {name}, email: {email}")

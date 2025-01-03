@@ -1,6 +1,6 @@
 import asyncio
 import grpc
-from src.services.generated import user_pb2, user_pb2_grpc
+from src.orchestrator.generated import user_pb2, user_pb2_grpc
 from src.database.user_repositories import UserRepository
 
 class UserService(user_pb2_grpc.UserServiceServicer):
