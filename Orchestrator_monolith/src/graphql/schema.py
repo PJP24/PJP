@@ -3,7 +3,6 @@ from src.orchestrator.orchestrator import Orchestrator
 from typing import Optional
 from typing import List
 
-
 @strawberry.type
 class Subscription:
     username: str
@@ -32,6 +31,12 @@ class DeleteUserResponse:
     status: str
     message: str
     user_id: Optional[str]
+
+@strawberry.type
+class AddSubscriptionResponse:
+    status: str
+    message: str
+    subscription: Optional[Subscription]
 
 @strawberry.type
 class Query:
@@ -109,4 +114,21 @@ class Mutation:
             status="success",
             message="User successfully deleted",
             user_id=user_id
+        )
+
+    @strawberry.mutation
+    async def add_subscription(self, email: str, subscription_type: str) -> AddSubscriptionResponse:
+        orchestrator = Orchestrator()
+        subscription_data = await orchestrator.add_subscription(email, subscription_type)
+
+        if "error" in subscription_data:
+            return AddSubscriptionResponse(
+                status="error",
+                message=subscription_data.get("error", "An error occurred"),
+                subscription=None
+            )
+        return AddSubscriptionResponse(
+            status="success",
+            message="Subscription successfully added",
+            subscription=Subscription(**subscription_data)
         )

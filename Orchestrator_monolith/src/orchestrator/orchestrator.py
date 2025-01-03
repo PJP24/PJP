@@ -21,6 +21,13 @@ class Orchestrator:
             return subscriptions
         except Exception as e:
             return {'error': f"Error fetching subscriptions data: {str(e)}"}
+    
+    async def add_subscription(self, email: str, subscription_type: str):
+        try:
+            subscription_data = await self.subscription_service_api.add_subscription(email, subscription_type)
+            return subscription_data
+        except Exception as e:
+            return {"error": f"Error adding subscription: {str(e)}"}
 
     async def get_user(self, user_id: str):
         logger.info(f"Fetching user data for user_id: {user_id}")

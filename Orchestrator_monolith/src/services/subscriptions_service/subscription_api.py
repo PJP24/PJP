@@ -16,3 +16,17 @@ class SubscriptionServiceAPI:
         subscriptions = [Subscription(username=sub.email, subscription_type=sub.subscription_type) for sub in response.subscriptions]
 
         return subscriptions
+
+    async def add_subscription(self, email: str, subscription_type: str):
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.CreateSubscriptionRequest(
+                email=email,
+                subscription_type=subscription_type
+            )
+            response = await stub.CreateSubscription(request)
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error adding subscription"}
