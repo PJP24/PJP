@@ -13,7 +13,7 @@ class SubscriptionServiceAPI:
             request = subscription_pb2.GetSubscriptionsRequest()
             response = await stub.GetSubscriptions(request)
 
-        subscriptions = [Subscription(username=sub.email, subscription_type=sub.subscription_type) for sub in response.subscriptions]
+        subscriptions = [Subscription(email=sub.email, subscription_type=sub.subscription_type) for sub in response.subscriptions]
 
         return subscriptions
 

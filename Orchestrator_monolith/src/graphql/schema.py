@@ -5,7 +5,7 @@ from typing import List
 
 @strawberry.type
 class Subscription:
-    username: str
+    email: str
     subscription_type: str
 
 @strawberry.type
@@ -35,8 +35,6 @@ class DeleteUserResponse:
 @strawberry.type
 class AddSubscriptionResponse:
     status: str
-    message: str
-    subscription: Optional[Subscription]
 
 @strawberry.type
 class Query:
@@ -124,11 +122,7 @@ class Mutation:
         if "error" in subscription_data:
             return AddSubscriptionResponse(
                 status="error",
-                message=subscription_data.get("error", "An error occurred"),
-                subscription=None
             )
         return AddSubscriptionResponse(
             status="success",
-            message="Subscription successfully added",
-            subscription=Subscription(**subscription_data)
         )

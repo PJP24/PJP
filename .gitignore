@@ -13,3 +13,4 @@ Users/src/grpc/generated/__pycache__/
 Users/src/utils/__pycache__/
 clear_docker_data.sh
 venv/
+Orchestrator_monolith/.DS_Store
