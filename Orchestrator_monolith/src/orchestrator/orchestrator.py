@@ -1,4 +1,3 @@
-from src.orchestrator.factories import user_service_api as user_service_api_factory
 import grpc
 from src.orchestrator.generated import subscription_pb2, subscription_pb2_grpc
 
