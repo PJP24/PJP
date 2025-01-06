@@ -14,3 +14,5 @@ Users/src/utils/__pycache__/
 clear_docker_data.sh
 venv/
 Orchestrator_monolith/.DS_Store
+Orchestrator_monolith/src/.DS_Store
+Orchestrator_monolith/src/services/.DS_Store

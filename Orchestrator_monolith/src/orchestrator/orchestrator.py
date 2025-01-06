@@ -1,74 +1,98 @@
-import logging
-from src.logger.logging_handler import DynamoDBLogHandler
 from src.orchestrator.factories import user_service_api as user_service_api_factory
-from src.orchestrator.factories import subscription_service_api as subscription_service_api_factory
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-dynamo_handler = DynamoDBLogHandler()
-formatter = logging.Formatter('%(message)s')
-dynamo_handler.setFormatter(formatter)
-logger.addHandler(dynamo_handler)
+import grpc
+from src.orchestrator.generated import subscription_pb2, subscription_pb2_grpc
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
-        self.user_service_api = user_service_api or user_service_api_factory()
-        self.subscription_service_api = subscription_service_api or subscription_service_api_factory()
+        self.host = "subscription_service:50052"
 
     async def get_all_subscriptions(self):
-        try:
-            subscriptions = await self.subscription_service_api.fetch_all_subscriptions()
-            return subscriptions
-        except Exception as e:
-            return {'error': f"Error fetching subscriptions data: {str(e)}"}
+        from src.graphql.schema import Subscription
+
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.GetSubscriptionsRequest()
+            response = await stub.GetSubscriptions(request)
+
+        subscriptions = [Subscription(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active) for sub in response.subscriptions]
+
+        return subscriptions
+
     
     async def add_subscription(self, email: str, subscription_type: str):
-        try:
-            subscription_data = await self.subscription_service_api.add_subscription(email, subscription_type)
-            return subscription_data
-        except Exception as e:
-            return {"error": f"Error adding subscription: {str(e)}"}
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.CreateSubscriptionRequest(
+                email=email,
+                subscription_type=subscription_type
+            )
+            response = await stub.CreateSubscription(request)
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error adding subscription"}
 
     async def change_subscription(self, email: str, subscription_type: str):
-        try:
-            changed_subscription = await self.subscription_service_api.change_subscription(email, subscription_type)
-            return changed_subscription
-        except Exception as e:
-            return {"error": f"Error changing subscription: {str(e)}"}
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.ChangeSubscriptionRequest(
+                email=email,
+                subscription_type=subscription_type
+            )
+            response = await stub.ChangeSubscription(request)
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error updating subscription"}
 
     async def delete_subscription(self, email: str):
-        try:
-            deleted_subscription = await self.subscription_service_api.delete_subscription(email)
-            if "error" in deleted_subscription:
-                return {"error": deleted_subscription["error"]}
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.DeleteSubscriptionRequest(
+                email=email
+            )
+            response = await stub.DeleteSubscription(request)
 
-            return deleted_subscription
-        except Exception as e:
-            return {"error": f"Error deleting subscription: {str(e)}"}
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error deleting subscription"}
+
     
     async def activate_subscription(self, email: str):
-        try:
-            response = await self.subscription_service_api.activate_subscription(email)
-            if "error" in response:
-                return {"status": "error", "message": response["error"]}
-            
-            return {"status": response["status"]}
-        except Exception as e:
-            return {"status": "error", "message": f"Error activating subscription: {str(e)}"}
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.ActivateSubscriptionRequest(
+                email=email
+            )
+            response = await stub.ActivateSubscription(request)
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error activating subscription"}
     
     async def deactivate_subscription(self, email: str):
-        try:
-            response = await self.subscription_service_api.deactivate_subscription(email)
-            if "error" in response:
-                return {"status": "error", "message": response["error"]}
-            
-            return {"status": response["status"]}
-        except Exception as e:
-            return {"status": "error", "message": f"Error activating subscription: {str(e)}"}
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.DeactivateSubscriptionRequest(
+                email=email
+            )
+            response = await stub.DeactivateSubscription(request)
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error deactivating subscription"}
 
     async def get_opt_out_policy(self):
-        try:
-            policy_text = await self.subscription_service_api.fetch_opt_out_policy()
-            return policy_text
-        except Exception as e:
-            return {"error": f"Error fetching opt-out policy: {str(e)}"}
+        policy_text = (
+            "Opt-Out Policy:\n"
+            "Cancel your subscription anytime to stop future charges.\n"
+            "1. Press 5\n"
+            "2. Enter the email you subscribed with\n"
+            "Activate your subscription again any time."
+        )
+        return policy_text
