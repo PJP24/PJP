@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+service UserService {
+    rpc GetUserDetails(UserRequest) returns (UserResponse);
+    rpc AddUser(UserRequest) returns (UserResponse);
+    rpc UpdateUser(UserUpdateRequest) returns (UserResponse);
+    rpc DeleteUser(UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+    string user_id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message UserUpdateRequest {
+    string user_id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message UserResponse {
+    string user_id = 1;
+    string name = 2;
+    string email = 3;
+    string message = 4;
+}

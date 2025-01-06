@@ -30,3 +30,18 @@ class SubscriptionServiceAPI:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error adding subscription"}
+
+    async def change_subscription(self, email: str, subscription_type: str):
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.ChangeSubscriptionRequest(
+                email=email,
+                subscription_type=subscription_type
+            )
+            response = await stub.ChangeSubscription(request)
+            print(f"Response: {response}")
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error updating subscription"}

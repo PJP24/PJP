@@ -15,6 +15,7 @@ class Orchestrator:
         self.user_service_api = user_service_api or user_service_api_factory()
         self.subscription_service_api = subscription_service_api or subscription_service_api_factory()
 
+    # Subscriptions
     async def get_all_subscriptions(self):
         try:
             subscriptions = await self.subscription_service_api.fetch_all_subscriptions()
@@ -29,6 +30,14 @@ class Orchestrator:
         except Exception as e:
             return {"error": f"Error adding subscription: {str(e)}"}
 
+    async def change_subscription(self, email: str, subscription_type: str):
+        try:
+            changed_subscription = await self.subscription_service_api.change_subscription(email, subscription_type)
+            return changed_subscription
+        except Exception as e:
+            return {"error": f"Error changing subscription: {str(e)}"}
+
+    # Users
     async def get_user(self, user_id: str):
         logger.info(f"Fetching user data for user_id: {user_id}")
         try:

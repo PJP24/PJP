@@ -37,6 +37,10 @@ class AddSubscriptionResponse:
     status: str
 
 @strawberry.type
+class UpdateSubscriptionResponse:
+    status: str
+
+@strawberry.type
 class Query:
     @strawberry.field
     async def get_user_details(self, user_id: str) -> Optional[User]:
@@ -118,6 +122,19 @@ class Mutation:
     async def add_subscription(self, email: str, subscription_type: str) -> AddSubscriptionResponse:
         orchestrator = Orchestrator()
         subscription_data = await orchestrator.add_subscription(email, subscription_type)
+
+        if "error" in subscription_data:
+            return AddSubscriptionResponse(
+                status="error",
+            )
+        return AddSubscriptionResponse(
+            status="success",
+        )
+    
+    @strawberry.mutation
+    async def change_subscription(self, email: str, subscription_type: str) -> UpdateSubscriptionResponse:
+        orchestrator = Orchestrator()
+        subscription_data = await orchestrator.change_subscription(email, subscription_type)
 
         if "error" in subscription_data:
             return AddSubscriptionResponse(
