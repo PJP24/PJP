@@ -15,7 +15,6 @@ class Orchestrator:
         self.user_service_api = user_service_api or user_service_api_factory()
         self.subscription_service_api = subscription_service_api or subscription_service_api_factory()
 
-    # Subscriptions
     async def get_all_subscriptions(self):
         try:
             subscriptions = await self.subscription_service_api.fetch_all_subscriptions()
@@ -73,56 +72,3 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"error": f"Error fetching opt-out policy: {str(e)}"}
-            
-    # Users
-    async def get_user(self, user_id: str):
-        logger.info(f"Fetching user data for user_id: {user_id}")
-        try:
-            user_data = await self.user_service_api.fetch_user_data(user_id)
-            logger.info(f"Received user data: {user_data}")
-            return user_data
-        except Exception as e:
-            logger.error(f"Error fetching user data for user_id {user_id}: {e}")
-            return {"error": f"Error fetching user data: {str(e)}"}
-
-    async def add_user(self, name: str, email: str):
-        logger.info(f"Adding user with name: {name}, email: {email}")
-        try:
-            user_data = await self.user_service_api.add_user(name, email)
-            if "error" in user_data:
-                logger.error(f"Error adding user: {user_data['error']}")
-                return {"error": user_data["error"]}
-
-            logger.info(f"User added successfully: {user_data}")
-            return user_data
-        except Exception as e:
-            logger.error(f"Error adding user with name {name} and email {email}: {e}")
-            return {"error": f"Error adding user: {str(e)}"}
-
-    async def update_user(self, user_id: str, name: str, email: str):
-        logger.info(f"Updating user with user_id: {user_id}, name: {name}, email: {email}")
-        try:
-            user_data = await self.user_service_api.update_user(user_id, name, email)
-            if "error" in user_data:
-                logger.error(f"Error updating user: {user_data['error']}")
-                return {"error": user_data["error"]}
-
-            logger.info(f"User updated successfully: {user_data}")
-            return user_data
-        except Exception as e:
-            logger.error(f"Error updating user with user_id {user_id}, name {name}, and email {email}: {e}")
-            return {"error": f"Error updating user: {str(e)}"}
-
-    async def delete_user(self, user_id: str):
-        logger.info(f"Deleting user with user_id: {user_id}")
-        try:
-            user_data = await self.user_service_api.delete_user(user_id)
-            if "error" in user_data:
-                logger.error(f"Error deleting user: {user_data['error']}")
-                return {"error": user_data["error"]}
-
-            logger.info(f"User deleted successfully: {user_data}")
-            return user_data
-        except Exception as e:
-            logger.error(f"Error deleting user with user_id {user_id}: {e}")
-            return {"error": f"Error deleting user: {str(e)}"}
