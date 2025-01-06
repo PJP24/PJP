@@ -66,7 +66,6 @@ async def get_subscriptions(session: AsyncSession):
     return response
 
 async def change_subscription(session: AsyncSession, email: str, new_subscription: str):
-    print(555)
     try:
         subscription = (
             await session.execute(sa.select(Subscription).filter_by(email=email))

@@ -37,6 +37,16 @@ class Orchestrator:
         except Exception as e:
             return {"error": f"Error changing subscription: {str(e)}"}
 
+    async def delete_subscription(self, email: str):
+        try:
+            deleted_subscription = await self.subscription_service_api.delete_subscription(email)
+            if "error" in deleted_subscription:
+                return {"error": deleted_subscription["error"]}
+
+            return deleted_subscription
+        except Exception as e:
+            return {"error": f"Error deleting subscription: {str(e)}"}
+
     # Users
     async def get_user(self, user_id: str):
         logger.info(f"Fetching user data for user_id: {user_id}")

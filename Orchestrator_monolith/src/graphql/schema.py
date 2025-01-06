@@ -1,7 +1,6 @@
 import strawberry
 from src.orchestrator.orchestrator import Orchestrator
-from typing import Optional
-from typing import List
+from typing import Optional, List
 
 @strawberry.type
 class Subscription:
@@ -38,6 +37,10 @@ class AddSubscriptionResponse:
 
 @strawberry.type
 class UpdateSubscriptionResponse:
+    status: str
+
+@strawberry.type
+class DeleteSubscriptionResponse:
     status: str
 
 @strawberry.type
@@ -137,9 +140,27 @@ class Mutation:
         subscription_data = await orchestrator.change_subscription(email, subscription_type)
 
         if "error" in subscription_data:
-            return AddSubscriptionResponse(
+            return UpdateSubscriptionResponse(
                 status="error",
             )
-        return AddSubscriptionResponse(
+        return UpdateSubscriptionResponse(
             status="success",
+        )
+
+    @strawberry.mutation
+    async def delete_subscription(self, email: str) -> DeleteSubscriptionResponse:
+        print()
+        print()
+        print("schema.py")
+        print()
+        print()
+        orchestrator = Orchestrator()
+        subscription_data = await orchestrator.delete_subscription(email)
+
+        if "error" in subscription_data:
+            return DeleteSubscriptionResponse(
+                status="error"
+            )
+        return DeleteSubscriptionResponse(
+            status="success"
         )

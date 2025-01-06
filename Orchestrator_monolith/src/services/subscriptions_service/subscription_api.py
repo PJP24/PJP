@@ -45,3 +45,22 @@ class SubscriptionServiceAPI:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error updating subscription"}
+
+    async def delete_subscription(self, email: str):
+        print()
+        print()
+        print("subscription_api.py")
+        print()
+        print()
+        async with grpc.aio.insecure_channel(self.host) as channel:
+            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
+            request = subscription_pb2.DeleteSubscriptionRequest(
+                email=email
+            )
+            response = await stub.DeleteSubscription(request)
+            print(f"Response: {response}")
+
+        if response.message:
+            return {"status": "success", "message": response.message}
+        else:
+            return {"status": "error", "message": "Error deleting subscription"}
