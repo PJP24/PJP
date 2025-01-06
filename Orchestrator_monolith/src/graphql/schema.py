@@ -6,6 +6,7 @@ from typing import Optional, List
 class Subscription:
     email: str
     subscription_type: str
+    is_active: str
 
 @strawberry.type
 class User:
@@ -42,6 +43,14 @@ class UpdateSubscriptionResponse:
 @strawberry.type
 class DeleteSubscriptionResponse:
     status: str
+
+@strawberry.type
+class ActivateSubscriptionResponse:
+    status: str
+
+@strawberry.type
+class OptOutPolicyResponse:
+    policy: str
 
 @strawberry.type
 class Query:
@@ -149,11 +158,6 @@ class Mutation:
 
     @strawberry.mutation
     async def delete_subscription(self, email: str) -> DeleteSubscriptionResponse:
-        print()
-        print()
-        print("schema.py")
-        print()
-        print()
         orchestrator = Orchestrator()
         subscription_data = await orchestrator.delete_subscription(email)
 
@@ -164,3 +168,28 @@ class Mutation:
         return DeleteSubscriptionResponse(
             status="success"
         )
+
+    @strawberry.mutation
+    async def activate_subscription(self, email: str) -> ActivateSubscriptionResponse:
+        orchestrator = Orchestrator()
+        await orchestrator.activate_subscription(email)
+
+        return ActivateSubscriptionResponse(
+            status="success"
+        )
+
+    @strawberry.mutation
+    async def deactivate_subscription(self, email: str) -> ActivateSubscriptionResponse:
+        orchestrator = Orchestrator()
+        await orchestrator.deactivate_subscription(email)
+
+        return ActivateSubscriptionResponse(
+            status="success"
+        )
+
+    @strawberry.mutation
+    async def opt_out_policy(self) -> OptOutPolicyResponse:
+        orchestrator = Orchestrator()
+        policy_text = await orchestrator.get_opt_out_policy()
+
+        return OptOutPolicyResponse(policy=policy_text)

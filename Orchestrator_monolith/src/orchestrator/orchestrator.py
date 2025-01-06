@@ -46,7 +46,34 @@ class Orchestrator:
             return deleted_subscription
         except Exception as e:
             return {"error": f"Error deleting subscription: {str(e)}"}
+    
+    async def activate_subscription(self, email: str):
+        try:
+            response = await self.subscription_service_api.activate_subscription(email)
+            if "error" in response:
+                return {"status": "error", "message": response["error"]}
+            
+            return {"status": response["status"]}
+        except Exception as e:
+            return {"status": "error", "message": f"Error activating subscription: {str(e)}"}
+    
+    async def deactivate_subscription(self, email: str):
+        try:
+            response = await self.subscription_service_api.deactivate_subscription(email)
+            if "error" in response:
+                return {"status": "error", "message": response["error"]}
+            
+            return {"status": response["status"]}
+        except Exception as e:
+            return {"status": "error", "message": f"Error activating subscription: {str(e)}"}
 
+    async def get_opt_out_policy(self):
+        try:
+            policy_text = await self.subscription_service_api.fetch_opt_out_policy()
+            return policy_text
+        except Exception as e:
+            return {"error": f"Error fetching opt-out policy: {str(e)}"}
+            
     # Users
     async def get_user(self, user_id: str):
         logger.info(f"Fetching user data for user_id: {user_id}")
