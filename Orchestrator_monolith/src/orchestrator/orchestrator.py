@@ -16,7 +16,6 @@ class Orchestrator:
         subscriptions = [Subscription(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active) for sub in response.subscriptions]
 
         return subscriptions
-
     
     async def add_subscription(self, email: str, subscription_type: str):
         async with grpc.aio.insecure_channel(self.host) as channel:

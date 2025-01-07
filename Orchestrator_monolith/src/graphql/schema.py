@@ -44,42 +44,43 @@ class OptOutPolicyResponse:
 class Mutation:
     @strawberry.mutation
     async def add_subscription(self, email: str, subscription_type: str) -> AddSubscriptionResponse:
-        orchestrator = Orchestrator()
-        subscription_data = await orchestrator.add_subscription(email, subscription_type)
-        if "error" in subscription_data:
-            return AddSubscriptionResponse(status="error")
-        return AddSubscriptionResponse(status="success")
+        response = requests.post("http://fastapi_service:8000/subscriptions", json={"email": email, "subscription_type": subscription_type})
+        if response.status_code == 200:
+            return AddSubscriptionResponse(status="success")
+        return AddSubscriptionResponse(status="error")
     
     @strawberry.mutation
     async def change_subscription(self, email: str, subscription_type: str) -> UpdateSubscriptionResponse:
-        orchestrator = Orchestrator()
-        subscription_data = await orchestrator.change_subscription(email, subscription_type)
-        if "error" in subscription_data:
-            return UpdateSubscriptionResponse(status="error")
-        return UpdateSubscriptionResponse(status="success")
+        response = requests.put("http://fastapi_service:8000/subscriptions", json={"email": email, "subscription_type": subscription_type})
+        if response.status_code == 200:
+            return UpdateSubscriptionResponse(status="success")
+        return UpdateSubscriptionResponse(status="error")
 
     @strawberry.mutation
     async def delete_subscription(self, email: str) -> DeleteSubscriptionResponse:
-        orchestrator = Orchestrator()
-        subscription_data = await orchestrator.delete_subscription(email)
-        if "error" in subscription_data:
-            return DeleteSubscriptionResponse(status="error")
-        return DeleteSubscriptionResponse(status="success")
+        response = requests.delete(f"http://fastapi_service:8000/subscriptions/{email}")
+        if response.status_code == 200:
+            return DeleteSubscriptionResponse(status="success")
+        return DeleteSubscriptionResponse(status="error")
 
     @strawberry.mutation
     async def activate_subscription(self, email: str) -> ActivateSubscriptionResponse:
-        orchestrator = Orchestrator()
-        await orchestrator.activate_subscription(email)
-        return ActivateSubscriptionResponse(status="success")
+        response = requests.post(f"http://fastapi_service:8000/subscriptions/{email}/activate")
+        if response.status_code == 200:
+            return ActivateSubscriptionResponse(status="success")
+        return ActivateSubscriptionResponse(status="error")
 
     @strawberry.mutation
     async def deactivate_subscription(self, email: str) -> DeactivateSubscriptionResponse:
-        orchestrator = Orchestrator()
-        await orchestrator.deactivate_subscription(email)
-        return DeactivateSubscriptionResponse(status="success")
+        response = requests.post(f"http://fastapi_service:8000/subscriptions/{email}/deactivate")
+        if response.status_code == 200:
+            return DeactivateSubscriptionResponse(status="success")
+        return DeactivateSubscriptionResponse(status="error")
 
     @strawberry.mutation
     async def opt_out_policy(self) -> OptOutPolicyResponse:
-        orchestrator = Orchestrator()
-        policy_text = await orchestrator.get_opt_out_policy()
-        return OptOutPolicyResponse(policy=policy_text)
+        response = requests.get("http://fastapi_service:8000/opt-out-policy")
+        if response.status_code == 200:
+            policy_text = response.json().get("policy", "No policy available")
+            return OptOutPolicyResponse(policy=policy_text)
+        return OptOutPolicyResponse(policy="Error fetching policy")
