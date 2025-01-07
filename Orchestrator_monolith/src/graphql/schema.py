@@ -18,23 +18,23 @@ class Query:
 
 @strawberry.type
 class AddSubscriptionResponse:
-    status: str
+    result_info: str
 
 @strawberry.type
 class UpdateSubscriptionResponse:
-    status: str
+    result_info: str
 
 @strawberry.type
 class DeleteSubscriptionResponse:
-    status: str
+    result_info: str
 
 @strawberry.type
 class ActivateSubscriptionResponse:
-    status: str
+    result_info: str
 
 @strawberry.type
 class DeactivateSubscriptionResponse:
-    status: str
+    result_info: str
 
 @strawberry.type
 class OptOutPolicyResponse:
@@ -42,19 +42,16 @@ class OptOutPolicyResponse:
 
 @strawberry.type
 class Mutation:
-
-
     @strawberry.mutation
     async def add_subscription(self, email: str, subscription_type: str) -> AddSubscriptionResponse:
         response = requests.get("http://fastapi_service:8000/subscriptions")
         subscriptions = response.json().get("subscriptions", [])
 
         if any(subscription["email"] == email for subscription in subscriptions):
-            return AddSubscriptionResponse(status="Subscription with this email already exists.")
+            return AddSubscriptionResponse(result_info="A subscription with this email already exists.")
 
         response = requests.post("http://fastapi_service:8000/subscriptions", json={"email": email, "subscription_type": subscription_type})
-        return AddSubscriptionResponse(status="success" if response.status_code == 200 else "error")
-
+        return AddSubscriptionResponse(result_info="Subscription successfully added." if response.status_code == 200 else "Failed to add subscription.")
 
     @strawberry.mutation
     async def change_subscription(self, email: str, subscription_type: str) -> UpdateSubscriptionResponse:
@@ -64,14 +61,13 @@ class Mutation:
         subscription = next((s for s in subscriptions if s["email"] == email), None)
 
         if not subscription:
-            return UpdateSubscriptionResponse(status="Subscription with this email doesn't exist.")
+            return UpdateSubscriptionResponse(result_info="Subscription with this email doesn't exist.")
 
         if subscription["subscription_type"] == subscription_type:
-            return UpdateSubscriptionResponse(status=f"Subscription is already {subscription_type}.")
+            return UpdateSubscriptionResponse(result_info=f"Subscription is already {subscription_type}.")
 
         response = requests.put("http://fastapi_service:8000/subscriptions", json={"email": email, "subscription_type": subscription_type})
-        return UpdateSubscriptionResponse(status="success" if response.status_code == 200 else "error")
-
+        return UpdateSubscriptionResponse(result_info="Subscription successfully updated." if response.status_code == 200 else "Failed to update subscription.")
 
     @strawberry.mutation
     async def delete_subscription(self, email: str) -> DeleteSubscriptionResponse:
@@ -79,29 +75,26 @@ class Mutation:
         subscriptions = response.json().get("subscriptions", [])
 
         if not any(subscription["email"] == email for subscription in subscriptions):
-            return DeleteSubscriptionResponse(status="Subscription with this email doesn't exist.")
+            return DeleteSubscriptionResponse(result_info="Subscription with this email doesn't exist.")
 
         response = requests.delete(f"http://fastapi_service:8000/subscriptions/{email}")
-        return DeleteSubscriptionResponse(status="success" if response.status_code == 200 else "error")
+        return DeleteSubscriptionResponse(result_info="Subscription successfully deleted." if response.status_code == 200 else "Failed to delete subscription.")
 
     @strawberry.mutation
     async def activate_subscription(self, email: str) -> ActivateSubscriptionResponse:
-
         response = requests.get("http://fastapi_service:8000/subscriptions")
         subscriptions = response.json().get("subscriptions", [])
         
         subscription = next((s for s in subscriptions if s["email"] == email), None)
 
-        if not any(subscription["email"] == email for subscription in subscriptions):
-            return ActivateSubscriptionResponse(status="Subscription with this email doesn't exist.")
+        if not subscription:
+            return ActivateSubscriptionResponse(result_info="Subscription with this email doesn't exist.")
 
         if subscription["is_active"]:
-            return ActivateSubscriptionResponse(status="Subscription with this email is already active.")
+            return ActivateSubscriptionResponse(result_info="Subscription with this email is already active.")
         
         response = requests.post(f"http://fastapi_service:8000/subscriptions/{email}/activate")
-        if response.status_code == 200:
-            return ActivateSubscriptionResponse(status="success")
-        return ActivateSubscriptionResponse(status="error")
+        return ActivateSubscriptionResponse(result_info="Subscription successfully activated." if response.status_code == 200 else "Failed to activate subscription.")
 
     @strawberry.mutation
     async def deactivate_subscription(self, email: str) -> DeactivateSubscriptionResponse:
@@ -111,15 +104,13 @@ class Mutation:
         subscription = next((s for s in subscriptions if s["email"] == email), None)
 
         if not subscription:
-            return DeactivateSubscriptionResponse(status="Subscription with this email doesn't exist.")
+            return DeactivateSubscriptionResponse(result_info="Subscription with this email doesn't exist.")
         
         if not subscription["is_active"]:
-            return DeactivateSubscriptionResponse(status="Subscription with this email is already inactive.")
+            return DeactivateSubscriptionResponse(result_info="Subscription with this email is already inactive.")
         
         response = requests.post(f"http://fastapi_service:8000/subscriptions/{email}/deactivate")
-        if response.status_code == 200:
-            return DeactivateSubscriptionResponse(status="success")
-        return DeactivateSubscriptionResponse(status="error")
+        return DeactivateSubscriptionResponse(result_info="Subscription successfully deactivated." if response.status_code == 200 else "Failed to deactivate subscription.")
 
     @strawberry.mutation
     async def opt_out_policy(self) -> OptOutPolicyResponse:
