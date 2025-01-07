@@ -1,3 +1,4 @@
+
 # import strawberry
 # from typing import List
 # import requests
@@ -9,10 +10,17 @@
 #     subscription_type: str
 #     is_active: str
 
+import strawberry
+from typing import Optional
+import requests
+
+
+
 @strawberry.type
 class User:
     username: str
     email: str
+
 
 
 
@@ -24,6 +32,7 @@ class User:
 #         response = requests.get("http://fastapi_service:8000/subscriptions")
 #         subscriptions = response.json().get("subscriptions", [])
 #         return [Subscription(**sub) for sub in subscriptions]
+
 
 @strawberry.type
 class Subscription:
@@ -63,18 +72,20 @@ class UpdateUserResponse:
 # class ActivateSubscriptionResponse:
 #     result_info: str
 
+
 @strawberry.type
 class DeleteUserResponse:
     status: str
     message: str
+
 
 @strawberry.type
 class Query:
     @strawberry.field
     async def get_user_details(self, user_id: int) -> Optional[User]:
         try:
-            orchestrator = Orchestrator()
-            user_data = await orchestrator.get_user(user_id)
+            response = requests.get(f"http://fast-api:8000/user_details/{user_id}")
+            user_data = response.json()
             if user_data is None:
                 print("User not found.")
                 return None
@@ -82,6 +93,7 @@ class Query:
         except Exception as e:
             print(f"Exception in get_user_details: {e}")
             return None
+
 
 
 # @strawberry.type
@@ -102,27 +114,36 @@ class Query:
 #         )
 #         result_info = response.json().get("message", "Unknown result")
 #         return AddSubscriptionResponse(result_info=result_info)
-
+=======
+        except Exception as e:
+            print(f"Exception in get_user_details: {e}")
+            return None
+>>>>>>> 7244560 (Add FastAPI for orchestrator)
 
 @strawberry.type
 class Mutation:
     @strawberry.mutation
-    async def add_user(self, username: str, email: str, password: str) -> AddUserResponse:
-        orchestrator = Orchestrator()
-        user_data = await orchestrator.add_user(username=username, email=email, password=password)
-        print(user_data.status)
-
-        if user_data.status == "error":
+    async def add_user(
+        self, username: str, email: str, password: str
+    ) -> AddUserResponse:
+        try:
+            user_data = {"username": username, "email": email, "password": password}
+            response = requests.post("http://fast-api:8000/add_user", json=user_data)
+            response_data = response.json()
+            if response_data.get("status") == "error":
+                return AddUserResponse(
+                    status="error", message=response_data.get("message"), user=None
+                )
             return AddUserResponse(
-                status="error",
-                message=user_data.message,
-                user=None
+                status="success",
+                message=response_data.get("message"),
+                user=User(
+                    username=response_data.get("username"),
+                    email=response_data.get("email"),
+                ),
             )
-        return AddUserResponse(
-            status="success",
-            message=user_data.message,
-            user=User(username=user_data.username, email=user_data.email)
-        )
+        except Exception as e:
+            print(e)
 
 
 
@@ -133,6 +154,7 @@ class Mutation:
 #         return ActivateSubscriptionResponse(result_info=result_info)
 
     @strawberry.mutation
+
     async def update_user_password(self, user_id: int, old_password: str, new_password: str) -> UpdateUserResponse:
         orchestrator = Orchestrator()
         response = await orchestrator.update_user_password(user_id, old_password, new_password)
@@ -161,14 +183,24 @@ class Mutation:
                 status="error",
                 message=subscription_data.get("error", "An error occurred"),
                 subscription=None
+    async def update_user_password(
+        self, user_id: int, old_password: str, new_password: str
+    ) -> UpdateUserResponse:
+        try:
+            passwords = {"old_password": old_password, "new_password": new_password}
+            response = requests.patch(
+                f"http://fast-api:8000/update_password/{user_id}", json=passwords
             )
-        return AddSubscriptionResponse(
-            status="success",
-            message="Subscription successfully added",
-            subscription=Subscription(**subscription_data)
-        )
+            response_data = response.json()
+            print(response_data)
+            return UpdateUserResponse(
+                status=response_data.get("status"), message=response_data.get("message")
+            )
+        except Exception as e:
+            print(e)
 
     @strawberry.mutation
+
     async def delete_user(self, user_id: int, confirmation: bool) -> DeleteUserResponse:
         orchestrator = Orchestrator()
         user_data = await orchestrator.delete_user(user_id, confirmation)
@@ -176,4 +208,15 @@ class Mutation:
             status=user_data.get("status", "Unknown"),
             message=user_data.get("message", "Unknown message"),
         )
+
+
+    async def delete_user(self, user_id: int) -> DeleteUserResponse:
+        try:
+            response = requests.delete(f"http://fast-api:8000/delete_user/{user_id}")
+            response_data = response.json()
+            return DeleteUserResponse(
+                status=response_data.get("status"), message=response_data.get("message")
+            )
+        except Exception as e:
+            print(e)
 

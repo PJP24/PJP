@@ -4,7 +4,7 @@ service UserManagement {
     rpc create (User) returns (CreateUserResponse);
     rpc read (Id) returns (UserDetails); 
     rpc update_password (UpdatePassword) returns (Response);
-    rpc delete (DeleteUser) returns (Response);
+    rpc delete (Id) returns (Response);
 
 }
 
@@ -12,11 +12,6 @@ message UpdatePassword {
     Id user_id = 1;
     string old_password = 2;
     string new_password = 3;
-}
-
-message DeleteUser {
-    Id user_id = 1;
-    bool confirm_delete = 2;
 }
 
 message Id {
