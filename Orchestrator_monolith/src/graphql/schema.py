@@ -1,6 +1,6 @@
 import strawberry
 from typing import List
-from src.orchestrator.orchestrator import Orchestrator
+import requests
 
 @strawberry.type
 class Subscription:
@@ -11,10 +11,10 @@ class Subscription:
 @strawberry.type
 class Query:
     @strawberry.field
-    async def get_all_subscriptions(self) -> List[Subscription]:
-        orchestrator = Orchestrator()
-        subscriptions = await orchestrator.get_all_subscriptions()
-        return subscriptions
+    def get_all_subscriptions(self) -> List[Subscription]:
+        response = requests.get("http://fastapi_service:8000/subscriptions")
+        subscriptions = response.json().get("subscriptions", [])
+        return [Subscription(**sub) for sub in subscriptions]
 
 @strawberry.type
 class AddSubscriptionResponse:

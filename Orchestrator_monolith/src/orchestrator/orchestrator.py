@@ -1,5 +1,5 @@
 import grpc
-from src.orchestrator.generated import subscription_pb2, subscription_pb2_grpc
+from src.generated import subscription_pb2, subscription_pb2_grpc
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
@@ -12,7 +12,7 @@ class Orchestrator:
             stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
             request = subscription_pb2.GetSubscriptionsRequest()
             response = await stub.GetSubscriptions(request)
-
+    
         subscriptions = [Subscription(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active) for sub in response.subscriptions]
 
         return subscriptions

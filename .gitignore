@@ -16,3 +16,5 @@ venv/
 Orchestrator_monolith/.DS_Store
 Orchestrator_monolith/src/.DS_Store
 Orchestrator_monolith/src/services/.DS_Store
+Orchestrator_monolith/src/orchestrator/.DS_Store
+__pycache__/
