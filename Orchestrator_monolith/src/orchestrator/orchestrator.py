@@ -3,7 +3,7 @@ from src.generated import subscription_pb2, subscription_pb2_grpc
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
-        self.host = "subscription_service:50052"
+        self.host = "subscription_container:50052"
 
     async def get_all_subscriptions(self):
         from src.graphql.schema import Subscription

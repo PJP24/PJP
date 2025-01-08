@@ -9,7 +9,6 @@ from src.grpc.subscription_operations import (
     delete_subscription,
     activate_subscription,
     deactivate_subscription,
-    get_subscriptions_dynamodb,
 )
 
 class SubscriptionService(SubscriptionServiceServicer):
