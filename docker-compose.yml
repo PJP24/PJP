@@ -38,7 +38,6 @@ services:
   grpc_server_service:
     build:
       context: ./Subscriptions
-      dockerfile: Dockerfile
     image: grpc-server
     container_name: subscription_service
     ports:
