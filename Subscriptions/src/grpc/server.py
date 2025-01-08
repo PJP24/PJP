@@ -10,6 +10,9 @@ from src.grpc.subscription_operations import (
     activate_subscription,
     deactivate_subscription,
     get_subscriptions_dynamodb,
+    create_subscription_dynamodb,
+    delete_subscription_dynamodb,
+    change_subscription_type_dynamodb
 )
 
 class SubscriptionService(SubscriptionServiceServicer):
@@ -41,7 +44,7 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Opt-Out Policy:\n"
             "Cancel your subscription anytime to stop future charges.\n"
             "1. Press 5\n"
-            "2. Enter thr email you subscribed with\n"
+            "2. Enter the email you subscribed with\n"
             "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
@@ -53,3 +56,15 @@ class SubscriptionService(SubscriptionServiceServicer):
     async def GetSubscriptionsDynamoDB(self, request, context):
         async with self.database.session_scope() as session:
             return await get_subscriptions_dynamodb(session)
+    
+    async def CreateSubscriptionDynamoDB(self, request, context):
+        async with self.database.session_scope() as session:
+            return await create_subscription_dynamodb(session, request.email, request.subscription_type, request.is_active)
+
+    async def DeleteSubscriptionDynamoDB(self, request, context):
+        async with self.database.session_scope() as session:
+            return await delete_subscription_dynamodb(session, request.email)
+
+    async def ChangeSubscriptionTypeDynamoDB(self, request, context):
+        async with self.database.session_scope() as session:
+            return await change_subscription_type_dynamodb(session, request.email, request.new_subscription_type)
