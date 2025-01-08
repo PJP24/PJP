@@ -39,7 +39,7 @@ services:
     build:
       context: ./Subscriptions
     image: grpc-server
-    container_name: subscription_container
+    container_name: subscription_server_container
     ports:
       - "50052:50052"
     depends_on:
