@@ -18,11 +18,9 @@ Orchestrator_monolith/src/.DS_Store
 Orchestrator_monolith/src/services/.DS_Store
 Orchestrator_monolith/src/orchestrator/.DS_Store
 __pycache__/
-<<<<<<< HEAD
 GraphQL/.env
 subscription_service/.DS_Store
 subscription_service/alembic/.DS_Store
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -154,4 +152,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+.vscode
 

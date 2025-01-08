@@ -116,6 +116,8 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
         
+# import logging
+# from src.logger.logging_handler import DynamoDBLogHandler
 import grpc
 from src.generated.user_pb2_grpc import UserManagementStub
 from src.generated.user_pb2 import Id, User, UpdatePassword
@@ -201,4 +203,5 @@ class Orchestrator:
                 return {"status": response.status, "message": response.message}
         except Exception as e:
             # logger.error(f"Error deleting user with user_id {user_id}: {e}")
+
             return {"error": f"Error deleting user: {str(e)}"}

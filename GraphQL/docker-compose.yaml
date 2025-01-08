@@ -1,0 +1,17 @@
+services:
+ orchestrator:
+   build:
+     context: .
+     dockerfile: Dockerfile
+   ports:
+     - "5001:5001"
+   container_name: graphql
+   networks:
+     - app-network
+
+
+
+
+networks:
+ app-network:
+   external: true

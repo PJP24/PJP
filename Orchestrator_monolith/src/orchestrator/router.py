@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from pydantic import BaseModel
 from src.orchestrator.orchestrator import Orchestrator
 
-app = FastAPI()
+users_router = APIRouter(prefix="/users")
 
 orchestrator = Orchestrator()
 
@@ -62,27 +62,29 @@ class UpdatePassword(BaseModel):
     new_password: str
 
 
-@app.get("/user_details/{user_id}")
+@users_router.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):
+    print("i got here")
     result = await orchestrator.get_user(user_id=user_id)
     return result
 
 
-@app.post("/add_user")
+@users_router.post("/add_user")
 async def add_user(user: User):
+    print("i was here 1")
     result = await orchestrator.add_user(
         username=user.username, email=user.email, password=user.password
-    )
+    )   
     return result
 
 
-@app.delete("/delete_user/{user_id}")
+@users_router.delete("/delete_user/{user_id}")
 async def delete_user(user_id: int):
     result = await orchestrator.delete_user(user_id=user_id)
     return result
 
 
-@app.patch("/update_password/{user_id}")
+@users_router.patch("/update_password/{user_id}")
 async def update_password(user_id: int, passwords: UpdatePassword):
     result = await orchestrator.update_user_password(
         user_id=user_id,
