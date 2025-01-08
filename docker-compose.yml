@@ -1,19 +1,19 @@
 services:
-  orchestrator_service:
-    build:
-      context: ./Orchestrator_monolith
-      dockerfile: Docker/Dockerfile.orchestrator
-    ports:
-      - "5001:5001"
-    environment:
-      - USER_SERVICE_HOST=user_service:50051
-      - SUBSCRIPTION_SERVICE_HOST=subscription_server_container:50052
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-    container_name: orchestrator_container
-    networks:
-      - grpc_network
+  # orchestrator_service:
+  #   build:
+  #     context: ./Orchestrator_monolith
+  #     dockerfile: Docker/Dockerfile.orchestrator
+  #   ports:
+  #     - "5001:5001"
+  #   environment:
+  #     - USER_SERVICE_HOST=user_service:50051
+  #     - SUBSCRIPTION_SERVICE_HOST=subscription_server_container:50052
+  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+  #   container_name: orchestrator_container
+  #   networks:
+  #     - grpc_network
 
   postgresql_service:
     image: postgres
@@ -59,6 +59,14 @@ services:
     networks:
       - grpc_network
 
+  graphql_service:
+    build:
+      context: ./GraphQL
+    container_name: graphql_container
+    ports:
+      - "5001:5001"
+    networks:
+      - grpc_network
 
 networks:
   grpc_network:
