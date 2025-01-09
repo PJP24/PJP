@@ -1,4 +1,14 @@
 services:
+  fast-api:
+   build:
+     context: Orchestrator_monolith
+     dockerfile: Docker/Dockerfile.fastapi
+   ports:
+     - "8000:8000"
+   container_name: fast-api
+   networks:
+     - app-network
+
   postgres:
     image: postgres:13-alpine
     ports:
@@ -35,13 +45,23 @@ services:
   grpc-server:
     build:
       dockerfile: Dockerfile
-      context: .
+      context: Users
     ports:
       - 50051:50051
     depends_on:
       postgres:
         condition: service_healthy
         restart: true
+    networks:
+      - app-network
+
+  graphql:
+    build:
+      context: GraphQL
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    container_name: graphql
     networks:
       - app-network
 
