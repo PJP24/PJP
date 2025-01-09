@@ -1,4 +1,3 @@
-from typing import List
 import requests
 
 def get_all_subscriptions_resolver():
