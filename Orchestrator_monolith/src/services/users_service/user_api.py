@@ -1,5 +1,5 @@
 import grpc
-from src.services.generated import user_pb2, user_pb2_grpc
+from src.orchestrator.generated import user_pb2, user_pb2_grpc
 from typing import Dict
 from src.database.utils.user_id_generator import UserIdGenerator
 

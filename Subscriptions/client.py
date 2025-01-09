@@ -15,7 +15,7 @@ from src.grpc.generated.subscription_pb2 import (
 from src.grpc.generated.subscription_pb2_grpc import SubscriptionServiceStub
 
 class SubscriptionClient:
-    def __init__(self, server_address='localhost:50051'):
+    def __init__(self, server_address='localhost:50052'):
         self.channel = grpc.insecure_channel(server_address)
         self.stub = SubscriptionServiceStub(self.channel)
 
