@@ -28,9 +28,7 @@ class UserCrud:
                 )
                 session.add(user_db)
                 return "success"
-        except IntegrityError as e:
-            raise e
-        except SQLAlchemyError as e:
+        except (IntegrityError, SQLAlchemyError) as e:
             raise e
 
     async def update_password(self, user_id: int, new_password: str):
