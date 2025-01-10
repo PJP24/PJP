@@ -45,12 +45,19 @@ class OptOutPolicyResponse:
 class Query:
     @strawberry.field(resolver=get_all_subscriptions_resolver)
     def all_subscriptions(self) -> List[Subscription]:
+        print("Get all subscriptions.")
         return get_all_subscriptions_resolver()
+
+    @strawberry.mutation(resolver=opt_out_policy_resolver)
+    def opt_out_policy(self) -> OptOutPolicyResponse:
+        policy = opt_out_policy_resolver()
+        return OptOutPolicyResponse(policy=policy)
     
 @strawberry.type
 class Mutation:
     @strawberry.mutation(resolver=add_subscription_resolver)
     def add_subscription(self, email: str, subscription_type: str) -> AddSubscriptionResponse:
+        print("Add subscription.")
         result_info = add_subscription_resolver(email, subscription_type)
         return AddSubscriptionResponse(result_info=result_info)
 
@@ -73,8 +80,3 @@ class Mutation:
     def deactivate_subscription(self, email: str) -> DeactivateSubscriptionResponse:
         result_info = deactivate_subscription_resolver(email)
         return DeactivateSubscriptionResponse(result_info=result_info)
-
-    @strawberry.mutation(resolver=opt_out_policy_resolver)
-    def opt_out_policy(self) -> OptOutPolicyResponse:
-        policy = opt_out_policy_resolver()
-        return OptOutPolicyResponse(policy=policy)

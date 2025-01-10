@@ -48,7 +48,3 @@ class SubscriptionService(SubscriptionServiceServicer):
     async def DeactivateSubscription(self, request, context):
         async with self.database.session_scope() as session:
             return await deactivate_subscription(session, request.email)
-
-    async def GetSubscriptionsDynamoDB(self, request, context):
-        async with self.database.session_scope() as session:
-            return await get_subscriptions_dynamodb(session)
