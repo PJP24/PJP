@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import strawberry
 from typing import List
 
@@ -14,7 +13,7 @@ from src.mutation_resolvers import (
     activate_subscription_resolver,
     deactivate_subscription_resolver,
 )
-=======
+
 
 # import strawberry
 # from typing import List
@@ -30,6 +29,12 @@ from src.mutation_resolvers import (
 import strawberry
 from typing import Optional
 import requests
+from src.query_resolvers import (
+    get_user_details,
+    add_user,
+    update_user_password,
+    delete_user,
+)
 
 
 
@@ -49,12 +54,12 @@ class User:
 #         response = requests.get("http://fastapi_service:8000/subscriptions")
 #         subscriptions = response.json().get("subscriptions", [])
 #         return [Subscription(**sub) for sub in subscriptions]
->>>>>>> e50b996 (Separate graphql from orchestrator)
+
 
 
 @strawberry.type
 class Subscription:
-<<<<<<< HEAD
+
     email: str
     subscription_type: str
     is_active: str
@@ -100,7 +105,7 @@ class Mutation:
     delete_subscription: DeleteSubscriptionResponse | None = strawberry.field(resolver=delete_subscription_resolver)
     activate_subscription: ActivateSubscriptionResponse | None = strawberry.field(resolver=activate_subscription_resolver)
     deactivate_subscription: DeactivateSubscriptionResponse | None = strawberry.field(resolver=deactivate_subscription_resolver)
-=======
+
     user_id: int
     period: str
     subscription_type: str
@@ -181,11 +186,10 @@ class Query:
 #         )
 #         result_info = response.json().get("message", "Unknown result")
 #         return AddSubscriptionResponse(result_info=result_info)
-=======
+
         except Exception as e:
             print(f"Exception in get_user_details: {e}")
             return None
->>>>>>> 7244560 (Add FastAPI for orchestrator)
 
 @strawberry.type
 class Mutation:
@@ -287,4 +291,18 @@ class Mutation:
         except Exception as e:
             print(e)
 
->>>>>>> e50b996 (Separate graphql from orchestrator)
+
+
+
+
+    user_details: User | None = strawberry.field(resolver=get_user_details)
+
+
+@strawberry.type
+class Mutation:
+    add_user: AddUserResponse | None = strawberry.field(resolver=add_user)
+    update_user_password: UpdateUserResponse | None = strawberry.field(
+        resolver=update_user_password
+    )
+    delete_user: DeleteUserResponse | None = strawberry.field(resolver=delete_user)
+
