@@ -28,13 +28,8 @@ from src.mutation_resolvers import (
 
 import strawberry
 from typing import Optional
-import requests
-from src.query_resolvers import (
-    get_user_details,
-    add_user,
-    update_user_password,
-    delete_user,
-)
+from src.query_resolvers import get_user_details
+from src.mutation_resolvers import add_user, update_user_password, delete_user
 
 
 
