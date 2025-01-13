@@ -1,9 +1,17 @@
 import httpx
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BASE_URL = os.getenv("FASTAPI_BASE_URL")
+
+print(f"Hello from resolvers.py: {BASE_URL}")
 
 async def get_all_subscriptions_resolver():
     from schema import Subscription
     async with httpx.AsyncClient() as client:
-        response = await client.get("http://fastapi_service:8000/subscriptions")
+        response = await client.get(f"{BASE_URL}/subscriptions")
         if response.status_code != 200:
             raise Exception(f"Failed to fetch subscriptions: {response.status_code} {response.text}")
         raw_subscriptions = response.json().get("subscriptions", [])
@@ -12,7 +20,7 @@ async def get_all_subscriptions_resolver():
 async def opt_out_policy_resolver():
     from schema import OptOutPolicyResponse
     async with httpx.AsyncClient() as client:
-        response = await client.get("http://fastapi_service:8000/opt-out-policy")
+        response = await client.get(f"{BASE_URL}/opt-out-policy")
         if response.status_code != 200:
             raise Exception(f"Failed to fetch opt-out policy: {response.status_code} {response.text}")
         policy_text = response.json().get("policy", "Unknown policy")
@@ -22,7 +30,7 @@ async def add_subscription_resolver(email: str, subscription_type: str):
     from schema import AddSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            "http://fastapi_service:8000/subscriptions",
+            f"{BASE_URL}/subscriptions",
             json={"email": email, "subscription_type": subscription_type},
         )
         if response.status_code != 200:
@@ -34,7 +42,7 @@ async def change_subscription_resolver(email: str, subscription_type: str):
     from schema import UpdateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.put(
-            "http://fastapi_service:8000/subscriptions",
+            f"{BASE_URL}/subscriptions",
             json={"email": email, "subscription_type": subscription_type},
         )
         if response.status_code != 200:
@@ -46,7 +54,7 @@ async def delete_subscription_resolver(email: str):
     from schema import DeleteSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.delete(
-            f"http://fastapi_service:8000/subscriptions/{email}",
+            f"{BASE_URL}/subscriptions/{email}",
         )
         if response.status_code != 200:
             raise Exception(f"Failed to delete subscription: {response.status_code} {response.text}")
@@ -57,7 +65,7 @@ async def activate_subscription_resolver(email: str):
     from schema import ActivateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"http://fastapi_service:8000/subscriptions/{email}/activate",
+            f"{BASE_URL}/subscriptions/{email}/activate",
         )
         if response.status_code != 200:
             raise Exception(f"Failed to activate subscription: {response.status_code} {response.text}")
@@ -68,7 +76,7 @@ async def deactivate_subscription_resolver(email: str):
     from schema import DeactivateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"http://fastapi_service:8000/subscriptions/{email}/deactivate",
+            f"{BASE_URL}/subscriptions/{email}/deactivate",
         )
         if response.status_code != 200:
             raise Exception(f"Failed to deactivate subscription: {response.status_code} {response.text}")
