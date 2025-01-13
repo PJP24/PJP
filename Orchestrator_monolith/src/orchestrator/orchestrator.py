@@ -22,7 +22,7 @@ class Orchestrator:
             )
             response = await stub.CreateSubscription(request)
 
-        if response.message:
+        if response.message is not None:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error adding subscription"}
@@ -36,7 +36,7 @@ class Orchestrator:
             )
             response = await stub.ChangeSubscription(request)
 
-        if response.message:
+        if response.message is not None:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error updating subscription"}
@@ -49,7 +49,7 @@ class Orchestrator:
             )
             response = await stub.DeleteSubscription(request)
 
-        if response.message:
+        if response.message is not None:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error deleting subscription"}
@@ -63,7 +63,7 @@ class Orchestrator:
             )
             response = await stub.ActivateSubscription(request)
 
-        if response.message:
+        if response.message is not None:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error activating subscription"}
@@ -76,7 +76,7 @@ class Orchestrator:
             )
             response = await stub.DeactivateSubscription(request)
 
-        if response.message:
+        if response.message is not None:
             return {"status": "success", "message": response.message}
         else:
             return {"status": "error", "message": "Error deactivating subscription"}
