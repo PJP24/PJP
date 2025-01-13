@@ -82,12 +82,10 @@ async def add_user(username: str, email: str, password: str):
     from src.schema import AddUserResponse, User
 
     async with httpx.AsyncClient() as client:
-        print(ADD_USER_URL)
         try:
             user_data = {"username": username, "email": email, "password": password}
             response = await client.post(ADD_USER_URL, json=user_data)
             response_data = response.json()
-            print(response_data)
             if response_data.get("status") == "error":
                 return AddUserResponse(
                     status="error", message=response_data.get("message"), user=None
