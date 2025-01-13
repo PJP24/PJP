@@ -1,1 +1,0 @@
-DB_URL="postgresql+asyncpg://test:test123@postgres:5432/user_management"
