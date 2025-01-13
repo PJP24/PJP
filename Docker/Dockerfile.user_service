@@ -1,0 +1,17 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY ../requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONPATH=/app/user_service/grpc_services/generated:$PYTHONPATH
+
+COPY ../ /app/
+COPY ./protos /app/protos
+
+RUN python -m grpc_tools.protoc -I=protos --python_out=user_service/grpc_services/generated --grpc_python_out=user_service/grpc_services/generated protos/user.proto
+
+EXPOSE 50051
+
+CMD ["python", "user_service/user_service_server.py"]

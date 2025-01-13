@@ -1,0 +1,23 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /app/requirements.txt
+
+ENV PYTHONPATH=/app/user_service/grpc_services/generated:/app:/app/subscription_service/grpc_services/generated:$PYTHONPATH
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY .. /app/
+
+ENV PYTHONUNBUFFERED=1
+
+EXPOSE 5001
+EXPOSE 8001
+
+CMD ["python", "main.py"]
