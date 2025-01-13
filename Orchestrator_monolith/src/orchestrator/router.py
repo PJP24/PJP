@@ -64,14 +64,12 @@ class UpdatePassword(BaseModel):
 
 @users_router.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):
-    print("i got here")
     result = await orchestrator.get_user(user_id=user_id)
     return result
 
 
 @users_router.post("/add_user")
 async def add_user(user: User):
-    print("i was here 1")
     result = await orchestrator.add_user(
         username=user.username, email=user.email, password=user.password
     )   

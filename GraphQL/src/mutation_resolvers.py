@@ -68,18 +68,24 @@ async def deactivate_subscription_resolver(email: str):
 
 import asyncio
 import httpx
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ADD_USER_URL = os.getenv("ADD_USER_URL")
+UPDATE_PASSWORD_URL = os.getenv("UPDATE_PASSWORD_URL")
+DELETE_USER_URL = os.getenv("DELETE_USER_URL")
 
 
 async def add_user(username: str, email: str, password: str):
     from src.schema import AddUserResponse, User
 
     async with httpx.AsyncClient() as client:
+        print(ADD_USER_URL)
         try:
             user_data = {"username": username, "email": email, "password": password}
-            response = await client.post(
-                "http://fast-api:8000/users/add_user", json=user_data
-            )
-            print(response)
+            response = await client.post(ADD_USER_URL, json=user_data)
             response_data = response.json()
             print(response_data)
             if response_data.get("status") == "error":
@@ -104,11 +110,9 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
     async with httpx.AsyncClient() as client:
         try:
             passwords = {"old_password": old_password, "new_password": new_password}
-            response = await client.patch(
-                f"http://fast-api:8000/users/update_password/{user_id}", json=passwords
-            )
+            url = UPDATE_PASSWORD_URL.format(user_id=user_id)
+            response = await client.patch(url, json=passwords)
             response_data = response.json()
-            print(response_data)
             return UpdateUserResponse(
                 status=response_data.get("status"), message=response_data.get("message")
             )
@@ -121,9 +125,8 @@ async def delete_user(self, user_id: int):
 
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.delete(
-                f"http://fast-api:8000/users/delete_user/{user_id}"
-            )
+            url = DELETE_USER_URL.format(user_id=user_id)
+            response = await client.delete(url)
             response_data = response.json()
             return DeleteUserResponse(
                 status=response_data.get("status"), message=response_data.get("message")
