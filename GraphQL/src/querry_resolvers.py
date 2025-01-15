@@ -7,7 +7,7 @@ load_dotenv()
 BASE_URL = os.getenv("FASTAPI_BASE_URL")
 
 async def get_all_subscriptions_resolver():
-    from schema import Subscription
+    from src.schema import Subscription
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{BASE_URL}/subscriptions")
         if response.status_code != 200:
@@ -16,7 +16,7 @@ async def get_all_subscriptions_resolver():
         return [Subscription(**sub) for sub in raw_subscriptions]
 
 async def opt_out_policy_resolver():
-    from schema import OptOutPolicyResponse
+    from src.schema import OptOutPolicyResponse
     async with httpx.AsyncClient() as client:
         response = await client.get(f"{BASE_URL}/opt-out-policy")
         if response.status_code != 200:
