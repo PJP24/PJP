@@ -17,8 +17,6 @@ async def start_graphql():
 
 async def main():
     await asyncio.gather(
-        serve_user(),
-        serve_subscription(),
         start_api_service(),
         start_graphql(),
     )

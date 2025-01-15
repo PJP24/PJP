@@ -51,11 +51,13 @@ message ActivateSubscriptionResponse {
   string message = 1;
 }
 
+// OptOutPolicy
 message OptOutPolicyRequest {}
 message OptOutPolicyResponse {
   string policy = 1;
 }
 
+// Deactivate
 message DeactivateSubscriptionRequest {
   string email = 1;
 }
@@ -67,4 +69,10 @@ message Subscription {
   string email = 1;
   string subscription_type = 2;
   bool is_active = 3;
+}
+
+// Read DynamoDB
+message GetSubscriptionsDynamoDBRequest {}
+message GetSubscriptionsDynamoDBResponse {
+  repeated Subscription subscriptions = 1;
 }

@@ -17,10 +17,10 @@ except ImportError:
 
 if _version_not_supported:
     raise RuntimeError(
-        f'The grpc_services package installed is at version {GRPC_VERSION},'
+        f'The grpc package installed is at version {GRPC_VERSION},'
         + f' but the generated code in user_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
-        + f' Please upgrade your grpc_services module to grpcio>={GRPC_GENERATED_VERSION}'
+        + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
@@ -32,7 +32,7 @@ class UserManagementStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc_services.Channel.
+            channel: A grpc.Channel.
         """
         self.create = channel.unary_unary(
                 '/UserManagement/create',

@@ -93,7 +93,7 @@ async def change_subscription_resolver(email: str, subscription_type: str):
 async def delete_subscription_resolver(email: str):
     from graphql_service.graphql_app import DeleteSubscriptionResponse
 
-    result_info = await fetch_data(f"http://localhost:5001/delete_subscriptions/{email}", method="DELETE")
+    result_info = await fetch_data(f"http://localhost:5001/subscriptions/{email}", method="DELETE")
 
     if not result_info or "message" not in result_info:
         return DeleteSubscriptionResponse(result_info="Unknown result")
@@ -103,7 +103,7 @@ async def delete_subscription_resolver(email: str):
 async def activate_subscription_resolver(email: str):
     from graphql_service.graphql_app import ActivateSubscriptionResponse
 
-    result_info = await fetch_data(f"http://localhost:5001/activate_subscriptions/{email}/activate", method="POST")
+    result_info = await fetch_data(f"http://localhost:5001/subscriptions/{email}/activate", method="POST")
 
     if not result_info or "message" not in result_info:
         return ActivateSubscriptionResponse(result_info="Unknown result")
@@ -113,7 +113,7 @@ async def activate_subscription_resolver(email: str):
 async def deactivate_subscription_resolver(email: str):
     from graphql_service.graphql_app import DeactivateSubscriptionResponse
 
-    result_info = await fetch_data(f"http://localhost:5001/deactivate_subscriptions/{email}/deactivate", method="POST")
+    result_info = await fetch_data(f"http://localhost:5001/subscriptions/{email}/deactivate", method="POST")
 
     if not result_info or "message" not in result_info:
         return DeactivateSubscriptionResponse(result_info="Unknown result")
