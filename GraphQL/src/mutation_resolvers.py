@@ -14,7 +14,7 @@ async def add_subscription_resolver(email: str, subscription_type: str):
                 f"{BASE_URL}/subscriptions",
                 json={"email": email, "subscription_type": subscription_type},
             )
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             result_info = response.json().get("message", "Unknown result")
             return AddSubscriptionResponse(result_info=result_info)
     except Exception as e:
@@ -28,7 +28,7 @@ async def change_subscription_resolver(email: str, subscription_type: str):
                 f"{BASE_URL}/subscriptions",
                 json={"email": email, "subscription_type": subscription_type},
             )
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             result_info = response.json().get("message", "Unknown result")
             return UpdateSubscriptionResponse(result_info=result_info)
     except Exception as e:
@@ -41,7 +41,7 @@ async def delete_subscription_resolver(email: str):
             response = await client.delete(
                 f"{BASE_URL}/subscriptions/{email}",
             )
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             result_info = response.json().get("message", "Unknown result")
             return DeleteSubscriptionResponse(result_info=result_info)
     except Exception as e:
@@ -54,7 +54,7 @@ async def activate_subscription_resolver(email: str):
             response = await client.post(
                 f"{BASE_URL}/subscriptions/{email}/activate",
             )
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             result_info = response.json().get("message", "Unknown result")
             return ActivateSubscriptionResponse(result_info=result_info)
     except Exception as e:
@@ -67,7 +67,7 @@ async def deactivate_subscription_resolver(email: str):
             response = await client.post(
                 f"{BASE_URL}/subscriptions/{email}/deactivate",
             )
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             result_info = response.json().get("message", "Unknown result")
             return DeactivateSubscriptionResponse(result_info=result_info)
     except Exception as e:

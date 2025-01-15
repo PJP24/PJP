@@ -11,7 +11,7 @@ async def get_all_subscriptions_resolver():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BASE_URL}/subscriptions")
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status() 
             raw_subscriptions = response.json().get("subscriptions", [])
             return [Subscription(**sub) for sub in raw_subscriptions]
     except Exception as e:
@@ -22,7 +22,7 @@ async def opt_out_policy_resolver():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{BASE_URL}/opt-out-policy")
-            response.raise_for_status()  # Automatically raises for non-2xx status codes
+            response.raise_for_status()
             policy_text = response.json().get("policy", "Unknown policy")
             return OptOutPolicyResponse(policy=policy_text)
     except Exception as e:
