@@ -7,7 +7,7 @@ load_dotenv()
 BASE_URL = os.getenv("FASTAPI_BASE_URL")
 
 async def add_subscription_resolver(email: str, subscription_type: str):
-    from GraphQL.src.schema import AddSubscriptionResponse
+    from src.schema import AddSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/subscriptions",
@@ -19,7 +19,7 @@ async def add_subscription_resolver(email: str, subscription_type: str):
         return AddSubscriptionResponse(result_info=result_info)
 
 async def change_subscription_resolver(email: str, subscription_type: str):
-    from GraphQL.src.schema import UpdateSubscriptionResponse
+    from src.schema import UpdateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.put(
             f"{BASE_URL}/subscriptions",
@@ -31,7 +31,7 @@ async def change_subscription_resolver(email: str, subscription_type: str):
         return UpdateSubscriptionResponse(result_info=result_info)
 
 async def delete_subscription_resolver(email: str):
-    from GraphQL.src.schema import DeleteSubscriptionResponse
+    from src.schema import DeleteSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.delete(
             f"{BASE_URL}/subscriptions/{email}",
@@ -42,7 +42,7 @@ async def delete_subscription_resolver(email: str):
         return DeleteSubscriptionResponse(result_info=result_info)
 
 async def activate_subscription_resolver(email: str):
-    from GraphQL.src.schema import ActivateSubscriptionResponse
+    from src.schema import ActivateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/subscriptions/{email}/activate",
@@ -53,7 +53,7 @@ async def activate_subscription_resolver(email: str):
         return ActivateSubscriptionResponse(result_info=result_info)
 
 async def deactivate_subscription_resolver(email: str):
-    from GraphQL.src.schema import DeactivateSubscriptionResponse
+    from src.schema import DeactivateSubscriptionResponse
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{BASE_URL}/subscriptions/{email}/deactivate",
