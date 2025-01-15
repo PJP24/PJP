@@ -6,7 +6,6 @@ load_dotenv()
 
 BASE_URL = os.getenv("FASTAPI_BASE_URL")
 
-print(f"Hello from resolvers.py: {BASE_URL}")
 
 async def get_all_subscriptions_resolver():
     from schema import Subscription
