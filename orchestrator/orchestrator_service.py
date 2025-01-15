@@ -6,8 +6,8 @@ from subscription_service.grpc_services.generated import subscription_pb2, subsc
 
 class OrchestratorService:
     def __init__(self):
-        self.user_service_host = "user_service_container:50051"
-        self.subscription_service_host = "subscription_server_container:50052"
+        self.user_service_host = "user_server_service:50051"
+        self.subscription_service_host = "subscription_server_service:50052"
 
     async def get_user(self, user_id: int):
         try:
@@ -141,10 +141,10 @@ class OrchestratorService:
 
     async def get_opt_out_policy(self):
         policy_text = (
-            "Opt-Out Policy:\n"
-            "Cancel your subscription anytime to stop future charges.\n"
-            "1. Press 5\n"
-            "2. Enter the email you subscribed with\n"
+            "Opt-Out Policy:"
+            "Cancel your subscription anytime to stop future charges."
+            "1. Press 5"
+            "2. Enter the email you subscribed with"
             "Activate your subscription again any time."
         )
         return policy_text

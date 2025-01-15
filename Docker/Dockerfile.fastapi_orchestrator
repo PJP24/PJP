@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt /app/requirements.txt
 
 ENV PYTHONPATH=/app/user_service/grpc_services/generated:/app:/app/subscription_service/grpc_services/generated:$PYTHONPATH
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY .. /app/
@@ -18,6 +17,5 @@ COPY .. /app/
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 5001
-EXPOSE 8001
 
-CMD ["python", "main.py"]
+CMD ["python", "orchestrator/fastapi_start.py"]

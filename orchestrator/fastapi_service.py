@@ -1,13 +1,11 @@
-import logging
 from fastapi import FastAPI
 from pydantic import BaseModel
-
-from graphql_service.graphql_app import graphql_app
 from orchestrator.orchestrator_service import OrchestratorService
+from graphql_service.graphql_app import graphql_app
 
 app = FastAPI()
 
-app.include_router(graphql_app, prefix='/graphql')
+app.include_router(graphql_app, prefix="/graphql")
 
 orchestrator = OrchestratorService()
 
@@ -98,8 +96,3 @@ async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    logging.info("Starting orchestrator service on port 5001...")
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5001)

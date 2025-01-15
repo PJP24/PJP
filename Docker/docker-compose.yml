@@ -9,22 +9,24 @@ services:
       - POSTGRES_DB=user_management
     volumes:
       - postgres_db:/var/lib/postgresql/data
-    container_name: postgres_user_container
+    container_name: postgres_user
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d user_management"]
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 10s
+    networks:
+      - mynetwork
 
   postgres_subscription:
     image: postgres
-    container_name: postgres_subscription_container
     environment:
       POSTGRES_PASSWORD: my_secret_password
       POSTGRES_DB: grpc_database
       POSTGRES_USER: user_1
       PGPORT: 5433
+    container_name: postgres_subscription
     ports:
       - "5433:5433"
     healthcheck:
@@ -35,48 +37,58 @@ services:
       timeout: 10s
     volumes:
       - postgresql_data:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - 8080:80
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=test@test.com
-      - PGADMIN_DEFAULT_PASSWORD=test123
-    container_name: pgadmin_container
-    depends_on:
-      - postgres_user
+    networks:
+      - mynetwork
 
   user_server_service:
     build:
       context: ..
       dockerfile: Docker/Dockerfile.user_service
-    container_name: user_service_container
+    container_name: user_server_service
     ports:
       - "50051:50051"
+    networks:
+      - mynetwork
 
   subscription_server_service:
     build:
       context: ..
       dockerfile: Docker/Dockerfile.subscription_service
-    container_name: subscription_server_container
+    container_name: subscription_server_service
     ports:
       - "50052:50052"
+    networks:
+      - mynetwork
 
-  orchestrator:
+  graphql:
     build:
       context: ..
-      dockerfile: Docker/Dockerfile.orchestrator
+      dockerfile: Docker/Dockerfile.graphql
+    ports:
+      - "8001:8001"
+    container_name: graphql
+    networks:
+      - mynetwork
+
+  fastapi_orchestrator:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.fastapi_orchestrator
     ports:
       - "5001:5001"
-      - "8001:8001"
-    container_name: orchestrator_container
+    container_name: fastapi_orchestrator
     depends_on:
       - user_server_service
       - subscription_server_service
+    networks:
+      - mynetwork
 
 volumes:
   postgres_db:
     name: postgres_db
   postgresql_data:
     name: grpc_volume
+
+networks:
+  mynetwork:
+    driver: bridge
