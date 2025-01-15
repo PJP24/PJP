@@ -10,7 +10,6 @@ service SubscriptionService {
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
-  rpc GetSubscriptionsDynamoDB (GetSubscriptionsDynamoDBRequest) returns (GetSubscriptionsDynamoDBResponse);
 }
 
 message CreateSubscriptionRequest {
