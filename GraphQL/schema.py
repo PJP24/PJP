@@ -1,14 +1,19 @@
 import strawberry
 from typing import List
-from resolvers import (
+
+from src.querry_resolvers import (
     get_all_subscriptions_resolver,
+    opt_out_policy_resolver,
+)
+
+from src.mutation_resolvers import (
     add_subscription_resolver,
     change_subscription_resolver,
     delete_subscription_resolver,
     activate_subscription_resolver,
     deactivate_subscription_resolver,
-    opt_out_policy_resolver,
 )
+
 
 @strawberry.type
 class Subscription:
