@@ -18,3 +18,4 @@ Orchestrator_monolith/src/.DS_Store
 Orchestrator_monolith/src/services/.DS_Store
 Orchestrator_monolith/src/orchestrator/.DS_Store
 __pycache__/
+GraphQL/.env
