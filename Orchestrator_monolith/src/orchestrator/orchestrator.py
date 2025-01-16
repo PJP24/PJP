@@ -1,5 +1,13 @@
 import grpc
-from src.generated import subscription_pb2, subscription_pb2_grpc
+from src.generated.subscription_pb2_grpc import SubscriptionServiceStub
+from src.generated.subscription_pb2 import (
+    GetSubscriptionsRequest,
+    CreateSubscriptionRequest,
+    ChangeSubscriptionRequest,
+    DeleteSubscriptionRequest,
+    ActivateSubscriptionRequest,
+    DeactivateSubscriptionRequest,
+)
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
@@ -8,8 +16,8 @@ class Orchestrator:
     async def get_all_subscriptions(self):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.GetSubscriptionsRequest()
+                stub = SubscriptionServiceStub(channel)
+                request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
 
             return [
@@ -22,8 +30,8 @@ class Orchestrator:
     async def add_subscription(self, email: str, subscription_type: str):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.CreateSubscriptionRequest(
+                stub = SubscriptionServiceStub(channel)
+                request = CreateSubscriptionRequest(
                     email=email,
                     subscription_type=subscription_type
                 )
@@ -39,8 +47,8 @@ class Orchestrator:
     async def change_subscription(self, email: str, subscription_type: str):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.ChangeSubscriptionRequest(
+                stub = SubscriptionServiceStub(channel)
+                request = ChangeSubscriptionRequest(
                     email=email,
                     subscription_type=subscription_type
                 )
@@ -56,8 +64,8 @@ class Orchestrator:
     async def delete_subscription(self, email: str):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.DeleteSubscriptionRequest(email=email)
+                stub = SubscriptionServiceStub(channel)
+                request = DeleteSubscriptionRequest(email=email)
                 response = await stub.DeleteSubscription(request)
 
             if response.message is not None:
@@ -70,8 +78,8 @@ class Orchestrator:
     async def activate_subscription(self, email: str):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.ActivateSubscriptionRequest(email=email)
+                stub = SubscriptionServiceStub(channel)
+                request = ActivateSubscriptionRequest(email=email)
                 response = await stub.ActivateSubscription(request)
 
             if response.message is not None:
@@ -84,8 +92,8 @@ class Orchestrator:
     async def deactivate_subscription(self, email: str):
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
-                stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-                request = subscription_pb2.DeactivateSubscriptionRequest(email=email)
+                stub = SubscriptionServiceStub(channel)
+                request = DeactivateSubscriptionRequest(email=email)
                 response = await stub.DeactivateSubscription(request)
 
             if response.message is not None:
