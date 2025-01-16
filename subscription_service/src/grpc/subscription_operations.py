@@ -47,15 +47,25 @@ def validate_email(email: str) -> bool:
 async def create_subscription(session: AsyncSession, email: str, subscription_type: str):
     if not validate_email(email):
         return CreateSubscriptionResponse(message="Invalid email.")
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-    if subscription:
-        return CreateSubscriptionResponse(message="Subscription exists.")
     
-    try:        
+    if subscription_type not in ["monthly", "yearly"]:
+        return CreateSubscriptionResponse(message="Invalid subscription type. Must be 'monthly' or 'yearly'.")
+    
+    subscription = (await session.execute(
+        sa.select(Subscription).filter_by(email=email)
+    )).scalars().first()
+    
+    if subscription:
+        return CreateSubscriptionResponse(message="Subscription already exists.")
+    
+    try:
         session.add(Subscription(email=email, subscription_type=subscription_type))
+        await session.commit()
         return CreateSubscriptionResponse(message="Created.")
     except SQLAlchemyError as e:
+        await session.rollback()
         return CreateSubscriptionResponse(message=f"Error: {str(e)}.")
+
     
 async def get_subscriptions(session: AsyncSession):
     subscriptions = (await session.execute(sa.select(Subscription))).scalars().all()
