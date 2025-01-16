@@ -1,8 +1,12 @@
 import re
 import sqlalchemy as sa
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.model import Subscription
+
 from src.grpc.generated.subscription_pb2 import (
     CreateSubscriptionResponse,
     GetSubscriptionsResponse,
@@ -10,15 +14,17 @@ from src.grpc.generated.subscription_pb2 import (
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
-    GetSubscriptionsDynamoDBResponse
+    # GetSubscriptionsDynamoDBResponse,
+    # CreateSubscriptionDynamoDBResponse,
+    # DeleteSubscriptionDynamoDBRequest,
+    # ChangeSubscriptionTypeDynamoDBRequest,
 )
 
-import asyncio
-import os
-from dotenv import load_dotenv
-from src.db.database import Database
-import boto3
-from src.db.model import Subscription
+
+
+# from src.db.database import Database
+# import boto3
+# import asyncio
 
 load_dotenv()
 
