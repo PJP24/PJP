@@ -15,13 +15,13 @@ class SubscriptionService(SubscriptionServiceServicer):
     def __init__(self, database: Database) -> None:
         self.database = database
 
-    async def CreateSubscription(self, request, context):
-        async with self.database.session_scope() as session:
-            return await create_subscription(session, request.email, request.subscription_type)
-
     async def GetSubscriptions(self, request, context):
         async with self.database.session_scope() as session:
             return await get_subscriptions(session)
+
+    async def CreateSubscription(self, request, context):
+        async with self.database.session_scope() as session:
+            return await create_subscription(session, request.email, request.subscription_type)
 
     async def ChangeSubscription(self, request, context):
         async with self.database.session_scope() as session:

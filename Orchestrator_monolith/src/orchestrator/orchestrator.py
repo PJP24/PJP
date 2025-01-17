@@ -18,12 +18,14 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = GetSubscriptionsRequest()
-                response = await stub.GetSubscriptions(request)
-
-            return [
-                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active}
+                response = await stub.GetSubscriptions(request)                 
+            result = [
+                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active, "end_date": sub.end_date}
                 for sub in response.subscriptions
             ]
+            print(333)
+            print(f"Result: {result}")
+            return result
         except Exception as e:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
 

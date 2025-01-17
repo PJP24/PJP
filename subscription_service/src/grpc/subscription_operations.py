@@ -7,6 +7,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.model import Subscription
 
+from datetime import datetime, timedelta
+
 from src.grpc.generated.subscription_pb2 import (
     CreateSubscriptionResponse,
     GetSubscriptionsResponse,
@@ -48,32 +50,32 @@ async def create_subscription(session: AsyncSession, email: str, subscription_ty
     if not validate_email(email):
         return CreateSubscriptionResponse(message="Invalid email.")
     
-    if subscription_type not in ["monthly", "yearly"]:
-        return CreateSubscriptionResponse(message="Invalid subscription type. Must be 'monthly' or 'yearly'.")
-    
-    subscription = (await session.execute(
-        sa.select(Subscription).filter_by(email=email)
-    )).scalars().first()
-    
+    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
     if subscription:
-        return CreateSubscriptionResponse(message="Subscription already exists.")
+        return CreateSubscriptionResponse(message="Subscription exists.")
+    
+    if subscription_type == 'monthly':
+        end_date = datetime.now().date() + timedelta(days=30)
+    elif subscription_type == 'yearly':
+        end_date = datetime.now().date() + timedelta(days=365)
+    else:
+        end_date = None
     
     try:
-        session.add(Subscription(email=email, subscription_type=subscription_type))
+        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=str(end_date))
+        session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")
+    
     except SQLAlchemyError as e:
-        await session.rollback()
         return CreateSubscriptionResponse(message=f"Error: {str(e)}.")
-
     
 async def get_subscriptions(session: AsyncSession):
     subscriptions = (await session.execute(sa.select(Subscription))).scalars().all()
-
     response = GetSubscriptionsResponse()
 
     for sub in subscriptions:
-        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active)
+        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date))
     return response
 
 async def change_subscription(session: AsyncSession, email: str, new_subscription: str):

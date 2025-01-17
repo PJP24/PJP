@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package subscription;
 
+import "google/protobuf/timestamp.proto";
+
 service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
@@ -17,6 +19,7 @@ service SubscriptionService {
 message CreateSubscriptionRequest {
   string email = 1;
   string subscription_type = 2;
+  string end_date = 3;
 }
 
 message CreateSubscriptionResponse {
@@ -72,6 +75,7 @@ message Subscription {
   string email = 1;
   string subscription_type = 2;
   bool is_active = 3;
+  string end_date = 4;
 }
 
 // Read DynamoDB

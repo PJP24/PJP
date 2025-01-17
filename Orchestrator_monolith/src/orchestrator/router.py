@@ -12,8 +12,9 @@ class SubscriptionRequest(BaseModel):
 
 @app.get("/subscriptions")
 async def get_all_subscriptions():
-    subscriptions = await orchestrator.get_all_subscriptions()
-    
+    print(222)
+    subscriptions = await orchestrator.get_all_subscriptions()    
+    print(f"Subscriptions: {subscriptions}")
     return {"subscriptions": subscriptions}
 
 @app.post("/subscriptions")

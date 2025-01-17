@@ -52,6 +52,19 @@ services:
     networks:
       - grpc_network
 
+  pgadmin_service:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    networks:
+      - grpc_network
+    depends_on:
+      - postgresql_service
+
 networks:
   grpc_network:
     name: grpc_network

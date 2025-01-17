@@ -19,3 +19,5 @@ Orchestrator_monolith/src/services/.DS_Store
 Orchestrator_monolith/src/orchestrator/.DS_Store
 __pycache__/
 GraphQL/.env
+subscription_service/.DS_Store
+subscription_service/alembic/.DS_Store
