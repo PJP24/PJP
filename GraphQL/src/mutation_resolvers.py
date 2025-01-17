@@ -18,17 +18,17 @@ async def add_subscription_resolver(email: str, subscription_type: str):
     except Exception as e:
         raise Exception(f"Error adding subscription: {e}")
 
-async def change_subscription_resolver(email: str, subscription_type: str):
-    from src.schema import UpdateSubscriptionResponse
+async def extend_subscription_resolver(email: str, period: str):
+    from src.schema import ExtendSubscriptionResponse
     try:
         url = f"{BASE_URL}/subscriptions"
         async with httpx.AsyncClient() as client:
-            request = await client.put(url, json={"email": email, "subscription_type": subscription_type})
+            request = await client.put(url, json={"email": email, "period": period})
             request.raise_for_status()
             result_info = request.json().get("message", "Unknown result")
-            return UpdateSubscriptionResponse(result_info=result_info)
+            return ExtendSubscriptionResponse(result_info=result_info)
     except Exception as e:
-        raise Exception(f"Error updating subscription: {e}")
+        raise Exception(f"Error extending subscription: {e}")
 
 async def delete_subscription_resolver(email: str):
     from src.schema import DeleteSubscriptionResponse

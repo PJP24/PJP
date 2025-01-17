@@ -8,7 +8,7 @@ from src.querry_resolvers import (
 
 from src.mutation_resolvers import (
     add_subscription_resolver,
-    change_subscription_resolver,
+    extend_subscription_resolver,
     delete_subscription_resolver,
     activate_subscription_resolver,
     deactivate_subscription_resolver,
@@ -47,6 +47,10 @@ class DeactivateSubscriptionResponse:
     result_info: str
 
 @strawberry.type
+class ExtendSubscriptionResponse:
+    result_info: str
+
+@strawberry.type
 class Query:
     all_subscriptions: List[Subscription] | None = strawberry.field(resolver=get_all_subscriptions_resolver)
     opt_out_policy: OptOutPolicyResponse | None = strawberry.field(resolver=opt_out_policy_resolver)
@@ -54,7 +58,7 @@ class Query:
 @strawberry.type
 class Mutation:
     add_subscription: AddSubscriptionResponse | None = strawberry.field(resolver=add_subscription_resolver)
-    change_subscription: UpdateSubscriptionResponse | None = strawberry.field(resolver=change_subscription_resolver)
+    extend_subscription: UpdateSubscriptionResponse | None = strawberry.field(resolver=extend_subscription_resolver)
     delete_subscription: DeleteSubscriptionResponse | None = strawberry.field(resolver=delete_subscription_resolver)
     activate_subscription: ActivateSubscriptionResponse | None = strawberry.field(resolver=activate_subscription_resolver)
     deactivate_subscription: DeactivateSubscriptionResponse | None = strawberry.field(resolver=deactivate_subscription_resolver)

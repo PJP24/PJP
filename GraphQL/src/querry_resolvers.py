@@ -14,7 +14,6 @@ async def get_all_subscriptions_resolver():
             request = await client.get(url)
             request.raise_for_status()
             raw_subscriptions = request.json().get("subscriptions", [])
-            print(f"Raw subscriptions: {raw_subscriptions}")
             return [Subscription(**sub) for sub in raw_subscriptions]
     except Exception as e:
         raise Exception(f"Error fetching subscriptions: {e}")

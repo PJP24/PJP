@@ -5,7 +5,7 @@ from src.grpc.generated.subscription_pb2 import OptOutPolicyResponse
 from src.grpc.subscription_operations import (
     create_subscription,
     get_subscriptions,
-    change_subscription,
+    extend_subscription,
     delete_subscription,
     activate_subscription,
     deactivate_subscription,
@@ -23,9 +23,9 @@ class SubscriptionService(SubscriptionServiceServicer):
         async with self.database.session_scope() as session:
             return await create_subscription(session, request.email, request.subscription_type)
 
-    async def ChangeSubscription(self, request, context):
+    async def ExtendSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            return await change_subscription(session, request.email, request.subscription_type)
+            return await extend_subscription(session, request.email, request.period)
 
     async def DeleteSubscription(self, request, context):
         async with self.database.session_scope() as session:
@@ -40,7 +40,7 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Opt-Out Policy:\n"
             "Cancel your subscription anytime to stop future charges.\n"
             "1. Press 5\n"
-            "2. Enter thr email you subscribed with\n"
+            "2. Enter the email you subscribed with\n"
             "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)

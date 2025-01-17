@@ -3,7 +3,7 @@ from src.generated.subscription_pb2_grpc import SubscriptionServiceStub
 from src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
     CreateSubscriptionRequest,
-    ChangeSubscriptionRequest,
+    ExtendSubscriptionRequest,
     DeleteSubscriptionRequest,
     ActivateSubscriptionRequest,
     DeactivateSubscriptionRequest,
@@ -23,8 +23,6 @@ class Orchestrator:
                 {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active, "end_date": sub.end_date}
                 for sub in response.subscriptions
             ]
-            print(333)
-            print(f"Result: {result}")
             return result
         except Exception as e:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
@@ -46,22 +44,22 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
-    async def change_subscription(self, email: str, subscription_type: str):
+    async def extend_subscription(self, email: str, period: str): 
         try:
             async with grpc.aio.insecure_channel(self.host) as channel:
                 stub = SubscriptionServiceStub(channel)
-                request = ChangeSubscriptionRequest(
+                request = ExtendSubscriptionRequest(
                     email=email,
-                    subscription_type=subscription_type
+                    period=period 
                 )
-                response = await stub.ChangeSubscription(request)
+                response = await stub.ExtendSubscription(request)
 
             if response.message is not None:
                 return {"status": "success", "message": response.message}
             else:
-                return {"status": "error", "message": "Error updating subscription"}
+                return {"status": "error", "message": "Error extending subscription"}
         except Exception as e:
-            return {"status": "error", "message": f"Error updating subscription: {e}"}
+            return {"status": "error", "message": f"Error extending subscription: {e}"}
 
     async def delete_subscription(self, email: str):
         try:
