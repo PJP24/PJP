@@ -58,11 +58,9 @@ async def create_subscription(session: AsyncSession, email: str, subscription_ty
         end_date = datetime.now().date() + timedelta(days=30)
     elif subscription_type == 'yearly':
         end_date = datetime.now().date() + timedelta(days=365)
-    else:
-        end_date = None
     
     try:
-        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=str(end_date))
+        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=end_date)
         session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")
