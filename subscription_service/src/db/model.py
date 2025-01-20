@@ -9,3 +9,4 @@ class Subscription(Base):
     email = sa.Column(sa.String, nullable=False, unique=True)
     subscription_type = sa.Column(sa.String, nullable=False)
     is_active = sa.Column(sa.Boolean, default=False)
+    end_date = sa.Column(sa.Date, nullable=True)

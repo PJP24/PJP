@@ -11,8 +11,10 @@ generate_all_protos_in_orchestrator:
 		$(PROTO_ROOT)/*.proto
 
 generate_all_protos_in_subscriptions:
-	mkdir -p Subscriptions/src/grpc/generated && python -m grpc_tools.protoc --proto_path=protos --python_out=Subscriptions/src/grpc/generated --grpc_python_out=Subscriptions/src/grpc/generated protos/subscription.proto
+	python -m grpc_tools.protoc --proto_path=protos --python_out=subscription_service/src/grpc/generated --grpc_python_out=subscription_service/src/grpc/generated protos/subscription.proto
 
+generate_all_protos_in_orchestrator:
+	python -m grpc_tools.protoc --proto_path=protos --python_out=Orchestrator_monolith/src/generated --grpc_python_out=Orchestrator_monolith/src/generated protos/subscription.proto
 
 create:
 	docker-compose up --build -d

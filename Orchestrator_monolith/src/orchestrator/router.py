@@ -10,10 +10,14 @@ class SubscriptionRequest(BaseModel):
     email: str
     subscription_type: str
 
+class ExtendSubscriptionRequest(BaseModel):
+    email: str
+    period: str  
+
 @app.get("/subscriptions")
 async def get_all_subscriptions():
-    subscriptions = await orchestrator.get_all_subscriptions()
-    
+    subscriptions = await orchestrator.get_all_subscriptions()    
+    print(f"Subscriptions: {subscriptions}")
     return {"subscriptions": subscriptions}
 
 @app.post("/subscriptions")
@@ -22,8 +26,8 @@ async def add_subscription(request: SubscriptionRequest):
     return result
 
 @app.put("/subscriptions")
-async def change_subscription(request: SubscriptionRequest):
-    result = await orchestrator.change_subscription(request.email, request.subscription_type)
+async def extend_subscription(request: ExtendSubscriptionRequest):
+    result = await orchestrator.extend_subscription(request.email, request.period)  
     return result
 
 @app.delete("/subscriptions/{email}")

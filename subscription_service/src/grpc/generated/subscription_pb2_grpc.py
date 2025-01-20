@@ -44,10 +44,10 @@ class SubscriptionServiceStub(object):
                 request_serializer=subscription__pb2.GetSubscriptionsRequest.SerializeToString,
                 response_deserializer=subscription__pb2.GetSubscriptionsResponse.FromString,
                 _registered_method=True)
-        self.ChangeSubscription = channel.unary_unary(
-                '/subscription.SubscriptionService/ChangeSubscription',
-                request_serializer=subscription__pb2.ChangeSubscriptionRequest.SerializeToString,
-                response_deserializer=subscription__pb2.ChangeSubscriptionResponse.FromString,
+        self.ExtendSubscription = channel.unary_unary(
+                '/subscription.SubscriptionService/ExtendSubscription',
+                request_serializer=subscription__pb2.ExtendSubscriptionRequest.SerializeToString,
+                response_deserializer=subscription__pb2.ExtendSubscriptionResponse.FromString,
                 _registered_method=True)
         self.OptOutPolicy = channel.unary_unary(
                 '/subscription.SubscriptionService/OptOutPolicy',
@@ -74,21 +74,6 @@ class SubscriptionServiceStub(object):
                 request_serializer=subscription__pb2.GetSubscriptionsDynamoDBRequest.SerializeToString,
                 response_deserializer=subscription__pb2.GetSubscriptionsDynamoDBResponse.FromString,
                 _registered_method=True)
-        self.CreateSubscriptionDynamoDB = channel.unary_unary(
-                '/subscription.SubscriptionService/CreateSubscriptionDynamoDB',
-                request_serializer=subscription__pb2.CreateSubscriptionDynamoDBRequest.SerializeToString,
-                response_deserializer=subscription__pb2.CreateSubscriptionDynamoDBResponse.FromString,
-                _registered_method=True)
-        self.DeleteSubscriptionDynamoDB = channel.unary_unary(
-                '/subscription.SubscriptionService/DeleteSubscriptionDynamoDB',
-                request_serializer=subscription__pb2.DeleteSubscriptionDynamoDBRequest.SerializeToString,
-                response_deserializer=subscription__pb2.DeleteSubscriptionDynamoDBResponse.FromString,
-                _registered_method=True)
-        self.ChangeSubscriptionTypeDynamoDB = channel.unary_unary(
-                '/subscription.SubscriptionService/ChangeSubscriptionTypeDynamoDB',
-                request_serializer=subscription__pb2.ChangeSubscriptionTypeDynamoDBRequest.SerializeToString,
-                response_deserializer=subscription__pb2.ChangeSubscriptionTypeDynamoDBResponse.FromString,
-                _registered_method=True)
 
 
 class SubscriptionServiceServicer(object):
@@ -106,7 +91,7 @@ class SubscriptionServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ChangeSubscription(self, request, context):
+    def ExtendSubscription(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -142,24 +127,6 @@ class SubscriptionServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreateSubscriptionDynamoDB(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def DeleteSubscriptionDynamoDB(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def ChangeSubscriptionTypeDynamoDB(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
 
 def add_SubscriptionServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -173,10 +140,10 @@ def add_SubscriptionServiceServicer_to_server(servicer, server):
                     request_deserializer=subscription__pb2.GetSubscriptionsRequest.FromString,
                     response_serializer=subscription__pb2.GetSubscriptionsResponse.SerializeToString,
             ),
-            'ChangeSubscription': grpc.unary_unary_rpc_method_handler(
-                    servicer.ChangeSubscription,
-                    request_deserializer=subscription__pb2.ChangeSubscriptionRequest.FromString,
-                    response_serializer=subscription__pb2.ChangeSubscriptionResponse.SerializeToString,
+            'ExtendSubscription': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExtendSubscription,
+                    request_deserializer=subscription__pb2.ExtendSubscriptionRequest.FromString,
+                    response_serializer=subscription__pb2.ExtendSubscriptionResponse.SerializeToString,
             ),
             'OptOutPolicy': grpc.unary_unary_rpc_method_handler(
                     servicer.OptOutPolicy,
@@ -202,21 +169,6 @@ def add_SubscriptionServiceServicer_to_server(servicer, server):
                     servicer.GetSubscriptionsDynamoDB,
                     request_deserializer=subscription__pb2.GetSubscriptionsDynamoDBRequest.FromString,
                     response_serializer=subscription__pb2.GetSubscriptionsDynamoDBResponse.SerializeToString,
-            ),
-            'CreateSubscriptionDynamoDB': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateSubscriptionDynamoDB,
-                    request_deserializer=subscription__pb2.CreateSubscriptionDynamoDBRequest.FromString,
-                    response_serializer=subscription__pb2.CreateSubscriptionDynamoDBResponse.SerializeToString,
-            ),
-            'DeleteSubscriptionDynamoDB': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteSubscriptionDynamoDB,
-                    request_deserializer=subscription__pb2.DeleteSubscriptionDynamoDBRequest.FromString,
-                    response_serializer=subscription__pb2.DeleteSubscriptionDynamoDBResponse.SerializeToString,
-            ),
-            'ChangeSubscriptionTypeDynamoDB': grpc.unary_unary_rpc_method_handler(
-                    servicer.ChangeSubscriptionTypeDynamoDB,
-                    request_deserializer=subscription__pb2.ChangeSubscriptionTypeDynamoDBRequest.FromString,
-                    response_serializer=subscription__pb2.ChangeSubscriptionTypeDynamoDBResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -284,7 +236,7 @@ class SubscriptionService(object):
             _registered_method=True)
 
     @staticmethod
-    def ChangeSubscription(request,
+    def ExtendSubscription(request,
             target,
             options=(),
             channel_credentials=None,
@@ -297,9 +249,9 @@ class SubscriptionService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/subscription.SubscriptionService/ChangeSubscription',
-            subscription__pb2.ChangeSubscriptionRequest.SerializeToString,
-            subscription__pb2.ChangeSubscriptionResponse.FromString,
+            '/subscription.SubscriptionService/ExtendSubscription',
+            subscription__pb2.ExtendSubscriptionRequest.SerializeToString,
+            subscription__pb2.ExtendSubscriptionResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -435,87 +387,6 @@ class SubscriptionService(object):
             '/subscription.SubscriptionService/GetSubscriptionsDynamoDB',
             subscription__pb2.GetSubscriptionsDynamoDBRequest.SerializeToString,
             subscription__pb2.GetSubscriptionsDynamoDBResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def CreateSubscriptionDynamoDB(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/subscription.SubscriptionService/CreateSubscriptionDynamoDB',
-            subscription__pb2.CreateSubscriptionDynamoDBRequest.SerializeToString,
-            subscription__pb2.CreateSubscriptionDynamoDBResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def DeleteSubscriptionDynamoDB(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/subscription.SubscriptionService/DeleteSubscriptionDynamoDB',
-            subscription__pb2.DeleteSubscriptionDynamoDBRequest.SerializeToString,
-            subscription__pb2.DeleteSubscriptionDynamoDBResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def ChangeSubscriptionTypeDynamoDB(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/subscription.SubscriptionService/ChangeSubscriptionTypeDynamoDB',
-            subscription__pb2.ChangeSubscriptionTypeDynamoDBRequest.SerializeToString,
-            subscription__pb2.ChangeSubscriptionTypeDynamoDBResponse.FromString,
             options,
             channel_credentials,
             insecure,

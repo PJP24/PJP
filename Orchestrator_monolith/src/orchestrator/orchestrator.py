@@ -1,92 +1,117 @@
 import grpc
-from src.generated import subscription_pb2, subscription_pb2_grpc
+from src.generated.subscription_pb2_grpc import SubscriptionServiceStub
+from src.generated.subscription_pb2 import (
+    GetSubscriptionsRequest,
+    CreateSubscriptionRequest,
+    ExtendSubscriptionRequest,
+    DeleteSubscriptionRequest,
+    ActivateSubscriptionRequest,
+    DeactivateSubscriptionRequest,
+)
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
         self.host = "subscription_server_container:50052"
 
     async def get_all_subscriptions(self):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.GetSubscriptionsRequest()
-            response = await stub.GetSubscriptions(request)
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetSubscriptionsRequest()
+                response = await stub.GetSubscriptions(request)                 
+            result = [
+                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active, "end_date": sub.end_date}
+                for sub in response.subscriptions
+            ]
+            return result
+        except Exception as e:
+            return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
 
-        return [{"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active} for sub in response.subscriptions]
-    
     async def add_subscription(self, email: str, subscription_type: str):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.CreateSubscriptionRequest(
-                email=email,
-                subscription_type=subscription_type
-            )
-            response = await stub.CreateSubscription(request)
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = CreateSubscriptionRequest(
+                    email=email,
+                    subscription_type=subscription_type
+                )
+                response = await stub.CreateSubscription(request)
 
-        if response.message is not None:
-            return {"status": "success", "message": response.message}
-        else:
-            return {"status": "error", "message": "Error adding subscription"}
+            if response.message is not None:
+                return {"status": "success", "message": response.message}
+            else:
+                return {"status": "error", "message": "Error adding subscription"}
+        except Exception as e:
+            return {"status": "error", "message": f"Error adding subscription: {e}"}
 
-    async def change_subscription(self, email: str, subscription_type: str):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.ChangeSubscriptionRequest(
-                email=email,
-                subscription_type=subscription_type
-            )
-            response = await stub.ChangeSubscription(request)
+    async def extend_subscription(self, email: str, period: str): 
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = ExtendSubscriptionRequest(
+                    email=email,
+                    period=period 
+                )
+                response = await stub.ExtendSubscription(request)
 
-        if response.message is not None:
-            return {"status": "success", "message": response.message}
-        else:
-            return {"status": "error", "message": "Error updating subscription"}
+            if response.message is not None:
+                return {"status": "success", "message": response.message}
+            else:
+                return {"status": "error", "message": "Error extending subscription"}
+        except Exception as e:
+            return {"status": "error", "message": f"Error extending subscription: {e}"}
 
     async def delete_subscription(self, email: str):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.DeleteSubscriptionRequest(
-                email=email
-            )
-            response = await stub.DeleteSubscription(request)
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = DeleteSubscriptionRequest(email=email)
+                response = await stub.DeleteSubscription(request)
 
-        if response.message is not None:
-            return {"status": "success", "message": response.message}
-        else:
-            return {"status": "error", "message": "Error deleting subscription"}
+            if response.message is not None:
+                return {"status": "success", "message": response.message}
+            else:
+                return {"status": "error", "message": "Error deleting subscription"}
+        except Exception as e:
+            return {"status": "error", "message": f"Error deleting subscription: {e}"}
 
-    
     async def activate_subscription(self, email: str):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.ActivateSubscriptionRequest(
-                email=email
-            )
-            response = await stub.ActivateSubscription(request)
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = ActivateSubscriptionRequest(email=email)
+                response = await stub.ActivateSubscription(request)
 
-        if response.message is not None:
-            return {"status": "success", "message": response.message}
-        else:
-            return {"status": "error", "message": "Error activating subscription"}
-    
+            if response.message is not None:
+                return {"status": "success", "message": response.message}
+            else:
+                return {"status": "error", "message": "Error activating subscription"}
+        except Exception as e:
+            return {"status": "error", "message": f"Error activating subscription: {e}"}
+
     async def deactivate_subscription(self, email: str):
-        async with grpc.aio.insecure_channel(self.host) as channel:
-            stub = subscription_pb2_grpc.SubscriptionServiceStub(channel)
-            request = subscription_pb2.DeactivateSubscriptionRequest(
-                email=email
-            )
-            response = await stub.DeactivateSubscription(request)
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = DeactivateSubscriptionRequest(email=email)
+                response = await stub.DeactivateSubscription(request)
 
-        if response.message is not None:
-            return {"status": "success", "message": response.message}
-        else:
-            return {"status": "error", "message": "Error deactivating subscription"}
+            if response.message is not None:
+                return {"status": "success", "message": response.message}
+            else:
+                return {"status": "error", "message": "Error deactivating subscription"}
+        except Exception as e:
+            return {"status": "error", "message": f"Error deactivating subscription: {e}"}
 
     async def get_opt_out_policy(self):
-        policy_text = (
-            "Opt-Out Policy:\n"
-            "Cancel your subscription anytime to stop future charges.\n"
-            "1. Press 5\n"
-            "2. Enter the email you subscribed with\n"
-            "Activate your subscription again any time."
-        )
-        return policy_text
+        try:
+            policy_text = (
+                "Opt-Out Policy:\n"
+                "Cancel your subscription anytime to stop future charges.\n"
+                "1. Press 5\n"
+                "2. Enter the email you subscribed with\n"
+                "Activate your subscription again any time."
+            )
+            return policy_text
+        except Exception as e:
+            return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}

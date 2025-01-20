@@ -1,24 +1,30 @@
 import re
 import sqlalchemy as sa
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.model import Subscription
+
+from datetime import datetime, timedelta
+
 from src.grpc.generated.subscription_pb2 import (
     CreateSubscriptionResponse,
     GetSubscriptionsResponse,
-    ChangeSubscriptionResponse,
+    ExtendSubscriptionResponse,
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
-    GetSubscriptionsDynamoDBResponse
+    # GetSubscriptionsDynamoDBResponse,
+    # CreateSubscriptionDynamoDBResponse,
+    # DeleteSubscriptionDynamoDBRequest,
+    # ChangeSubscriptionTypeDynamoDBRequest,
 )
 
-import asyncio
-import os
-from dotenv import load_dotenv
-from src.db.database import Database
-import boto3
-from src.db.model import Subscription
+# from src.db.database import Database
+# import boto3
+# import asyncio
 
 load_dotenv()
 
@@ -27,12 +33,12 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # Connect to DynamoDB
-dynamodb = boto3.resource(
-    'dynamodb',
-    region_name=AWS_REGION,
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-)
+# dynamodb = boto3.resource(
+#     'dynamodb',
+#     region_name=AWS_REGION,
+#     aws_access_key_id=AWS_ACCESS_KEY_ID,
+#     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+# )
 
 def validate_email(email: str) -> bool:
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -41,41 +47,57 @@ def validate_email(email: str) -> bool:
 async def create_subscription(session: AsyncSession, email: str, subscription_type: str):
     if not validate_email(email):
         return CreateSubscriptionResponse(message="Invalid email.")
+    
     subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
     if subscription:
         return CreateSubscriptionResponse(message="Subscription exists.")
     
-    try:        
-        session.add(Subscription(email=email, subscription_type=subscription_type))
+    if subscription_type == 'monthly':
+        end_date = datetime.now().date() + timedelta(days=30)
+    elif subscription_type == 'yearly':
+        end_date = datetime.now().date() + timedelta(days=365)
+    
+    try:
+        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=end_date)
+        session.add(new_subscription)
+        await session.commit()
         return CreateSubscriptionResponse(message="Created.")
+    
     except SQLAlchemyError as e:
         return CreateSubscriptionResponse(message=f"Error: {str(e)}.")
     
 async def get_subscriptions(session: AsyncSession):
     subscriptions = (await session.execute(sa.select(Subscription))).scalars().all()
-
     response = GetSubscriptionsResponse()
 
     for sub in subscriptions:
-        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active)
+        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date))
     return response
 
-async def change_subscription(session: AsyncSession, email: str, new_subscription: str):
-
+async def extend_subscription(session: AsyncSession, email: str, period: str):  
     subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
 
     if subscription is None:
-        return ChangeSubscriptionResponse(message="No subscription with this email.")
-
-    if subscription.subscription_type == new_subscription:
-        return ChangeSubscriptionResponse(message=f"Subscription for {email} is already {new_subscription}.")
-
+        return ExtendSubscriptionResponse(message="No subscription with this email.")
+    
+    if period == 'month':
+        new_end_date = subscription.end_date + timedelta(days=30)
+    elif period == 'year':
+        new_end_date = subscription.end_date + timedelta(days=365)
+    else:
+        return ExtendSubscriptionResponse(message="Invalid period. Use 'month' or 'year'.")
+    
     try:
-        await session.execute(sa.update(Subscription).where(Subscription.email == email).values(subscription_type=new_subscription))
-        return ChangeSubscriptionResponse(message=f"Subscription for {email} updated to {new_subscription}.")
+        await session.execute(
+            sa.update(Subscription)
+            .where(Subscription.email == email)
+            .values(end_date=new_end_date)
+        )
+        await session.commit()
+        return ExtendSubscriptionResponse(message=f"Subscription for {email} extended to {new_end_date}.")
     
     except SQLAlchemyError as e:
-        return ChangeSubscriptionResponse(message=f"Failed to change subscription: {str(e)}.")
+        return ExtendSubscriptionResponse(message=f"Failed to extend subscription: {str(e)}.")
 
 async def delete_subscription(session: AsyncSession, email: str):
     subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
