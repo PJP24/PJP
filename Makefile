@@ -1,6 +1,7 @@
 grpc:
-	@python -m grpc_tools.protoc -I=protos --python_out=user_service/grpc/generated --grpc_python_out=user_service/grpc/generated protos/user.proto
-	@python -m grpc_tools.protoc -I=protos --python_out=subscription_service/grpc/generated --grpc_python_out=subscription_service/grpc/generated protos/subscription.proto
+	@python -m grpc_tools.protoc -I=protos --python_out=user_service/grpc_services/generated --grpc_python_out=user_service/grpc_services/generated protos/user.proto
+	@python -m grpc_tools.protoc -I=protos --python_out=subscription_service/grpc_services/generated --grpc_python_out=subscription_service/grpc_services/generated protos/subscription.proto
+	@python -m grpc_tools.protoc -I=protos --python_out=orchestrator/generated --grpc_python_out=orchestrator/generated protos/*.proto
 	@echo "gRPC files generated successfully."
 
 install:

@@ -5,7 +5,6 @@ service UserManagement {
     rpc read (Id) returns (UserDetails);
     rpc update_password (UpdatePassword) returns (Response);
     rpc delete (Id) returns (Response);
-
 }
 
 message UpdatePassword {

@@ -1,7 +1,7 @@
 import grpc
-from user_service.grpc_services.generated.user_pb2_grpc import UserManagementStub
-from user_service.grpc_services.generated.user_pb2 import Id, User, UpdatePassword
-from subscription_service.grpc_services.generated import subscription_pb2, subscription_pb2_grpc
+from orchestrator.generated.user_pb2_grpc import UserManagementStub
+from orchestrator.generated.user_pb2 import Id, User, UpdatePassword
+from orchestrator.generated import subscription_pb2, subscription_pb2_grpc
 
 
 class OrchestratorService:
