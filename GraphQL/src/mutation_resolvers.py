@@ -66,16 +66,6 @@ async def deactivate_subscription_resolver(email: str):
     except Exception as e:
         raise Exception(f"Error deactivating subscription: {e}")
 
-import asyncio
-import httpx
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-BASE_URL = os.getenv("BASE_URL")
-
-
 async def add_user(username: str, email: str, password: str):
     from src.schema import AddUserResponse, User
 
@@ -128,14 +118,6 @@ async def delete_user(self, user_id: int):
             response = await client.delete(url)
             response.raise_for_status()
             response_data = response.json()
-
-            return DeleteUserResponse(
-                status=response_data.get("status"), message=response_data.get("message")
-            )
-        except Exception as e:
-            print(e)
-
-
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
             return DeleteUserResponse(status="error", message=str(e))
         return DeleteUserResponse(
