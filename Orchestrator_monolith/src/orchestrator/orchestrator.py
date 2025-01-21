@@ -115,3 +115,93 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
+        
+# import logging
+# from src.logger.logging_handler import DynamoDBLogHandler
+import grpc
+from src.generated.user_pb2_grpc import UserManagementStub
+from src.generated.user_pb2 import Id, User, UpdatePassword
+
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# dynamo_handler = DynamoDBLogHandler()
+# formatter = logging.Formatter('%(message)s')
+# dynamo_handler.setFormatter(formatter)
+# logger.addHandler(dynamo_handler)
+
+
+class Orchestrator:
+    def __init__(self):
+        self.host = "grpc-server:50051"
+
+    async def get_user(self, user_id: int):
+        # logger.info(f"Fetching user data for user_id: {user_id}")
+        try:
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = UserManagementStub(channel)
+                user_data = await stub.read(Id(id=user_id))
+                # logger.info(f"Received user data: {user_data}")
+                return {"username": user_data.username, "email": user_data.email}
+        except Exception as e:
+            # logger.error(f"Error fetching user data for user_id {user_id}: {e}")
+            return {"error": f"Error fetching user data: {str(e)}"}
+
+    async def add_user(self, username: str, email: str, password: str):
+        # logger.info(f"Adding user with name: {name}, email: {email}")
+        try:
+            request = User(username=username, email=email, password=password)
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = UserManagementStub(channel)
+                user_data = await stub.create(request)
+            # if user_data.status == "error":
+            #     # logger.error(f"Error adding user: {user_data['error']}")
+            #     return {"error": user_data["error"]}
+
+            # logger.info(f"User added successfully: {user_data}")
+                return {
+                    "status": user_data.status,
+                    "message": user_data.message,
+                    "username": user_data.username,
+                    "email": user_data.email,
+                }
+        except Exception as e:
+            # logger.error(f"Error adding user with name {name} and email {email}: {e}")
+            return {"error": f"Error adding user: {str(e)}"}
+
+    async def update_user_password(self, user_id: int, old_password: str, new_password: str):
+        # logger.info(f"Updating password for user with id {user_id}")
+        try:
+            request = UpdatePassword(
+                user_id=Id(id=user_id),
+                old_password=old_password,
+                new_password=new_password,
+            )
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = UserManagementStub(channel)
+                response = await stub.update_password(request)
+            # if user_data.status == "error":
+            #     # logger.error(f"Error updating password for user {user_id}")
+            #     return {"error": user_data["error"]}
+
+            # logger.info(f"User updated successfully: {user_data}")
+                return {"status": response.status, "message": response.message}
+        except Exception as e:
+            # logger.error(f"Error updating user with user_id {user_id}, name {name}, and email {email}: {e}")
+            return {"error": f"Error updating user: {str(e)}"}
+
+    async def delete_user(self, user_id: int):
+        # logger.info(f"Deleting user with user_id: {user_id}")
+        try:
+            request = Id(id=user_id)
+            async with grpc.aio.insecure_channel(self.host) as channel:
+                stub = UserManagementStub(channel)
+                response = await stub.delete(request)
+            # if response.status == "error":
+            #     # logger.error(f"Error deleting user: {user_data['error']}")
+
+            # logger.info(f"User deleted successfully: {user_data}")
+                return {"status": response.status, "message": response.message}
+        except Exception as e:
+            # logger.error(f"Error deleting user with user_id {user_id}: {e}")
+
+            return {"error": f"Error deleting user: {str(e)}"}

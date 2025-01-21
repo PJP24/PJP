@@ -3,7 +3,10 @@
 import grpc
 import warnings
 
+
 import user_pb2 as user__pb2
+
+from src.services.generated import user_pb2 as user__pb2
 
 GRPC_GENERATED_VERSION = '1.68.0'
 GRPC_VERSION = grpc.__version__
@@ -37,7 +40,7 @@ class UserManagementStub(object):
         self.create = channel.unary_unary(
                 '/UserManagement/create',
                 request_serializer=user__pb2.User.SerializeToString,
-                response_deserializer=user__pb2.Response.FromString,
+                response_deserializer=user__pb2.CreateUserResponse.FromString,
                 _registered_method=True)
         self.read = channel.unary_unary(
                 '/UserManagement/read',
@@ -51,7 +54,7 @@ class UserManagementStub(object):
                 _registered_method=True)
         self.delete = channel.unary_unary(
                 '/UserManagement/delete',
-                request_serializer=user__pb2.DeleteUser.SerializeToString,
+                request_serializer=user__pb2.Id.SerializeToString,
                 response_deserializer=user__pb2.Response.FromString,
                 _registered_method=True)
 
@@ -89,7 +92,7 @@ def add_UserManagementServicer_to_server(servicer, server):
             'create': grpc.unary_unary_rpc_method_handler(
                     servicer.create,
                     request_deserializer=user__pb2.User.FromString,
-                    response_serializer=user__pb2.Response.SerializeToString,
+                    response_serializer=user__pb2.CreateUserResponse.SerializeToString,
             ),
             'read': grpc.unary_unary_rpc_method_handler(
                     servicer.read,
@@ -103,7 +106,7 @@ def add_UserManagementServicer_to_server(servicer, server):
             ),
             'delete': grpc.unary_unary_rpc_method_handler(
                     servicer.delete,
-                    request_deserializer=user__pb2.DeleteUser.FromString,
+                    request_deserializer=user__pb2.Id.FromString,
                     response_serializer=user__pb2.Response.SerializeToString,
             ),
     }
@@ -133,7 +136,7 @@ class UserManagement(object):
             target,
             '/UserManagement/create',
             user__pb2.User.SerializeToString,
-            user__pb2.Response.FromString,
+            user__pb2.CreateUserResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -213,7 +216,7 @@ class UserManagement(object):
             request,
             target,
             '/UserManagement/delete',
-            user__pb2.DeleteUser.SerializeToString,
+            user__pb2.Id.SerializeToString,
             user__pb2.Response.FromString,
             options,
             channel_credentials,

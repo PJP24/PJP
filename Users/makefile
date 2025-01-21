@@ -11,8 +11,17 @@ protos:
 		--grpc_python_out=./src/grpc/generated \
 		proto_files/user.proto
 
+	python \
+		-m grpc_tools.protoc \
+		-I./proto_files \
+		--python_out=../Orchestrator_monolith/src/services/generated \
+		--grpc_python_out=../Orchestrator_monolith/src/services/generated \
+		proto_files/user.proto
+
+
+
 server:
 	python main.py
 
 client:
-	python client.py
+	python client.py§

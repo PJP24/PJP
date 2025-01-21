@@ -28,9 +28,7 @@ class UserCrud:
                 )
                 session.add(user_db)
                 return "success"
-        except IntegrityError:
-            return "Account already exists with this username/email."
-        except SQLAlchemyError as e:
+        except (IntegrityError, SQLAlchemyError) as e:
             raise e
 
     async def update_password(self, user_id: int, new_password: str):

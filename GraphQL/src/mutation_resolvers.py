@@ -65,3 +65,61 @@ async def deactivate_subscription_resolver(email: str):
             return DeactivateSubscriptionResponse(result_info=result_info)
     except Exception as e:
         raise Exception(f"Error deactivating subscription: {e}")
+
+async def add_user(username: str, email: str, password: str):
+    from src.schema import AddUserResponse, User
+
+    user_data = {"username": username, "email": email, "password": password}
+    url = f"{BASE_URL}/add_user"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json=user_data)
+            response.raise_for_status()
+            response_data = response.json()
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            return AddUserResponse(status="error", message=str(e), user=None)
+        if response_data.get("status") == "error":
+            return AddUserResponse(
+                status="error", message=response_data.get("message"), user=None
+            )
+        return AddUserResponse(
+            status="success",
+            message=response_data.get("message"),
+            user=User(
+                username=response_data.get("username"),
+                email=response_data.get("email"),
+            ),
+        )
+
+
+async def update_user_password(user_id: int, old_password: str, new_password: str):
+    from src.schema import UpdateUserResponse
+
+    passwords = {"old_password": old_password, "new_password": new_password}
+    url = f"{BASE_URL}/update_password/{user_id}"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.patch(url, json=passwords)
+            response.raise_for_status()
+            response_data = response.json()
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
+            return UpdateUserResponse(status="error", message=str(e))
+        return UpdateUserResponse(
+            status=response_data.get("status"), message=response_data.get("message")
+        )
+
+
+async def delete_user(self, user_id: int):
+    from src.schema import DeleteUserResponse
+
+    url = f"{BASE_URL}/delete_user/{user_id}"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.delete(url)
+            response.raise_for_status()
+            response_data = response.json()
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
+            return DeleteUserResponse(status="error", message=str(e))
+        return DeleteUserResponse(
+            status=response_data.get("status"), message=response_data.get("message")
+        )
