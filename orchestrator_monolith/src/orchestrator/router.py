@@ -2,8 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from src.orchestrator.orchestrator import Orchestrator
 
-users_router = APIRouter(prefix="/users")
-subscriptions_router = APIRouter(prefix="/subscriptions")
+fastapi_app = APIRouter(prefix="")
 
 orchestrator = Orchestrator()
 
@@ -16,38 +15,38 @@ class ExtendSubscriptionRequest(BaseModel):
     email: str
     period: str  
 
-@subscriptions_router.get("/subscriptions")
+@fastapi_app.get("/get_subscriptions")
 async def get_all_subscriptions():
     subscriptions = await orchestrator.get_all_subscriptions()    
     print(f"Subscriptions: {subscriptions}")
     return {"subscriptions": subscriptions}
 
-@subscriptions_router.post("/subscriptions")
+@fastapi_app.post("/add_subscriptions")
 async def add_subscription(request: SubscriptionRequest):
     result = await orchestrator.add_subscription(request.email, request.subscription_type)
     return result
 
-@subscriptions_router.put("/subscriptions")
+@fastapi_app.put("/extend_subscriptions")
 async def extend_subscription(request: ExtendSubscriptionRequest):
     result = await orchestrator.extend_subscription(request.email, request.period)  
     return result
 
-@subscriptions_router.delete("/subscriptions/{email}")
+@fastapi_app.delete("/delete_subscriptions/{email}")
 async def delete_subscription(email: str):
     result = await orchestrator.delete_subscription(email)
     return result
 
-@subscriptions_router.post("/subscriptions/{email}/activate")
+@fastapi_app.post("/activate_subscriptions/{email}")
 async def activate_subscription(email: str):
     result = await orchestrator.activate_subscription(email)
     return result
 
-@subscriptions_router.post("/subscriptions/{email}/deactivate")
+@fastapi_app.post("/deactivate_subscriptions/{email}")
 async def deactivate_subscription(email: str):
     result = await orchestrator.deactivate_subscription(email)
     return result
 
-@subscriptions_router.get("/opt-out-policy")
+@fastapi_app.get("/opt-out-policy")
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
@@ -63,13 +62,13 @@ class UpdatePassword(BaseModel):
     new_password: str
 
 
-@users_router.get("/user_details/{user_id}")
+@fastapi_app.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):
     result = await orchestrator.get_user(user_id=user_id)
     return result
 
 
-@users_router.post("/add_user")
+@fastapi_app.post("/add_user")
 async def add_user(user: User):
     result = await orchestrator.add_user(
         username=user.username, email=user.email, password=user.password
@@ -77,13 +76,13 @@ async def add_user(user: User):
     return result
 
 
-@users_router.delete("/delete_user/{user_id}")
+@fastapi_app.delete("/delete_user/{user_id}")
 async def delete_user(user_id: int):
     result = await orchestrator.delete_user(user_id=user_id)
     return result
 
 
-@users_router.patch("/update_password/{user_id}")
+@fastapi_app.patch("/update_password/{user_id}")
 async def update_password(user_id: int, passwords: UpdatePassword):
     result = await orchestrator.update_user_password(
         user_id=user_id,

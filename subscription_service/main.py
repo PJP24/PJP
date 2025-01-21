@@ -1,6 +1,6 @@
 import asyncio
-from src.grpc.config import DATABASE_URL as db_url
-from src.grpc.start_grpc_server import start_grpc_server
+from src.grpc_services.config import DATABASE_URL as db_url
+from src.grpc_services.start_grpc_server import start_grpc_server
 from src.db.database import Database
 
 async def main():

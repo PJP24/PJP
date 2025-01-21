@@ -9,7 +9,7 @@ BASE_URL = os.getenv("FASTAPI_BASE_URL")
 async def add_subscription_resolver(email: str, subscription_type: str):
     from src.schema import AddSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions"
+        url = f"{BASE_URL}/add_subscriptions"
         async with httpx.AsyncClient() as client:
             request = await client.post(url, json={"email": email, "subscription_type": subscription_type})
             request.raise_for_status()
@@ -21,7 +21,7 @@ async def add_subscription_resolver(email: str, subscription_type: str):
 async def extend_subscription_resolver(email: str, period: str):
     from src.schema import ExtendSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions"
+        url = f"{BASE_URL}/extend_subscriptions"
         async with httpx.AsyncClient() as client:
             request = await client.put(url, json={"email": email, "period": period})
             request.raise_for_status()
@@ -33,7 +33,7 @@ async def extend_subscription_resolver(email: str, period: str):
 async def delete_subscription_resolver(email: str):
     from src.schema import DeleteSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions/{email}"
+        url = f"{BASE_URL}/delete_subscriptions/{email}"
         async with httpx.AsyncClient() as client:
             request = await client.delete(url)
             request.raise_for_status()
@@ -45,7 +45,7 @@ async def delete_subscription_resolver(email: str):
 async def activate_subscription_resolver(email: str):
     from src.schema import ActivateSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions/{email}/activate"
+        url = f"{BASE_URL}/activate_subscriptions/{email}/activate"
         async with httpx.AsyncClient() as client:
             request = await client.post(url)
             request.raise_for_status()
@@ -57,7 +57,7 @@ async def activate_subscription_resolver(email: str):
 async def deactivate_subscription_resolver(email: str):
     from src.schema import DeactivateSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions/{email}/deactivate"
+        url = f"{BASE_URL}/deactivate_subscriptions/{email}"
         async with httpx.AsyncClient() as client:
             request = await client.post(url)
             request.raise_for_status()
@@ -70,7 +70,7 @@ async def add_user(username: str, email: str, password: str):
     from src.schema import AddUserResponse, User
 
     user_data = {"username": username, "email": email, "password": password}
-    url = f"{BASE_URL}/users/add_user"
+    url = f"{BASE_URL}/add_user"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(url, json=user_data)
@@ -96,7 +96,7 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
     from src.schema import Response
 
     passwords = {"old_password": old_password, "new_password": new_password}
-    url = f"{BASE_URL}/users/update_password/{user_id}"
+    url = f"{BASE_URL}/update_password/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.patch(url, json=passwords)
@@ -112,7 +112,7 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
 async def delete_user(self, user_id: int):
     from src.schema import Response
 
-    url = f"{BASE_URL}/users/delete_user/{user_id}"
+    url = f"{BASE_URL}/delete_user/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.delete(url)

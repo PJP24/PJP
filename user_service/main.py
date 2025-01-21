@@ -1,11 +1,11 @@
 import asyncio
 import grpc
-from src.grpc.server import UserManagement
-from src.grpc.user_crud import UserCrud
+from src.grpc_services.server import UserManagement
+from src.grpc_services.user_crud import UserCrud
 
 
 from src.db.database import Database
-from src.grpc.generated import user_pb2_grpc
+from src.grpc_services.generated import user_pb2_grpc
 import config
 
 DB_URL = config.DB_URL

@@ -1,7 +1,7 @@
 services:
-  postgresql_service:
+  postgresql_subscription_service:
     image: postgres
-    container_name: postgresql_container
+    container_name: postgresql_subscription_container
     environment:
       POSTGRES_PASSWORD: my_secret_password
       POSTGRES_DB: grpc_database
@@ -20,65 +20,19 @@ services:
     volumes:
       - postgresql_data:/var/lib/postgresql/data
 
-  subscription_server_service:
-    build:
-      context: ./subscription_service
-    image: grpc-server
-    container_name: subscription_server_container
-    ports:
-      - "50052:50052"
-    depends_on:
-      postgresql_service:
-        condition: service_healthy
-    restart: always
-    networks:
-      - grpc_network
-
-  fastapi_service:
-    container_name: fastapi_container
-    build:
-      context: ./Orchestrator_monolith
-      dockerfile: Docker/Dockerfile.fastapi
-    ports:
-      - 8000:8000
-    networks:
-      - grpc_network
-
-  graphql_service:
-    build:
-      context: ./GraphQL
-    container_name: graphql_container
-    ports:
-      - "5001:5001"
-    networks:
-      - grpc_network
-
-  pgadmin_service:
-    image: dpage/pgadmin4
-    container_name: pgadmin_container
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8080:80"
-    networks:
-      - grpc_network
-    depends_on:
-      - postgresql_service
-
   postgresql_user_service:
     image: postgres:13-alpine
-    container_name: postgresql_user_container
     ports:
       - 5432:5432
+    container_name: postgresql_user_container
     environment:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test123
       - POSTGRES_DB=user_management
     volumes:
-      - postgresql_user_data:/var/lib/postgresql/data
+      - postgres_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test -d user_management"]
+      test: [ "CMD-SHELL", "pg_isready -U test -d user_management" ]
       interval: 10s
       retries: 5
       start_period: 30s
@@ -86,27 +40,57 @@ services:
     networks:
       - grpc_network
 
+  subscription_server_service:
+    build:
+      context: ./subscription_service
+    container_name: subscription_service_container
+    ports:
+      - "50052:50052"
+    depends_on:
+      postgresql_subscription_service:
+        condition: service_healthy
+    networks:
+      - grpc_network
+
   user_server_service:
     build:
       dockerfile: Dockerfile
       context: user_service
-    container_name: user_server_container
+    container_name: user_service_container
     ports:
-      - 50051:50051
+      - "50051:50051"
     depends_on:
       postgresql_user_service:
         condition: service_healthy
-        restart: true
     networks:
       - grpc_network
-      
+
+  fastapi_orchestrator_service:
+    container_name: fastapi_orchestrator_container
+    build:
+      context: orchestrator_monolith
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - grpc_network
+
+  graphql_service:
+    build:
+      context: graphql
+    container_name: graphql_container
+    ports:
+      - "5001:5001"
+    networks:
+      - grpc_network
+
+
 networks:
   grpc_network:
-    name: grpc_network
+    driver: bridge
 
 volumes:
   postgresql_data:
     name: grpc_volume
-
-  postgresql_user_data:
-    name: postgresql_user_volume   # Users
+  postgres_db:
+    name: postgres_db

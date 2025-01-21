@@ -9,7 +9,7 @@ BASE_URL = os.getenv("FASTAPI_BASE_URL")
 async def get_all_subscriptions_resolver():
     from src.schema import Subscription
     try:
-        url = f"{BASE_URL}/subscriptions/subscriptions"
+        url = f"{BASE_URL}/get_subscriptions"
         async with httpx.AsyncClient() as client:
             request = await client.get(url)
             request.raise_for_status()
@@ -21,7 +21,7 @@ async def get_all_subscriptions_resolver():
 async def opt_out_policy_resolver():
     from src.schema import OptOutPolicyResponse
     try:
-        url = f"{BASE_URL}/subscriptions/opt-out-policy"
+        url = f"{BASE_URL}/opt-out-policy"
         async with httpx.AsyncClient() as client:
             request = await client.get(url)
             request.raise_for_status()
@@ -34,7 +34,7 @@ async def opt_out_policy_resolver():
 async def get_user_details(user_id: int):
     from src.schema import User
 
-    url = f"{BASE_URL}/users/user_details/{user_id}"
+    url = f"{BASE_URL}/user_details/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url)

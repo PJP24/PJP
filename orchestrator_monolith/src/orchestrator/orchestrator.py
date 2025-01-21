@@ -15,8 +15,8 @@ from src.generated.user_pb2 import Id, User, UpdatePassword
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
-        self.user_host = "user_server_service:50051"
-        self.subscription_host = "subscription_server_container:50052"
+        self.user_host = "user_service_container:50051"
+        self.subscription_host = "subscription_service_container:50052"
 
     async def get_user(self, user_id: int):
         try:
@@ -72,8 +72,12 @@ class Orchestrator:
                 stub = SubscriptionServiceStub(channel)
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
+                print("Raw response:", response)
+                print("Subscriptions:", response.subscriptions)
+
             result = [
-                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active, "end_date": sub.end_date}
+                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active,
+                 "end_date": sub.end_date}
                 for sub in response.subscriptions
             ]
             return result

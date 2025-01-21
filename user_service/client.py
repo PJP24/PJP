@@ -1,8 +1,8 @@
 import asyncio
 import grpc
 
-from src.grpc.generated.user_pb2 import Id, User, UpdatePassword, DeleteUser
-from src.grpc.generated.user_pb2_grpc import UserManagementStub
+from src.grpc_services.generated.user_pb2 import Id, User, UpdatePassword, DeleteUser
+from src.grpc_services.generated.user_pb2_grpc import UserManagementStub
 from src.utils.validators import is_valid_username, is_valid_email, is_valid_password
 
 
