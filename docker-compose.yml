@@ -66,8 +66,9 @@ services:
     depends_on:
       - postgresql_service
 
-  postgres:
+  postgresql_user_service:
     image: postgres:13-alpine
+    container_name: postgresql_user_container
     ports:
       - 5432:5432
     environment:
@@ -75,7 +76,7 @@ services:
       - POSTGRES_PASSWORD=test123
       - POSTGRES_DB=user_management
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - postgresql_user_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d user_management"]
       interval: 10s
@@ -85,14 +86,15 @@ services:
     networks:
       - grpc_network
 
-  grpc-server:
+  user_server_service:
     build:
       dockerfile: Dockerfile
       context: user_service
+    container_name: user_server_container
     ports:
       - 50051:50051
     depends_on:
-      postgres:
+      postgresql_user_service:
         condition: service_healthy
         restart: true
     networks:
@@ -106,5 +108,5 @@ volumes:
   postgresql_data:
     name: grpc_volume
 
-  postgres_db:
-    name: postgres_db   # Users
+  postgresql_user_data:
+    name: postgresql_user_volume   # Users

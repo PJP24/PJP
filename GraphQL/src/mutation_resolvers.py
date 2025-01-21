@@ -93,7 +93,7 @@ async def add_user(username: str, email: str, password: str):
 
 
 async def update_user_password(user_id: int, old_password: str, new_password: str):
-    from src.schema import UpdateUserResponse
+    from src.schema import Response
 
     passwords = {"old_password": old_password, "new_password": new_password}
     url = f"{BASE_URL}/users/update_password/{user_id}"
@@ -103,14 +103,14 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
             response.raise_for_status()
             response_data = response.json()
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            return UpdateUserResponse(status="error", message=str(e))
-        return UpdateUserResponse(
+            return Response(status="error", message=str(e))
+        return Response(
             status=response_data.get("status"), message=response_data.get("message")
         )
 
 
 async def delete_user(self, user_id: int):
-    from src.schema import DeleteUserResponse
+    from src.schema import Response
 
     url = f"{BASE_URL}/users/delete_user/{user_id}"
     async with httpx.AsyncClient() as client:
@@ -119,7 +119,7 @@ async def delete_user(self, user_id: int):
             response.raise_for_status()
             response_data = response.json()
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            return DeleteUserResponse(status="error", message=str(e))
-        return DeleteUserResponse(
+            return Response(status="error", message=str(e))
+        return Response(
             status=response_data.get("status"), message=response_data.get("message")
         )

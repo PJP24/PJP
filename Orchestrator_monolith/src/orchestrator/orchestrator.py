@@ -15,7 +15,7 @@ from src.generated.user_pb2 import Id, User, UpdatePassword
 
 class Orchestrator:
     def __init__(self, user_service_api=None, subscription_service_api=None):
-        self.user_host = "grpc-server:50051"
+        self.user_host = "user_server_service:50051"
         self.subscription_host = "subscription_server_container:50052"
 
     async def get_user(self, user_id: int):
