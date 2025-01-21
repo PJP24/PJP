@@ -1,6 +1,5 @@
-import strawberry
 from typing import List, Optional
-from strawberry.fastapi import GraphQLRouter
+import strawberry.asgi
 from graphql_service.resolvers.query_resolvers import get_user_details, get_all_subscriptions_resolver, opt_out_policy_resolver
 from graphql_service.resolvers.mutation_resolvers import (
     add_user,
@@ -20,11 +19,11 @@ class User:
 
 
 @strawberry.type
-@strawberry.type
 class Subscription:
-    email: str | None
-    subscription_type: str | None
-    is_active: str | None
+    email: str
+    subscription_type: str
+    is_active: str
+    end_date: str
 
 
 @strawberry.type
@@ -104,4 +103,4 @@ class Mutation:
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 
-graphql_app = GraphQLRouter(schema)
+graphql_app = strawberry.asgi.GraphQL(schema)

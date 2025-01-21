@@ -1,8 +1,7 @@
 import logging
 import asyncio
 import uvicorn
-
-from orchestrator.fastapi_service import app
+from graphql_app import graphql_app as app
 
 async def start_graphql():
     logging.basicConfig(level=logging.INFO)

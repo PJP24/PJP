@@ -1,11 +1,8 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from pydantic import BaseModel
-from orchestrator.orchestrator_service import OrchestratorService
-from graphql_service.graphql_app import graphql_app
+from orchestrator.src.orchestrator_service import OrchestratorService
 
-app = FastAPI()
-
-app.include_router(graphql_app, prefix="/graphql")
+app = APIRouter(prefix="")
 
 orchestrator = OrchestratorService()
 
@@ -22,6 +19,10 @@ class UpdatePassword(BaseModel):
 class SubscriptionRequest(BaseModel):
     email: str
     subscription_type: str
+
+class ExtendSubscriptionRequest(BaseModel):
+    email: str
+    period: str
 
 
 @app.get("/user_details/{user_id}")
@@ -57,19 +58,17 @@ async def update_password(user_id: int, passwords: UpdatePassword):
 @app.get("/get_subscriptions")
 async def get_all_subscriptions():
     subscriptions = await orchestrator.get_all_subscriptions()
-
+    print(f"Subscriptions data: {subscriptions}")
     return {"subscriptions": subscriptions}
 
 @app.post("/add_subscriptions")
 async def add_subscription(request: SubscriptionRequest):
     result = await orchestrator.add_subscription(request.email, request.subscription_type)
-    print(result)
     return result
 
-
 @app.put("/change_subscriptions")
-async def change_subscription(request: SubscriptionRequest):
-    result = await orchestrator.change_subscription(request.email, request.subscription_type)
+async def extend_subscription(request: ExtendSubscriptionRequest):
+    result = await orchestrator.extend_subscription(request.email, request.period)
     return result
 
 
@@ -95,4 +94,3 @@ async def deactivate_subscription(email: str):
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
-

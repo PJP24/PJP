@@ -44,10 +44,10 @@ class SubscriptionServiceStub(object):
                 request_serializer=subscription__pb2.GetSubscriptionsRequest.SerializeToString,
                 response_deserializer=subscription__pb2.GetSubscriptionsResponse.FromString,
                 _registered_method=True)
-        self.ChangeSubscription = channel.unary_unary(
-                '/subscription.SubscriptionService/ChangeSubscription',
-                request_serializer=subscription__pb2.ChangeSubscriptionRequest.SerializeToString,
-                response_deserializer=subscription__pb2.ChangeSubscriptionResponse.FromString,
+        self.ExtendSubscription = channel.unary_unary(
+                '/subscription.SubscriptionService/ExtendSubscription',
+                request_serializer=subscription__pb2.ExtendSubscriptionRequest.SerializeToString,
+                response_deserializer=subscription__pb2.ExtendSubscriptionResponse.FromString,
                 _registered_method=True)
         self.OptOutPolicy = channel.unary_unary(
                 '/subscription.SubscriptionService/OptOutPolicy',
@@ -86,7 +86,7 @@ class SubscriptionServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ChangeSubscription(self, request, context):
+    def ExtendSubscription(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -129,10 +129,10 @@ def add_SubscriptionServiceServicer_to_server(servicer, server):
                     request_deserializer=subscription__pb2.GetSubscriptionsRequest.FromString,
                     response_serializer=subscription__pb2.GetSubscriptionsResponse.SerializeToString,
             ),
-            'ChangeSubscription': grpc.unary_unary_rpc_method_handler(
-                    servicer.ChangeSubscription,
-                    request_deserializer=subscription__pb2.ChangeSubscriptionRequest.FromString,
-                    response_serializer=subscription__pb2.ChangeSubscriptionResponse.SerializeToString,
+            'ExtendSubscription': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExtendSubscription,
+                    request_deserializer=subscription__pb2.ExtendSubscriptionRequest.FromString,
+                    response_serializer=subscription__pb2.ExtendSubscriptionResponse.SerializeToString,
             ),
             'OptOutPolicy': grpc.unary_unary_rpc_method_handler(
                     servicer.OptOutPolicy,
@@ -220,7 +220,7 @@ class SubscriptionService(object):
             _registered_method=True)
 
     @staticmethod
-    def ChangeSubscription(request,
+    def ExtendSubscription(request,
             target,
             options=(),
             channel_credentials=None,
@@ -233,9 +233,9 @@ class SubscriptionService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/subscription.SubscriptionService/ChangeSubscription',
-            subscription__pb2.ChangeSubscriptionRequest.SerializeToString,
-            subscription__pb2.ChangeSubscriptionResponse.FromString,
+            '/subscription.SubscriptionService/ExtendSubscription',
+            subscription__pb2.ExtendSubscriptionRequest.SerializeToString,
+            subscription__pb2.ExtendSubscriptionResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -43,7 +43,7 @@ services:
   user_server_service:
     build:
       context: ..
-      dockerfile: Docker/Dockerfile.user_service
+      dockerfile: docker/Dockerfile.user_service
     container_name: user_server_service
     ports:
       - "50051:50051"
@@ -53,7 +53,7 @@ services:
   subscription_server_service:
     build:
       context: ..
-      dockerfile: Docker/Dockerfile.subscription_service
+      dockerfile: docker/Dockerfile.subscription_service
     container_name: subscription_server_service
     ports:
       - "50052:50052"
@@ -63,7 +63,7 @@ services:
   graphql:
     build:
       context: ..
-      dockerfile: Docker/Dockerfile.graphql
+      dockerfile: docker/Dockerfile.graphql
     ports:
       - "8001:8001"
     container_name: graphql
@@ -73,7 +73,7 @@ services:
   fastapi_orchestrator:
     build:
       context: ..
-      dockerfile: Docker/Dockerfile.fastapi_orchestrator
+      dockerfile: docker/Dockerfile.fastapi_orchestrator
     ports:
       - "5001:5001"
     container_name: fastapi_orchestrator

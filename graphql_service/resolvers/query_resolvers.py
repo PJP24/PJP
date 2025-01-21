@@ -25,15 +25,27 @@ async def get_user_details(user_id: int):
 
 async def get_all_subscriptions_resolver():
     from graphql_service.graphql_app import Subscription
-    subscriptions_data = await fetch_data("http://fastapi_orchestrator:5001/get_subscriptions")
-    if not subscriptions_data or "subscriptions" not in subscriptions_data:
-        print("No subscriptions found.")
-        return []
-    raw_subscriptions = subscriptions_data["subscriptions"]
-    return [Subscription(**sub) for sub in raw_subscriptions]
+    try:
+        url = "http://fastapi_orchestrator:5001/get_subscriptions"
+        async with httpx.AsyncClient() as client:
+            request = await client.get(url)
+            request.raise_for_status()
+            raw_subscriptions = request.json().get("subscriptions", [])
+            return [Subscription(**sub) for sub in raw_subscriptions]
+    except Exception as e:
+        raise Exception(f"Error fetching subscriptions: {e}")
+
 
 async def opt_out_policy_resolver():
     from graphql_service.graphql_app import OptOutPolicyResponse
-    policy_data = await fetch_data("http://fastapi_orchestrator:5001/opt-out-policy")
-    policy_text = policy_data.get("policy", "Unknown policy") if policy_data else "Unknown policy"
-    return OptOutPolicyResponse(policy=policy_text)
+    try:
+        url = "http://fastapi_orchestrator:5001/opt-out-policy"
+        async with httpx.AsyncClient() as client:
+            request = await client.get(url)
+            request.raise_for_status()
+            policy_text = request.json().get("policy", "Unknown policy")
+            return OptOutPolicyResponse(policy=policy_text)
+    except Exception as e:
+        raise Exception(f"Error fetching opt-out policy: {e}")
+
+

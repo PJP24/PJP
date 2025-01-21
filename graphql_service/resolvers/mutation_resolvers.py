@@ -109,3 +109,5 @@ async def deactivate_subscription_resolver(email: str):
     if not result_info or "message" not in result_info:
         return DeactivateSubscriptionResponse(result_info="Unknown result")
     return DeactivateSubscriptionResponse(result_info=result_info["message"])
+
+

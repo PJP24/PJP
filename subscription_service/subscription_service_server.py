@@ -1,40 +1,43 @@
 import asyncio
 import grpc
-from subscription_service.grpc_services.generated.subscription_pb2_grpc import add_SubscriptionServiceServicer_to_server
-from subscription_service.db.database import Database
-from subscription_service.grpc_services.generated.subscription_pb2_grpc import SubscriptionServiceServicer
-from subscription_service.grpc_services.generated.subscription_pb2 import OptOutPolicyResponse
 from subscription_service.utils.config import DB_URL
-from subscription_service.grpc_services.subscription_db_operations import SubscriptionManager
+from subscription_service.src.db.database import Database
+from subscription_service.src.grpc_services.generated.subscription_pb2_grpc import add_SubscriptionServiceServicer_to_server
+from subscription_service.src.grpc_services.generated.subscription_pb2_grpc import SubscriptionServiceServicer
+from subscription_service.src.grpc_services.generated.subscription_pb2 import OptOutPolicyResponse
+from subscription_service.src.grpc_services.subscription_db_operations import (
+    create_subscription,
+    get_subscriptions,
+    extend_subscription,
+    delete_subscription,
+    activate_subscription,
+    deactivate_subscription,
+)
+
 
 class SubscriptionService(SubscriptionServiceServicer):
     def __init__(self, database: Database) -> None:
         self.database = database
 
-    async def CreateSubscription(self, request, context):
-        async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.create_subscription(request.email, request.subscription_type)
-
     async def GetSubscriptions(self, request, context):
         async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.get_subscriptions()
+            return await get_subscriptions(session)
 
-    async def ChangeSubscription(self, request, context):
+    async def CreateSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.change_subscription(request.email, request.subscription_type)
+            return await create_subscription(session, request.email, request.subscription_type)
+
+    async def ExtendSubscription(self, request, context):
+        async with self.database.session_scope() as session:
+            return await extend_subscription(session, request.email, request.period)
 
     async def DeleteSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.delete_subscription(request.email)
+            return await delete_subscription(session, request.email)
 
     async def ActivateSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.activate_subscription(request.email)
+            return await activate_subscription(session, request.email)
 
     async def OptOutPolicy(self, request, context):
         policy_text = (
@@ -42,14 +45,13 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Cancel your subscription anytime to stop future charges.\n"
             "1. Press 5\n"
             "2. Enter the email you subscribed with\n"
-            "Activate your subscription again anytime."
+            "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
 
     async def DeactivateSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            manager = SubscriptionManager(session)
-            return await manager.deactivate_subscription(request.email)
+            return await deactivate_subscription(session, request.email)
 
 async def serve_subscription(db: Database) -> None:
     server = grpc.aio.server()

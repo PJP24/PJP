@@ -1,7 +1,7 @@
 import logging
 import asyncio
 import uvicorn
-from orchestrator.fastapi_service import app
+from orchestrator.src.fastapi_service import app
 
 
 async def start_api_service():

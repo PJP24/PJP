@@ -1,5 +1,5 @@
-from user_service.db.database import Database
-from user_service.db.models import User
+from user_service.src.db.database import Database
+from user_service.src.db.models import User
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError

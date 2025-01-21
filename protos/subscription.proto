@@ -5,7 +5,7 @@ package subscription;
 service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
-  rpc ChangeSubscription (ChangeSubscriptionRequest) returns (ChangeSubscriptionResponse);
+  rpc ExtendSubscription (ExtendSubscriptionRequest) returns (ExtendSubscriptionResponse);
   rpc OptOutPolicy (OptOutPolicyRequest) returns (OptOutPolicyResponse);
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
@@ -15,6 +15,7 @@ service SubscriptionService {
 message CreateSubscriptionRequest {
   string email = 1;
   string subscription_type = 2;
+  string end_date = 3;
 }
 
 message CreateSubscriptionResponse {
@@ -26,14 +27,13 @@ message GetSubscriptionsResponse {
   repeated Subscription subscriptions = 1;
 }
 
-message ChangeSubscriptionRequest {
+message ExtendSubscriptionRequest {
   string email = 1;
-  string subscription_type = 2;
+  string period = 2;
 }
-message ChangeSubscriptionResponse {
+message ExtendSubscriptionResponse {
   string message = 1;
 }
-
 
 message DeleteSubscriptionRequest {
   string email = 1;
@@ -42,7 +42,6 @@ message DeleteSubscriptionResponse {
   string message = 1;
 }
 
-// Activate
 message ActivateSubscriptionRequest {
   string email = 1;
 }
@@ -50,13 +49,11 @@ message ActivateSubscriptionResponse {
   string message = 1;
 }
 
-// OptOutPolicy
 message OptOutPolicyRequest {}
 message OptOutPolicyResponse {
   string policy = 1;
 }
 
-// Deactivate
 message DeactivateSubscriptionRequest {
   string email = 1;
 }
@@ -68,4 +65,5 @@ message Subscription {
   string email = 1;
   string subscription_type = 2;
   bool is_active = 3;
+  string end_date = 4;
 }
