@@ -9,7 +9,7 @@ BASE_URL = os.getenv("FASTAPI_BASE_URL")
 async def add_subscription_resolver(email: str, subscription_type: str):
     from src.schema import AddSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions"
+        url = f"{BASE_URL}/subscriptions/subscriptions"
         async with httpx.AsyncClient() as client:
             request = await client.post(url, json={"email": email, "subscription_type": subscription_type})
             request.raise_for_status()
@@ -21,7 +21,7 @@ async def add_subscription_resolver(email: str, subscription_type: str):
 async def extend_subscription_resolver(email: str, period: str):
     from src.schema import ExtendSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions"
+        url = f"{BASE_URL}/subscriptions/subscriptions"
         async with httpx.AsyncClient() as client:
             request = await client.put(url, json={"email": email, "period": period})
             request.raise_for_status()
@@ -33,7 +33,7 @@ async def extend_subscription_resolver(email: str, period: str):
 async def delete_subscription_resolver(email: str):
     from src.schema import DeleteSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/{email}"
+        url = f"{BASE_URL}/subscriptions/subscriptions/{email}"
         async with httpx.AsyncClient() as client:
             request = await client.delete(url)
             request.raise_for_status()
@@ -45,7 +45,7 @@ async def delete_subscription_resolver(email: str):
 async def activate_subscription_resolver(email: str):
     from src.schema import ActivateSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/{email}/activate"
+        url = f"{BASE_URL}/subscriptions/subscriptions/{email}/activate"
         async with httpx.AsyncClient() as client:
             request = await client.post(url)
             request.raise_for_status()
@@ -57,7 +57,7 @@ async def activate_subscription_resolver(email: str):
 async def deactivate_subscription_resolver(email: str):
     from src.schema import DeactivateSubscriptionResponse
     try:
-        url = f"{BASE_URL}/subscriptions/{email}/deactivate"
+        url = f"{BASE_URL}/subscriptions/subscriptions/{email}/deactivate"
         async with httpx.AsyncClient() as client:
             request = await client.post(url)
             request.raise_for_status()
