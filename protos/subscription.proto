@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package subscription;
 
-import "google/protobuf/timestamp.proto";
-
 service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);

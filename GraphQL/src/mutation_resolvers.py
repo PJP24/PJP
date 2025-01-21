@@ -70,7 +70,7 @@ async def add_user(username: str, email: str, password: str):
     from src.schema import AddUserResponse, User
 
     user_data = {"username": username, "email": email, "password": password}
-    url = f"{BASE_URL}/add_user"
+    url = f"{BASE_URL}/users/add_user"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(url, json=user_data)
@@ -96,7 +96,7 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
     from src.schema import UpdateUserResponse
 
     passwords = {"old_password": old_password, "new_password": new_password}
-    url = f"{BASE_URL}/update_password/{user_id}"
+    url = f"{BASE_URL}/users/update_password/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.patch(url, json=passwords)
@@ -112,7 +112,7 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
 async def delete_user(self, user_id: int):
     from src.schema import DeleteUserResponse
 
-    url = f"{BASE_URL}/delete_user/{user_id}"
+    url = f"{BASE_URL}/users/delete_user/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.delete(url)

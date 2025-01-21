@@ -34,7 +34,7 @@ async def opt_out_policy_resolver():
 async def get_user_details(user_id: int):
     from src.schema import User
 
-    url = f"{BASE_URL}/user_details/{user_id}"
+    url = f"{BASE_URL}/users/user_details/{user_id}"
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url)

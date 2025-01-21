@@ -6,8 +6,9 @@ services:
       POSTGRES_PASSWORD: my_secret_password
       POSTGRES_DB: grpc_database
       POSTGRES_USER: user_1
+      PGPORT: 5433
     ports:
-      - "5432:5432"
+      - "5433:5433"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user_1 -d grpc_database"]
       interval: 10s
@@ -65,6 +66,38 @@ services:
     depends_on:
       - postgresql_service
 
+  postgres:
+    image: postgres:13-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test123
+      - POSTGRES_DB=user_management
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d user_management"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - grpc_network
+
+  grpc-server:
+    build:
+      dockerfile: Dockerfile
+      context: user_service
+    ports:
+      - 50051:50051
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+    networks:
+      - grpc_network
+      
 networks:
   grpc_network:
     name: grpc_network
@@ -72,3 +105,6 @@ networks:
 volumes:
   postgresql_data:
     name: grpc_volume
+
+  postgres_db:
+    name: postgres_db   # Users

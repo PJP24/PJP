@@ -22,50 +22,49 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
-from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12subscription.proto\x12\x0csubscription\x1a\x1fgoogle/protobuf/timestamp.proto\"W\n\x19\x43reateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x19\n\x11subscription_type\x18\x02 \x01(\t\x12\x10\n\x08\x65nd_date\x18\x03 \x01(\t\"-\n\x1a\x43reateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x19\n\x17GetSubscriptionsRequest\"M\n\x18GetSubscriptionsResponse\x12\x31\n\rsubscriptions\x18\x01 \x03(\x0b\x32\x1a.subscription.Subscription\":\n\x19\x45xtendSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x0e\n\x06period\x18\x02 \x01(\t\"-\n\x1a\x45xtendSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"*\n\x19\x44\x65leteSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"-\n\x1a\x44\x65leteSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\",\n\x1b\x41\x63tivateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"/\n\x1c\x41\x63tivateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x15\n\x13OptOutPolicyRequest\"&\n\x14OptOutPolicyResponse\x12\x0e\n\x06policy\x18\x01 \x01(\t\".\n\x1d\x44\x65\x61\x63tivateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"1\n\x1e\x44\x65\x61\x63tivateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"]\n\x0cSubscription\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x19\n\x11subscription_type\x18\x02 \x01(\t\x12\x11\n\tis_active\x18\x03 \x01(\x08\x12\x10\n\x08\x65nd_date\x18\x04 \x01(\t\"!\n\x1fGetSubscriptionsDynamoDBRequest\"U\n GetSubscriptionsDynamoDBResponse\x12\x31\n\rsubscriptions\x18\x01 \x03(\x0b\x32\x1a.subscription.Subscription2\xe9\x06\n\x13SubscriptionService\x12g\n\x12\x43reateSubscription\x12\'.subscription.CreateSubscriptionRequest\x1a(.subscription.CreateSubscriptionResponse\x12\x61\n\x10GetSubscriptions\x12%.subscription.GetSubscriptionsRequest\x1a&.subscription.GetSubscriptionsResponse\x12g\n\x12\x45xtendSubscription\x12\'.subscription.ExtendSubscriptionRequest\x1a(.subscription.ExtendSubscriptionResponse\x12U\n\x0cOptOutPolicy\x12!.subscription.OptOutPolicyRequest\x1a\".subscription.OptOutPolicyResponse\x12g\n\x12\x44\x65leteSubscription\x12\'.subscription.DeleteSubscriptionRequest\x1a(.subscription.DeleteSubscriptionResponse\x12m\n\x14\x41\x63tivateSubscription\x12).subscription.ActivateSubscriptionRequest\x1a*.subscription.ActivateSubscriptionResponse\x12s\n\x16\x44\x65\x61\x63tivateSubscription\x12+.subscription.DeactivateSubscriptionRequest\x1a,.subscription.DeactivateSubscriptionResponse\x12y\n\x18GetSubscriptionsDynamoDB\x12-.subscription.GetSubscriptionsDynamoDBRequest\x1a..subscription.GetSubscriptionsDynamoDBResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12subscription.proto\x12\x0csubscription\"W\n\x19\x43reateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x19\n\x11subscription_type\x18\x02 \x01(\t\x12\x10\n\x08\x65nd_date\x18\x03 \x01(\t\"-\n\x1a\x43reateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x19\n\x17GetSubscriptionsRequest\"M\n\x18GetSubscriptionsResponse\x12\x31\n\rsubscriptions\x18\x01 \x03(\x0b\x32\x1a.subscription.Subscription\":\n\x19\x45xtendSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x0e\n\x06period\x18\x02 \x01(\t\"-\n\x1a\x45xtendSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"*\n\x19\x44\x65leteSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"-\n\x1a\x44\x65leteSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\",\n\x1b\x41\x63tivateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"/\n\x1c\x41\x63tivateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x15\n\x13OptOutPolicyRequest\"&\n\x14OptOutPolicyResponse\x12\x0e\n\x06policy\x18\x01 \x01(\t\".\n\x1d\x44\x65\x61\x63tivateSubscriptionRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"1\n\x1e\x44\x65\x61\x63tivateSubscriptionResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"]\n\x0cSubscription\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x19\n\x11subscription_type\x18\x02 \x01(\t\x12\x11\n\tis_active\x18\x03 \x01(\x08\x12\x10\n\x08\x65nd_date\x18\x04 \x01(\t\"!\n\x1fGetSubscriptionsDynamoDBRequest\"U\n GetSubscriptionsDynamoDBResponse\x12\x31\n\rsubscriptions\x18\x01 \x03(\x0b\x32\x1a.subscription.Subscription2\xe9\x06\n\x13SubscriptionService\x12g\n\x12\x43reateSubscription\x12\'.subscription.CreateSubscriptionRequest\x1a(.subscription.CreateSubscriptionResponse\x12\x61\n\x10GetSubscriptions\x12%.subscription.GetSubscriptionsRequest\x1a&.subscription.GetSubscriptionsResponse\x12g\n\x12\x45xtendSubscription\x12\'.subscription.ExtendSubscriptionRequest\x1a(.subscription.ExtendSubscriptionResponse\x12U\n\x0cOptOutPolicy\x12!.subscription.OptOutPolicyRequest\x1a\".subscription.OptOutPolicyResponse\x12g\n\x12\x44\x65leteSubscription\x12\'.subscription.DeleteSubscriptionRequest\x1a(.subscription.DeleteSubscriptionResponse\x12m\n\x14\x41\x63tivateSubscription\x12).subscription.ActivateSubscriptionRequest\x1a*.subscription.ActivateSubscriptionResponse\x12s\n\x16\x44\x65\x61\x63tivateSubscription\x12+.subscription.DeactivateSubscriptionRequest\x1a,.subscription.DeactivateSubscriptionResponse\x12y\n\x18GetSubscriptionsDynamoDB\x12-.subscription.GetSubscriptionsDynamoDBRequest\x1a..subscription.GetSubscriptionsDynamoDBResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'subscription_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_CREATESUBSCRIPTIONREQUEST']._serialized_start=69
-  _globals['_CREATESUBSCRIPTIONREQUEST']._serialized_end=156
-  _globals['_CREATESUBSCRIPTIONRESPONSE']._serialized_start=158
-  _globals['_CREATESUBSCRIPTIONRESPONSE']._serialized_end=203
-  _globals['_GETSUBSCRIPTIONSREQUEST']._serialized_start=205
-  _globals['_GETSUBSCRIPTIONSREQUEST']._serialized_end=230
-  _globals['_GETSUBSCRIPTIONSRESPONSE']._serialized_start=232
-  _globals['_GETSUBSCRIPTIONSRESPONSE']._serialized_end=309
-  _globals['_EXTENDSUBSCRIPTIONREQUEST']._serialized_start=311
-  _globals['_EXTENDSUBSCRIPTIONREQUEST']._serialized_end=369
-  _globals['_EXTENDSUBSCRIPTIONRESPONSE']._serialized_start=371
-  _globals['_EXTENDSUBSCRIPTIONRESPONSE']._serialized_end=416
-  _globals['_DELETESUBSCRIPTIONREQUEST']._serialized_start=418
-  _globals['_DELETESUBSCRIPTIONREQUEST']._serialized_end=460
-  _globals['_DELETESUBSCRIPTIONRESPONSE']._serialized_start=462
-  _globals['_DELETESUBSCRIPTIONRESPONSE']._serialized_end=507
-  _globals['_ACTIVATESUBSCRIPTIONREQUEST']._serialized_start=509
-  _globals['_ACTIVATESUBSCRIPTIONREQUEST']._serialized_end=553
-  _globals['_ACTIVATESUBSCRIPTIONRESPONSE']._serialized_start=555
-  _globals['_ACTIVATESUBSCRIPTIONRESPONSE']._serialized_end=602
-  _globals['_OPTOUTPOLICYREQUEST']._serialized_start=604
-  _globals['_OPTOUTPOLICYREQUEST']._serialized_end=625
-  _globals['_OPTOUTPOLICYRESPONSE']._serialized_start=627
-  _globals['_OPTOUTPOLICYRESPONSE']._serialized_end=665
-  _globals['_DEACTIVATESUBSCRIPTIONREQUEST']._serialized_start=667
-  _globals['_DEACTIVATESUBSCRIPTIONREQUEST']._serialized_end=713
-  _globals['_DEACTIVATESUBSCRIPTIONRESPONSE']._serialized_start=715
-  _globals['_DEACTIVATESUBSCRIPTIONRESPONSE']._serialized_end=764
-  _globals['_SUBSCRIPTION']._serialized_start=766
-  _globals['_SUBSCRIPTION']._serialized_end=859
-  _globals['_GETSUBSCRIPTIONSDYNAMODBREQUEST']._serialized_start=861
-  _globals['_GETSUBSCRIPTIONSDYNAMODBREQUEST']._serialized_end=894
-  _globals['_GETSUBSCRIPTIONSDYNAMODBRESPONSE']._serialized_start=896
-  _globals['_GETSUBSCRIPTIONSDYNAMODBRESPONSE']._serialized_end=981
-  _globals['_SUBSCRIPTIONSERVICE']._serialized_start=984
-  _globals['_SUBSCRIPTIONSERVICE']._serialized_end=1857
+  _globals['_CREATESUBSCRIPTIONREQUEST']._serialized_start=36
+  _globals['_CREATESUBSCRIPTIONREQUEST']._serialized_end=123
+  _globals['_CREATESUBSCRIPTIONRESPONSE']._serialized_start=125
+  _globals['_CREATESUBSCRIPTIONRESPONSE']._serialized_end=170
+  _globals['_GETSUBSCRIPTIONSREQUEST']._serialized_start=172
+  _globals['_GETSUBSCRIPTIONSREQUEST']._serialized_end=197
+  _globals['_GETSUBSCRIPTIONSRESPONSE']._serialized_start=199
+  _globals['_GETSUBSCRIPTIONSRESPONSE']._serialized_end=276
+  _globals['_EXTENDSUBSCRIPTIONREQUEST']._serialized_start=278
+  _globals['_EXTENDSUBSCRIPTIONREQUEST']._serialized_end=336
+  _globals['_EXTENDSUBSCRIPTIONRESPONSE']._serialized_start=338
+  _globals['_EXTENDSUBSCRIPTIONRESPONSE']._serialized_end=383
+  _globals['_DELETESUBSCRIPTIONREQUEST']._serialized_start=385
+  _globals['_DELETESUBSCRIPTIONREQUEST']._serialized_end=427
+  _globals['_DELETESUBSCRIPTIONRESPONSE']._serialized_start=429
+  _globals['_DELETESUBSCRIPTIONRESPONSE']._serialized_end=474
+  _globals['_ACTIVATESUBSCRIPTIONREQUEST']._serialized_start=476
+  _globals['_ACTIVATESUBSCRIPTIONREQUEST']._serialized_end=520
+  _globals['_ACTIVATESUBSCRIPTIONRESPONSE']._serialized_start=522
+  _globals['_ACTIVATESUBSCRIPTIONRESPONSE']._serialized_end=569
+  _globals['_OPTOUTPOLICYREQUEST']._serialized_start=571
+  _globals['_OPTOUTPOLICYREQUEST']._serialized_end=592
+  _globals['_OPTOUTPOLICYRESPONSE']._serialized_start=594
+  _globals['_OPTOUTPOLICYRESPONSE']._serialized_end=632
+  _globals['_DEACTIVATESUBSCRIPTIONREQUEST']._serialized_start=634
+  _globals['_DEACTIVATESUBSCRIPTIONREQUEST']._serialized_end=680
+  _globals['_DEACTIVATESUBSCRIPTIONRESPONSE']._serialized_start=682
+  _globals['_DEACTIVATESUBSCRIPTIONRESPONSE']._serialized_end=731
+  _globals['_SUBSCRIPTION']._serialized_start=733
+  _globals['_SUBSCRIPTION']._serialized_end=826
+  _globals['_GETSUBSCRIPTIONSDYNAMODBREQUEST']._serialized_start=828
+  _globals['_GETSUBSCRIPTIONSDYNAMODBREQUEST']._serialized_end=861
+  _globals['_GETSUBSCRIPTIONSDYNAMODBRESPONSE']._serialized_start=863
+  _globals['_GETSUBSCRIPTIONSDYNAMODBRESPONSE']._serialized_end=948
+  _globals['_SUBSCRIPTIONSERVICE']._serialized_start=951
+  _globals['_SUBSCRIPTIONSERVICE']._serialized_end=1824
 # @@protoc_insertion_point(module_scope)

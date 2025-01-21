@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from src.orchestrator.orchestrator import Orchestrator
 
 users_router = APIRouter(prefix="/users")
+subscriptions_router = APIRouter(prefix="/subscriptions")
 
 orchestrator = Orchestrator()
 
@@ -15,38 +16,38 @@ class ExtendSubscriptionRequest(BaseModel):
     email: str
     period: str  
 
-@app.get("/subscriptions")
+@subscriptions_router.get("/subscriptions")
 async def get_all_subscriptions():
     subscriptions = await orchestrator.get_all_subscriptions()    
     print(f"Subscriptions: {subscriptions}")
     return {"subscriptions": subscriptions}
 
-@app.post("/subscriptions")
+@subscriptions_router.post("/subscriptions")
 async def add_subscription(request: SubscriptionRequest):
     result = await orchestrator.add_subscription(request.email, request.subscription_type)
     return result
 
-@app.put("/subscriptions")
+@subscriptions_router.put("/subscriptions")
 async def extend_subscription(request: ExtendSubscriptionRequest):
     result = await orchestrator.extend_subscription(request.email, request.period)  
     return result
 
-@app.delete("/subscriptions/{email}")
+@subscriptions_router.delete("/subscriptions/{email}")
 async def delete_subscription(email: str):
     result = await orchestrator.delete_subscription(email)
     return result
 
-@app.post("/subscriptions/{email}/activate")
+@subscriptions_router.post("/subscriptions/{email}/activate")
 async def activate_subscription(email: str):
     result = await orchestrator.activate_subscription(email)
     return result
 
-@app.post("/subscriptions/{email}/deactivate")
+@subscriptions_router.post("/subscriptions/{email}/deactivate")
 async def deactivate_subscription(email: str):
     result = await orchestrator.deactivate_subscription(email)
     return result
 
-@app.get("/opt-out-policy")
+@subscriptions_router.get("/opt-out-policy")
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
