@@ -30,27 +30,27 @@ async def get_all_subscriptions():
     print(f"Subscriptions: {subscriptions}")
     return {"subscriptions": subscriptions}
 
-@fastapi_app.post("/add_subscriptions")
+@fastapi_app.post("/add_subscription")
 async def add_subscription(request: SubscriptionRequest):
     result = await orchestrator.add_subscription(request.email, request.subscription_type)
     return result
 
-@fastapi_app.put("/extend_subscriptions")
+@fastapi_app.put("/extend_subscription/{email}")
 async def extend_subscription(request: ExtendSubscriptionRequest):
     result = await orchestrator.extend_subscription(request.email, request.period)  
     return result
 
-@fastapi_app.delete("/delete_subscriptions/{email}")
+@fastapi_app.delete("/delete_subscription/{email}")
 async def delete_subscription(email: str):
     result = await orchestrator.delete_subscription(email)
     return result
 
-@fastapi_app.post("/activate_subscriptions/{email}")
+@fastapi_app.post("/activate_subscription/{email}")
 async def activate_subscription(email: str):
     result = await orchestrator.activate_subscription(email)
     return result
 
-@fastapi_app.post("/deactivate_subscriptions/{email}")
+@fastapi_app.post("/deactivate_subscription/{email}")
 async def deactivate_subscription(email: str):
     result = await orchestrator.deactivate_subscription(email)
     return result

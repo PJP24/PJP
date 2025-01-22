@@ -34,7 +34,11 @@ class SubscriptionService(SubscriptionServiceServicer):
     async def ActivateSubscription(self, request, context):
         async with self.database.session_scope() as session:
             return await activate_subscription(session, request.email)
-    
+
+    async def DeactivateSubscription(self, request, context):
+        async with self.database.session_scope() as session:
+            return await deactivate_subscription(session, request.email)
+
     async def OptOutPolicy(self, request, context):
         policy_text = (
             "Opt-Out Policy:\n"
@@ -44,7 +48,3 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
-
-    async def DeactivateSubscription(self, request, context):
-        async with self.database.session_scope() as session:
-            return await deactivate_subscription(session, request.email)
