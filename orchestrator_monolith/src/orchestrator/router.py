@@ -1,11 +1,20 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from src.orchestrator.orchestrator import Orchestrator
+from orchestrator_monolith.src.orchestrator.orchestrator import Orchestrator
 
 fastapi_app = APIRouter(prefix="")
 
 orchestrator = Orchestrator()
 
+class User(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class UpdatePassword(BaseModel):
+    old_password: str
+    new_password: str
 
 class SubscriptionRequest(BaseModel):
     email: str
@@ -50,17 +59,6 @@ async def deactivate_subscription(email: str):
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
-
-class User(BaseModel):
-    username: str
-    email: str
-    password: str
-
-
-class UpdatePassword(BaseModel):
-    old_password: str
-    new_password: str
-
 
 @fastapi_app.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):

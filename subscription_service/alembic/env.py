@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 
-from src.db.model import Base  
+from subscription_service.src.db.model import Base
 
 target_metadata = Base.metadata
 

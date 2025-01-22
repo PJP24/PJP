@@ -1,5 +1,5 @@
 import strawberry.asgi
-from src.schema import Query, Mutation
+from graphql_service.src.schema import Query, Mutation
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 

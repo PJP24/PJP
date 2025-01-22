@@ -1,4 +1,4 @@
-from src.grpc.generated.user_pb2 import (
+from user_service.src.grpc_services.generated.user_pb2 import (
     Response,
     User,
     Id,
@@ -6,11 +6,11 @@ from src.grpc.generated.user_pb2 import (
     UpdatePassword,
     CreateUserResponse,
 )
-from src.grpc.generated.user_pb2_grpc import UserManagementServicer
+from user_service.src.grpc_services.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
 from sqlalchemy.exc import IntegrityError
-from src.grpc.user_crud import UserCrud
-from src.utils.validators import is_valid_email, is_valid_password, is_valid_username
+from user_service.src.grpc_services.user_crud import UserCrud
+from user_service.src.utils.validators import is_valid_email, is_valid_password, is_valid_username
 
 
 class UserManagement(UserManagementServicer):

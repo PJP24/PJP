@@ -7,7 +7,7 @@ load_dotenv()
 BASE_URL = os.getenv("FASTAPI_BASE_URL")
 
 async def get_all_subscriptions_resolver():
-    from src.schema import Subscription
+    from graphql_service.src.schema import Subscription
     try:
         url = f"{BASE_URL}/get_subscriptions"
         async with httpx.AsyncClient() as client:
@@ -19,7 +19,7 @@ async def get_all_subscriptions_resolver():
         raise Exception(f"Error fetching subscriptions: {e}")
 
 async def opt_out_policy_resolver():
-    from src.schema import OptOutPolicyResponse
+    from graphql_service.src.schema import OptOutPolicyResponse
     try:
         url = f"{BASE_URL}/opt-out-policy"
         async with httpx.AsyncClient() as client:
@@ -32,7 +32,7 @@ async def opt_out_policy_resolver():
 
 
 async def get_user_details(user_id: int):
-    from src.schema import User
+    from graphql_service.src.schema import User
 
     url = f"{BASE_URL}/user_details/{user_id}"
     async with httpx.AsyncClient() as client:

@@ -1,6 +1,6 @@
 import grpc
-from src.generated.subscription_pb2_grpc import SubscriptionServiceStub
-from src.generated.subscription_pb2 import (
+from orchestrator_monolith.src.generated.subscription_pb2_grpc import SubscriptionServiceStub
+from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
     CreateSubscriptionRequest,
     ExtendSubscriptionRequest,
@@ -9,12 +9,12 @@ from src.generated.subscription_pb2 import (
     DeactivateSubscriptionRequest,
 )
 
-from src.generated.user_pb2_grpc import UserManagementStub
-from src.generated.user_pb2 import Id, User, UpdatePassword
+from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
+from orchestrator_monolith.src.generated.user_pb2 import Id, User, UpdatePassword
 
 
 class Orchestrator:
-    def __init__(self, user_service_api=None, subscription_service_api=None):
+    def __init__(self):
         self.user_host = "user_service_container:50051"
         self.subscription_host = "subscription_service_container:50052"
 

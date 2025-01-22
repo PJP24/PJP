@@ -2,16 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY orchestrator_monolith/requirements.txt /app/orchestrator_monolith/requirements.txt
 
-ENV PYTHONPATH=/app/src/orchestrator/generated:$PYTHONPATH
+RUN pip3 install --no-cache-dir -r /app/orchestrator_monolith/requirements.txt
 
-COPY ./protos /app/protos
+ENV PYTHONPATH=/app/orchestrator_monolith/src/generated:/app:$PYTHONPATH
 
-RUN python -m grpc_tools.protoc -I=/app/protos --python_out=src/orchestrator/generated --grpc_python_out=src/orchestrator/generated /app/protos/*.proto
+COPY . /app/
 
-COPY ./ .
+RUN python -m grpc_tools.protoc -I=protos --python_out=orchestrator_monolith/src/generated --grpc_python_out=orchestrator_monolith/src/generated protos/*.proto
 
-EXPOSE 5001
+EXPOSE 8000
 
-CMD ["python", "main.py"]
+CMD ["python", "orchestrator_monolith/main.py"]

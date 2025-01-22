@@ -16,14 +16,14 @@ services:
       start_period: 30s
       timeout: 10s
     networks:
-      - grpc_network
+      - pjp_mynetwork
     volumes:
       - postgresql_data:/var/lib/postgresql/data
 
   postgresql_user_service:
     image: postgres:13-alpine
     ports:
-      - 5432:5432
+      - "5432:5432"
     container_name: postgresql_user_container
     environment:
       - POSTGRES_USER=test
@@ -38,11 +38,12 @@ services:
       start_period: 30s
       timeout: 10s
     networks:
-      - grpc_network
+      - pjp_mynetwork
 
   subscription_server_service:
     build:
-      context: ./subscription_service
+      context: ./
+      dockerfile: subscription_service/Dockerfile
     container_name: subscription_service_container
     ports:
       - "50052:50052"
@@ -50,12 +51,12 @@ services:
       postgresql_subscription_service:
         condition: service_healthy
     networks:
-      - grpc_network
+      - pjp_mynetwork
 
   user_server_service:
     build:
-      dockerfile: Dockerfile
-      context: user_service
+      context: .
+      dockerfile: user_service/Dockerfile
     container_name: user_service_container
     ports:
       - "50051:50051"
@@ -63,30 +64,35 @@ services:
       postgresql_user_service:
         condition: service_healthy
     networks:
-      - grpc_network
+      - pjp_mynetwork
 
   fastapi_orchestrator_service:
     container_name: fastapi_orchestrator_container
     build:
-      context: orchestrator_monolith
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: orchestrator_monolith/Dockerfile
     ports:
       - "8000:8000"
+    depends_on:
+      user_server_service:
+        condition: service_started
+      subscription_server_service:
+        condition: service_started
     networks:
-      - grpc_network
+      - pjp_mynetwork
 
   graphql_service:
     build:
-      context: graphql
+      context: .
+      dockerfile: graphql_service/Dockerfile
     container_name: graphql_container
     ports:
       - "5001:5001"
     networks:
-      - grpc_network
-
+      - pjp_mynetwork
 
 networks:
-  grpc_network:
+  pjp_mynetwork:
     driver: bridge
 
 volumes:

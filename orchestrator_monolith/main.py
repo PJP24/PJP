@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
-from src.orchestrator.router import fastapi_app
+from orchestrator_monolith.src.orchestrator.router import fastapi_app
 
 app = FastAPI()
 

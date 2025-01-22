@@ -2,14 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY user_service/requirements.txt /app/user_service/requirements.txt
 
-RUN pip3 install -r requirements.txt
+RUN pip install --no-cache-dir -r /app/user_service/requirements.txt
 
-COPY . /app
+ENV PYTHONPATH=/app/user_service/src/grpc_services/generated:/app:$PYTHONPATH
 
-ENV PYTHONPATH=/app/src/grpc_services/generated:$PYTHONPATH
+COPY . /app/
 
-RUN python -m grpc_tools.protoc -I=../protos --python_out=src/grpc_services/generated --grpc_python_out=src/grpc_services/generated ../protos/user.proto
+RUN python -m grpc_tools.protoc -I=protos --python_out=user_service/src/grpc_services/generated --grpc_python_out=user_service/src/grpc_services/generated protos/user.proto
 
-CMD ["python", "main.py"]
+EXPOSE 50051
+
+CMD ["python3", "user_service/main.py"]

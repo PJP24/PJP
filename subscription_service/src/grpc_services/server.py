@@ -1,8 +1,8 @@
-from src.db.database import Database
-from src.grpc.generated.subscription_pb2_grpc import SubscriptionServiceServicer
-from src.grpc.generated.subscription_pb2 import OptOutPolicyResponse
+from subscription_service.src.db.database import Database
+from subscription_service.src.grpc_services.generated.subscription_pb2_grpc import SubscriptionServiceServicer
+from subscription_service.src.grpc_services.generated.subscription_pb2 import OptOutPolicyResponse
 
-from src.grpc.subscription_operations import (
+from subscription_service.src.grpc_services.subscription_operations import (
     create_subscription,
     get_subscriptions,
     extend_subscription,

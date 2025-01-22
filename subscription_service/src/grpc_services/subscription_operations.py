@@ -1,44 +1,19 @@
 import re
 import sqlalchemy as sa
-import os
-from dotenv import load_dotenv
-
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.db.model import Subscription
+from subscription_service.src.db.model import Subscription
 
 from datetime import datetime, timedelta
 
-from src.grpc.generated.subscription_pb2 import (
+from subscription_service.src.grpc_services.generated.subscription_pb2 import (
     CreateSubscriptionResponse,
     GetSubscriptionsResponse,
     ExtendSubscriptionResponse,
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
-    # GetSubscriptionsDynamoDBResponse,
-    # CreateSubscriptionDynamoDBResponse,
-    # DeleteSubscriptionDynamoDBRequest,
-    # ChangeSubscriptionTypeDynamoDBRequest,
 )
-
-# from src.db.database import Database
-# import boto3
-# import asyncio
-
-load_dotenv()
-
-AWS_REGION = os.getenv("AWS_REGION")
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-
-# Connect to DynamoDB
-# dynamodb = boto3.resource(
-#     'dynamodb',
-#     region_name=AWS_REGION,
-#     aws_access_key_id=AWS_ACCESS_KEY_ID,
-#     aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-# )
 
 def validate_email(email: str) -> bool:
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -146,55 +121,3 @@ async def deactivate_subscription(session: AsyncSession, email: str):
     except SQLAlchemyError as e:
         return DeactivateSubscriptionResponse(message=f"Failed to deactivate subscription: {str(e)}.")
 
-# async def get_subscriptions_dynamodb(session: AsyncSession):
-#     subscriptions_table = dynamodb.Table('Subscriptions')
-
-#     response = subscriptions_table.scan()
-
-#     subscriptions = [Subscription(**item) for item in response['Items']]
-
-#     response = GetSubscriptionsDynamoDBResponse()
-#     for sub in subscriptions:
-#         response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active)
-#     return response
-
-# async def create_subscription_dynamodb(session: AsyncSession, email: str, subscription_type: str, is_active: bool):
-#     subscriptions_table = dynamodb.Table('Subscriptions')
-#     try:
-#         subscriptions_table.put_item(Item={'email': email, 'subscription_type': subscription_type, 'is_active': is_active})
-#         return CreateSubscriptionResponse(message=f"Subscription for {email} created successfully in DynamoDB.")
-#     except Exception as e:
-#         return CreateSubscriptionResponse(message=f"Error creating subscription: {str(e)}")
-
-
-# async def delete_subscription_dynamodb(session: AsyncSession, email: str):
-#     subscriptions_table = dynamodb.Table('Subscriptions')
-#     try:
-#         item_search = subscriptions_table.get_item(Key={'email': email})
-        
-#         if 'Item' not in item_search:
-#             return DeleteSubscriptionDynamoDBResponse(message="No subscription found.")
-        
-#         subscriptions_table.delete_item(Key={'email': email})
-
-#         return DeleteSubscriptionDynamoDBResponse(message="\nSubscription deleted from DynamoDB.")
-    
-#     except Exception as e:
-#         return DeleteSubscriptionDynamoDBResponse(message=f"\nFailed to delete subscription from DynamoDB: {str(e)}.")
-
-# async def change_subscription_type_dynamodb(session: AsyncSession, email: str, new_subscription_type: str):
-
-#     subscriptions_table = dynamodb.Table('Subscriptions')
-
-#     item_search = subscriptions_table.get_item(Key={'email': email})
-        
-#     if 'Item' not in item_search:
-#         return ChangeSubscriptionTypeDynamoDBResponse(message="No subscription found.")
-        
-#     subscriptions_table.update_item(
-#         Key={'email': email},
-#         UpdateExpression="set subscription_type = :s",
-#         ExpressionAttributeValues={":s": new_subscription_type},
-#     )
-
-#     return ChangeSubscriptionTypeDynamoDBResponse(message=f"Subscription type for {email} updated in DynamoDB.")
