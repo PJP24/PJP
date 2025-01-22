@@ -1,5 +1,4 @@
 .vscode/
-Subscriptions/.env
 Subscriptions/alembic/__pycache__/
 Subscriptions/alembic/versions/__pycache__/
 Subscriptions/src/db/__pycache__/
@@ -18,7 +17,6 @@ orchestrator_monolith/src/.DS_Store
 orchestrator_monolith/src/services/.DS_Store
 orchestrator_monolith/src/orchestrator/.DS_Store
 __pycache__/
-graphql_service/.env
 subscription_service/.DS_Store
 subscription_service/alembic/.DS_Store
 # Byte-compiled / optimized / DLL files
@@ -153,3 +151,4 @@ cython_debug/
 
 .vscode
 .idea
+.DS_Store
