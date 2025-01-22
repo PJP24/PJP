@@ -18,7 +18,7 @@ services:
     networks:
       - pjp_mynetwork
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgresql_subscription_data:/var/lib/postgresql/data
 
   postgresql_user_service:
     image: postgres:13-alpine
@@ -30,7 +30,7 @@ services:
       - POSTGRES_PASSWORD=test123
       - POSTGRES_DB=user_management
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - postgresql_user_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U test -d user_management" ]
       interval: 10s
@@ -96,7 +96,8 @@ networks:
     driver: bridge
 
 volumes:
-  postgresql_data:
-    name: grpc_volume
-  postgres_db:
-    name: postgres_db
+  postgresql_subscription_data:
+    name: postgresql_subscription_volume
+
+  postgresql_user_data:
+    name: postgresql_user_volume
