@@ -10,11 +10,17 @@ ENV PYTHONPATH=/app/subscription_service/src/grpc_services/generated:/app:$PYTHO
 
 COPY . /app/
 
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && rm -rf /var/lib/apt/lists/*
+
 RUN python -m grpc_tools.protoc -I=protos \
     --python_out=subscription_service/src/grpc_services/generated \
     --grpc_python_out=subscription_service/src/grpc_services/generated \
     protos/subscription.proto
 
+COPY subscription_service/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 50052
 
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["python3", "subscription_service/main.py"]
