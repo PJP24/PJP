@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12
 
 WORKDIR /app
 
@@ -10,7 +10,10 @@ ENV PYTHONPATH=/app/user_service/src/grpc_services/generated:/app:$PYTHONPATH
 
 COPY . /app/
 
-RUN python -m grpc_tools.protoc -I=protos --python_out=user_service/src/grpc_services/generated --grpc_python_out=user_service/src/grpc_services/generated protos/user.proto
+RUN python -m grpc_tools.protoc -I=protos \
+    --python_out=user_service/src/grpc_services/generated \
+    --grpc_python_out=user_service/src/grpc_services/generated \
+    protos/user.proto
 
 EXPOSE 50051
 
