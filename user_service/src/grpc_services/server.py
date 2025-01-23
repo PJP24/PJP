@@ -5,6 +5,8 @@ from user_service.src.grpc_services.generated.user_pb2 import (
     UserDetails,
     UpdatePassword,
     CreateUserResponse,
+    GetUserIdRequest,
+    GetUserIdResponse
 )
 from user_service.src.grpc_services.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
@@ -104,3 +106,11 @@ class UserManagement(UserManagementServicer):
             status="success",
             message=f"User with Id {request.id} was deleted successfully.",
         )
+
+
+    async def get_user_id(self, request: GetUserIdRequest, context) -> Id:
+        user = await self.user_crud.get_user_by_email(request.email)
+        print(user)
+        if user is None:
+            return GetUserIdResponse(status='error')
+        return GetUserIdResponse(status=str(user.id))

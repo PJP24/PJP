@@ -85,3 +85,9 @@ async def update_password(user_id: int, passwords: UpdatePassword):
     )
     return result
 
+
+
+@fastapi_app.get("/get_user_id/{user_email}")
+async def get_user_id_by_email(user_email: str):
+    result = await orchestrator.get_user_id_by_email(email=user_email)
+    return result

@@ -4,7 +4,7 @@ from typing import List, Optional
 from graphql_service.src.query_resolvers import (
     get_all_subscriptions_resolver,
     opt_out_policy_resolver,
-    get_user_details
+    get_user_details,
 )
 from graphql_service.src.mutation_resolvers import (
     add_subscription_resolver,
@@ -67,6 +67,7 @@ class AddUserResponse:
 class Response:
     status: str
     message: str
+
 
 @strawberry.type
 class Query:

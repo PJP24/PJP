@@ -5,6 +5,7 @@ service UserManagement {
     rpc read (Id) returns (UserDetails); 
     rpc update_password (UpdatePassword) returns (Response);
     rpc delete (Id) returns (Response);
+    rpc get_user_id(GetUserIdRequest) returns (GetUserIdResponse);
 
 }
 
@@ -41,3 +42,11 @@ message CreateUserResponse {
     string username = 3;
     string email = 4;
 }
+
+message GetUserIdRequest {
+    string email = 1;
+}
+
+message GetUserIdResponse {
+        string status = 1;
+    }

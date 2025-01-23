@@ -46,3 +46,12 @@ class UserCrud:
                 await session.execute(delete(User).where(User.id == user_id))
         except SQLAlchemyError as e:
             raise e
+
+
+    async def get_user_by_email(self, user_email: str):
+        try:
+            async with self.db.session_scope() as session:
+                user = await session.scalar(select(User).where(User.email == user_email))
+                return user
+        except SQLAlchemyError as e:
+            raise e

@@ -10,7 +10,7 @@ from orchestrator_monolith.src.generated.subscription_pb2 import (
 )
 
 from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
-from orchestrator_monolith.src.generated.user_pb2 import Id, User, UpdatePassword
+from orchestrator_monolith.src.generated.user_pb2 import Id, User, UpdatePassword, GetUserIdRequest
 
 
 class Orchestrator:
@@ -65,6 +65,17 @@ class Orchestrator:
                 return {"status": response.status, "message": response.message}
         except Exception as e:
             return {"error": f"Error deleting user: {str(e)}"}
+        
+
+    async def get_user_id_by_email(self, email: str):
+        try:
+            async with grpc.aio.insecure_channel(self.user_host) as channel:
+                stub = UserManagementStub(channel)
+                request = GetUserIdRequest(email=email)
+                user_data = await stub.get_user_id(request)
+                return {"status": user_data.status}
+        except Exception as e:
+            return {"error": f"Error fetching user id: {str(e)}"}
 
     async def get_all_subscriptions(self):
         try:
