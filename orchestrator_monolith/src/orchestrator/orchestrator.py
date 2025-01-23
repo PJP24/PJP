@@ -1,5 +1,7 @@
 import grpc
-from orchestrator_monolith.src.generated.subscription_pb2_grpc import SubscriptionServiceStub
+from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
+    SubscriptionServiceStub,
+)
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
     CreateSubscriptionRequest,
@@ -10,7 +12,12 @@ from orchestrator_monolith.src.generated.subscription_pb2 import (
 )
 
 from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
-from orchestrator_monolith.src.generated.user_pb2 import Id, User, UpdatePassword, GetUserIdRequest
+from orchestrator_monolith.src.generated.user_pb2 import (
+    UserId,
+    CreateUserRequest,
+    UpdatePassword,
+    GetUserIdRequest,
+)
 
 
 class Orchestrator:
@@ -22,17 +29,19 @@ class Orchestrator:
         try:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
-                user_data = await stub.read(Id(id=user_id))
+                user_data = await stub.GetUserDetails(UserId(id=user_id))
                 return {"username": user_data.username, "email": user_data.email}
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
 
     async def add_user(self, username: str, email: str, password: str):
         try:
-            request = User(username=username, email=email, password=password)
+            request = CreateUserRequest(
+                username=username, email=email, password=password
+            )
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
-                user_data = await stub.create(request)
+                user_data = await stub.CreateUser(request)
                 return {
                     "status": user_data.status,
                     "message": user_data.message,
@@ -42,37 +51,38 @@ class Orchestrator:
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
 
-    async def update_user_password(self, user_id: int, old_password: str, new_password: str):
+    async def update_user_password(
+        self, user_id: int, old_password: str, new_password: str
+    ):
         try:
             request = UpdatePassword(
-                user_id=Id(id=user_id),
+                user_id=UserId(id=user_id),
                 old_password=old_password,
                 new_password=new_password,
             )
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
-                response = await stub.update_password(request)
+                response = await stub.UpdateUserPassword(request)
                 return {"status": response.status, "message": response.message}
         except Exception as e:
             return {"error": f"Error updating user: {str(e)}"}
 
     async def delete_user(self, user_id: int):
         try:
-            request = Id(id=user_id)
+            request = UserId(id=user_id)
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
-                response = await stub.delete(request)
+                response = await stub.DeleteUser(request)
                 return {"status": response.status, "message": response.message}
         except Exception as e:
             return {"error": f"Error deleting user: {str(e)}"}
-        
 
     async def get_user_id_by_email(self, email: str):
         try:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 request = GetUserIdRequest(email=email)
-                user_data = await stub.get_user_id(request)
+                user_data = await stub.GetUserId(request)
                 return {"status": user_data.status}
         except Exception as e:
             return {"error": f"Error fetching user id: {str(e)}"}
@@ -124,6 +134,7 @@ class Orchestrator:
                     user_id=user_id,
                     period=period 
                 )
+
                 response = await stub.ExtendSubscription(request)
 
             return {"status": "success", "message": response.message}
@@ -178,7 +189,10 @@ class Orchestrator:
 
             return {"status": "success", "message": response.message}
         except Exception as e:
-            return {"status": "error", "message": f"Error deactivating subscription: {e}"}
+            return {
+                "status": "error",
+                "message": f"Error deactivating subscription: {e}",
+            }
 
     async def get_opt_out_policy(self):
         try:

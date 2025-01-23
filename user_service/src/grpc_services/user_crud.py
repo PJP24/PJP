@@ -9,7 +9,7 @@ class UserCrud:
     def __init__(self, db: Database):
         self.db = db
 
-    async def read(self, user_id: int):
+    async def get_user(self, user_id: int):
         try:
             async with self.db.session_scope() as session:
                 user = await session.scalar(select(User).where(User.id == user_id))
@@ -18,7 +18,7 @@ class UserCrud:
             raise e
         # How to handle this on server side?
 
-    async def create(self, user):
+    async def create_user(self, user):
         try:
             async with self.db.session_scope() as session:
                 user_db = User(
@@ -40,7 +40,7 @@ class UserCrud:
         except SQLAlchemyError as e:
             raise e
 
-    async def delete(self, user_id: int):
+    async def delete_user(self, user_id: int):
         try:
             async with self.db.session_scope() as session:
                 await session.execute(delete(User).where(User.id == user_id))
