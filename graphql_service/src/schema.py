@@ -21,6 +21,7 @@ from graphql_service.src.mutation_resolvers import (
 
 @strawberry.type
 class Subscription:
+    id: str
     subscription_type: str
     is_active: str
     end_date: str
