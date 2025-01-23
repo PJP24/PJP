@@ -67,5 +67,6 @@ message Subscription {
   string subscription_type = 2;
   bool is_active = 3;
   string end_date = 4;
+  string user_id = 5;
 }
 

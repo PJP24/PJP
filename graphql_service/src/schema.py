@@ -25,7 +25,7 @@ class Subscription:
     subscription_type: str
     is_active: str
     end_date: str
-
+    user_id: str
 
 @strawberry.type
 class OptOutPolicyResponse:

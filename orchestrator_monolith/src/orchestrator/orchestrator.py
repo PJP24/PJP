@@ -72,12 +72,9 @@ class Orchestrator:
                 stub = SubscriptionServiceStub(channel)
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
-                print("Raw response:", response)
-                print("Subscriptions:", response.subscriptions)
-
             result = [
                 {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active,
-                 "end_date": sub.end_date}
+                "end_date": sub.end_date, "user_id": sub.user_id}
                 for sub in response.subscriptions
             ]
             return result
