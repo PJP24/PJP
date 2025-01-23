@@ -73,7 +73,7 @@ class Orchestrator:
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
             result = [
-                {"email": sub.email, "subscription_type": sub.subscription_type, "is_active": sub.is_active,
+                {"subscription_type": sub.subscription_type, "is_active": sub.is_active,
                 "end_date": sub.end_date, "user_id": sub.user_id}
                 for sub in response.subscriptions
             ]

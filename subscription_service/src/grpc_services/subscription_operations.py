@@ -46,7 +46,7 @@ async def get_subscriptions(session: AsyncSession):
     response = GetSubscriptionsResponse()
 
     for sub in subscriptions:
-        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
+        response.subscriptions.add(subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
     return response
 
 async def extend_subscription(session: AsyncSession, email: str, period: str):  

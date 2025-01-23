@@ -63,10 +63,9 @@ message DeactivateSubscriptionResponse {
 }
 
 message Subscription {
-  string email = 1;
-  string subscription_type = 2;
-  bool is_active = 3;
-  string end_date = 4;
-  string user_id = 5;
+  string subscription_type = 1;
+  bool is_active = 2;
+  string end_date = 3;
+  string user_id = 4;
 }
 
