@@ -1,4 +1,8 @@
 import grpc
+import json
+import aiofiles
+from kafka import KafkaProducer
+from pathlib import Path
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import SubscriptionServiceStub
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
@@ -17,6 +21,57 @@ class Orchestrator:
     def __init__(self):
         self.user_host = "user_service_container:50051"
         self.subscription_host = "subscription_service_container:50052"
+        self.kafka_broker = "broker:9092"
+        self.producer = KafkaProducer(
+            bootstrap_servers=self.kafka_broker,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        )
+
+    def send_to_kafka(self, topic: str, message: dict):
+        try:
+            self.producer.send(topic, value=message)
+            self.producer.flush()  # Ensure the message is sent
+            print(f"Message sent to topic '{topic}': {message}")
+        except Exception as e:
+            print(f"Failed to send message to Kafka topic '{topic}': {e}")
+
+    async def send_verification_email(self, email: str):
+        try:
+            verification_data = {
+                "email": email,
+                "message": "Please verify your email to complete the registration.",
+            }
+            self.send_to_kafka(topic="email_notifications", message=verification_data)
+
+            return {
+                "status": "success",
+                "message": "Verification email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending verification email: {e}"
+            }
+
+    async def add_user(self, username: str, email: str, password: str):
+        try:
+            request = User(username=username, email=email, password=password)
+            async with grpc.aio.insecure_channel(self.user_host) as channel:
+                stub = UserManagementStub(channel)
+                user_data = await stub.create(request)
+
+            email_result = await self.send_verification_email(email)
+
+            print(f"Verification data saved at: {email_result.get('file_location')}")
+
+            return {
+                "status": user_data.status,
+                "message": f"{user_data.message} | {email_result['message']}",
+                "username": user_data.username,
+                "email": user_data.email
+            }
+        except Exception as e:
+            return {"error": f"Error adding user: {str(e)}"}
 
     async def get_user(self, user_id: int):
         try:
@@ -26,21 +81,6 @@ class Orchestrator:
                 return {"username": user_data.username, "email": user_data.email}
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
-
-    async def add_user(self, username: str, email: str, password: str):
-        try:
-            request = User(username=username, email=email, password=password)
-            async with grpc.aio.insecure_channel(self.user_host) as channel:
-                stub = UserManagementStub(channel)
-                user_data = await stub.create(request)
-                return {
-                    "status": user_data.status,
-                    "message": user_data.message,
-                    "username": user_data.username,
-                    "email": user_data.email,
-                }
-        except Exception as e:
-            return {"error": f"Error adding user: {str(e)}"}
 
     async def update_user_password(self, user_id: int, old_password: str, new_password: str):
         try:
@@ -172,3 +212,19 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
+
+
+    # async def add_user(self, username: str, email: str, password: str):
+    #     try:
+    #         request = User(username=username, email=email, password=password)
+    #         async with grpc.aio.insecure_channel(self.user_host) as channel:
+    #             stub = UserManagementStub(channel)
+    #             user_data = await stub.create(request)
+    #             return {
+    #                 "status": user_data.status,
+    #                 "message": user_data.message,
+    #                 "username": user_data.username,
+    #                 "email": user_data.email,
+    #             }
+    #     except Exception as e:
+    #         return {"error": f"Error adding user: {str(e)}"}

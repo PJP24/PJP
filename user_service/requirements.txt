@@ -19,3 +19,4 @@ pytest-coverage==0.0
 setuptools==75.6.0
 SQLAlchemy==2.0.36
 typing_extensions==4.12.2
+kafka-python-ng==2.2.3

@@ -23,8 +23,8 @@ generate_user_protos_in_orchestrator:
 	python -m grpc_tools.protoc --proto_path=protos --python_out=Orchestrator_monolith/src/generated --grpc_python_out=Orchestrator_monolith/src/generated protos/user.proto
 
 
-create:
-	docker-compose up --build -d
+start:
+	docker-compose up --build
 
 clean-containers:
 	@docker ps -a -q | xargs -r docker rm -f
@@ -32,4 +32,4 @@ clean-containers:
 clean-images:
 	@docker images -q | xargs -r docker rmi
 
-clean: clean-containers clean-images
+stop: clean-containers clean-images
