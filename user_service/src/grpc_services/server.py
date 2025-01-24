@@ -27,6 +27,7 @@ class UserManagement(UserManagementServicer):
                 message="Username must be at least 5 characters long",
                 username=None,
                 email=None,
+                id=None,
             )
         if not is_valid_email(request.email):
             return CreateUserResponse(
@@ -34,6 +35,7 @@ class UserManagement(UserManagementServicer):
                 message="Invalid email",
                 username=None,
                 email=None,
+                id=None,
             )
         if not is_valid_password(request.password):
             return CreateUserResponse(
@@ -41,15 +43,17 @@ class UserManagement(UserManagementServicer):
                 message="Password is not strong enough.",
                 username=None,
                 email=None,
+                id=None,
             )
         try:
             result = await self.user_crud.create_user(request)
-            if result == "success":
+            if result:
                 return CreateUserResponse(
                     status="success",
                     message="User created successfully",
                     username=request.username,
                     email=request.email,
+                    id = result,
                 )
         except IntegrityError:
             return CreateUserResponse(
@@ -57,6 +61,7 @@ class UserManagement(UserManagementServicer):
                 message="Account already exists with this username/email",
                 username=None,
                 email=None,
+                id = None,
             )
         except RpcError as e:
             print(f"gRPC error: {e}")
@@ -65,6 +70,7 @@ class UserManagement(UserManagementServicer):
                 message="An error occured while processing your request.",
                 username=None,
                 email=None,
+                id = None,
             )
 
     async def GetUserDetails(self, request: UserId, context) -> UserDetails:

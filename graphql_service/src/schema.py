@@ -58,10 +58,17 @@ class User:
     email: str
 
 @strawberry.type
+class CreatedUser:
+    username: str
+    email: str
+    id: int
+
+
+@strawberry.type
 class AddUserResponse:
     status: str
     message: str
-    user: Optional[User]
+    user: Optional[CreatedUser]
 
 @strawberry.type
 class Response:

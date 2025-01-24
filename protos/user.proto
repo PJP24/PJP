@@ -41,6 +41,7 @@ message CreateUserResponse {
     string message = 2;
     string username = 3;
     string email = 4;
+    int32 id = 5;
 }
 
 message GetUserIdRequest {

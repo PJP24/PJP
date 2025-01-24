@@ -27,7 +27,10 @@ class UserCrud:
                     password=user.password,
                 )
                 session.add(user_db)
-                return "success"
+                await session.flush()
+                print(f'new user is{user_db}')
+                print(f"the user id: {user_db.id}")
+                return user_db.id
         except (IntegrityError, SQLAlchemyError) as e:
             raise e
 

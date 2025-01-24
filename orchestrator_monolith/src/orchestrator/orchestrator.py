@@ -42,11 +42,13 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
+                print(user_data)
                 return {
                     "status": user_data.status,
                     "message": user_data.message,
                     "username": user_data.username,
                     "email": user_data.email,
+                    "id": user_data.id,
                 }
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}

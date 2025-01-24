@@ -39,6 +39,8 @@ async def get_user_details(user_id: int):
         try:
             response = await client.get(url)
             user_data = response.json()
+            if user_data['username'] == '':
+                return None
             return User(**user_data)
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Exception in get_user_details: {e}")
