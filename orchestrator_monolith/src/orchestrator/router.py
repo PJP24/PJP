@@ -64,7 +64,6 @@ async def get_user_details(user_id: int):
     result = await orchestrator.get_user(user_id=user_id)
     return result
 
-
 @fastapi_app.post("/add_user")
 async def add_user(user: User):
     result = await orchestrator.add_user(
@@ -72,12 +71,10 @@ async def add_user(user: User):
     )   
     return result
 
-
 @fastapi_app.delete("/delete_user/{user_id}")
 async def delete_user(user_id: int):
     result = await orchestrator.delete_user(user_id=user_id)
     return result
-
 
 @fastapi_app.patch("/update_password/{user_id}")
 async def update_password(user_id: int, passwords: UpdatePassword):
