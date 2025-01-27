@@ -43,7 +43,7 @@ message DeleteSubscriptionResponse {
 }
 
 message ActivateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message ActivateSubscriptionResponse {
   string message = 1;

@@ -33,7 +33,7 @@ class SubscriptionService(SubscriptionServiceServicer):
 
     async def ActivateSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            return await activate_subscription(session, request.email)
+            return await activate_subscription(session, request.user_id)
 
     async def DeactivateSubscription(self, request, context):
         async with self.database.session_scope() as session:

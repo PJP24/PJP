@@ -44,9 +44,8 @@ async def get_subscriptions(session: AsyncSession):
 
 async def extend_subscription(session: AsyncSession, user_id: int, period: str):  
     subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
-
     if subscription is None:
-        return ExtendSubscriptionResponse(message="No subscription with this email.")
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
     
     if period == 'month':
         new_end_date = subscription.end_date + timedelta(days=30)
@@ -69,8 +68,8 @@ async def extend_subscription(session: AsyncSession, user_id: int, period: str):
 
 async def delete_subscription(session: AsyncSession, user_id: int):
     subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
-    if not subscription:
-        return DeleteSubscriptionResponse(message="No subscription with this email.")
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
     
     try:
         await session.delete(subscription)
@@ -78,21 +77,21 @@ async def delete_subscription(session: AsyncSession, user_id: int):
     except SQLAlchemyError as e:
         return DeleteSubscriptionResponse(message=f"Failed to delete subscription: {str(e)}.")
 
-async def activate_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-
-    if not subscription:
-        return ActivateSubscriptionResponse(message="No subscription with this email.")
+async def activate_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
+    
     if subscription.is_active:
         return ActivateSubscriptionResponse(message="The subscription for this email is already active.")
     
     try:
         await session.execute(
             sa.update(Subscription)
-            .where(Subscription.email == email)
+            .where(Subscription.user_id == user_id)
             .values(is_active=True)
         )
-        return ActivateSubscriptionResponse(message=f"Subscription for email {email} was activated.")
+        return ActivateSubscriptionResponse(message=f"Subscription for user with id {user_id} was activated.")
     except SQLAlchemyError as e:
         return ActivateSubscriptionResponse(message=f"Failed to activate subscription: {str(e)}.")
 
