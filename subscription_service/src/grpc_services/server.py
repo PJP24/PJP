@@ -25,7 +25,7 @@ class SubscriptionService(SubscriptionServiceServicer):
 
     async def ExtendSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            return await extend_subscription(session, request.email, request.period)
+            return await extend_subscription(session, request.user_id, request.period)
 
     async def DeleteSubscription(self, request, context):
         async with self.database.session_scope() as session:

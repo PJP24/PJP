@@ -105,11 +105,18 @@ class Orchestrator:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
     async def extend_subscription(self, email: str, period: str): 
+        print(f"333 - {email} - {period}")
+    
+        # Има юзър с с този имейл
+        # If user with this email doesn't exist -> Error
+        # Else -> return user_id -> go on ...
+        user_id = 1
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = ExtendSubscriptionRequest(
-                    email=email,
+                    user_id=user_id,
                     period=period 
                 )
                 response = await stub.ExtendSubscription(request)
