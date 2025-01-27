@@ -26,7 +26,7 @@ async def create_subscription(session: AsyncSession, user_id: int, subscription_
     elif subscription_type == 'yearly':
         end_date = datetime.now().date() + timedelta(days=365)
     try:
-        new_subscription = Subscription(user_id=user_id, subscription_type=subscription_type, end_date=end_date)
+        new_subscription = Subscription(user_id=user_id, end_date=end_date)
         session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")
@@ -39,7 +39,7 @@ async def get_subscriptions(session: AsyncSession):
     response = GetSubscriptionsResponse()
 
     for sub in subscriptions:
-        response.subscriptions.add(id=str(sub.id), subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
+        response.subscriptions.add(id=str(sub.id), is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
     return response
 
 async def extend_subscription(session: AsyncSession, user_id: int, period: str):  

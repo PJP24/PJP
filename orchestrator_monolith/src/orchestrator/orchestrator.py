@@ -73,7 +73,7 @@ class Orchestrator:
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
             result = [
-                {"id": sub.id, "subscription_type": sub.subscription_type, "is_active": sub.is_active,
+                {"id": sub.id, "is_active": sub.is_active,
                 "end_date": sub.end_date, "user_id": sub.user_id}
                 for sub in response.subscriptions
             ]
@@ -82,8 +82,7 @@ class Orchestrator:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
 
     async def add_subscription(self, email: str, subscription_type: str):
-
-        # Има юзър с с този имейл
+        # Check if user with this email exists
         # If user with this email doesn't exist -> Error
         # Else -> return user_id -> go on ...
         user_id = 1
@@ -97,17 +96,12 @@ class Orchestrator:
                 )
                 response = await stub.CreateSubscription(request)
 
-            if response.message is not None:
-                return {"status": "success", "message": response.message}
-            else:
-                return {"status": "error", "message": "Error adding subscription"}
+            return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
     async def extend_subscription(self, email: str, period: str): 
-        print(f"333 - {email} - {period}")
-    
-        # Има юзър с с този имейл
+        # Check if user with this email exists
         # If user with this email doesn't exist -> Error
         # Else -> return user_id -> go on ...
         user_id = 1
@@ -121,24 +115,24 @@ class Orchestrator:
                 )
                 response = await stub.ExtendSubscription(request)
 
-            if response.message is not None:
-                return {"status": "success", "message": response.message}
-            else:
-                return {"status": "error", "message": "Error extending subscription"}
+            return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error extending subscription: {e}"}
 
     async def delete_subscription(self, email: str):
+
+        # Check if user with this email exists
+        # If user with this email doesn't exist -> Error
+        # Else -> return user_id -> go on ...
+        user_id = 1
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
-                request = DeleteSubscriptionRequest(email=email)
+                request = DeleteSubscriptionRequest(user_id=user_id)
                 response = await stub.DeleteSubscription(request)
 
-            if response.message is not None:
-                return {"status": "success", "message": response.message}
-            else:
-                return {"status": "error", "message": "Error deleting subscription"}
+            return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error deleting subscription: {e}"}
 
@@ -149,10 +143,7 @@ class Orchestrator:
                 request = ActivateSubscriptionRequest(email=email)
                 response = await stub.ActivateSubscription(request)
 
-            if response.message is not None:
-                return {"status": "success", "message": response.message}
-            else:
-                return {"status": "error", "message": "Error activating subscription"}
+            return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error activating subscription: {e}"}
 
@@ -163,20 +154,15 @@ class Orchestrator:
                 request = DeactivateSubscriptionRequest(email=email)
                 response = await stub.DeactivateSubscription(request)
 
-            if response.message is not None:
-                return {"status": "success", "message": response.message}
-            else:
-                return {"status": "error", "message": "Error deactivating subscription"}
+            return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error deactivating subscription: {e}"}
 
     async def get_opt_out_policy(self):
         try:
             policy_text = (
-                "Opt-Out Policy:\n"
-                "Cancel your subscription anytime to stop future charges.\n"
-                "1. Press 5\n"
-                "2. Enter the email you subscribed with\n"
+                "Opt-Out Policy:"
+                "Cancel your subscription anytime to stop future charges."
                 "Activate your subscription again any time."
             )
             return policy_text

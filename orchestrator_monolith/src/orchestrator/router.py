@@ -36,7 +36,6 @@ async def add_subscription(request: SubscriptionRequest):
 
 @fastapi_app.put("/extend_subscription/{email}")
 async def extend_subscription(request: ExtendSubscriptionRequest):
-    print(f"222 - {request.email} - {request.period}")
     result = await orchestrator.extend_subscription(request.email, request.period)  
     return result
 

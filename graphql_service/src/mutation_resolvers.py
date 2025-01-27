@@ -19,7 +19,6 @@ async def add_subscription_resolver(email: str, subscription_type: str):
         raise Exception(f"Error adding subscription: {e}")
 
 async def extend_subscription_resolver(email: str, period: str):
-    print(f"111 - {email} - {period}")
     from graphql_service.src.schema import ExtendSubscriptionResponse
     try:
         url = f"{BASE_URL}/extend_subscription/{email}"
