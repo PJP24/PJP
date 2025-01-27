@@ -6,7 +6,6 @@ from graphql_service.src.query_resolvers import (
     opt_out_policy_resolver,
     get_user_details
 )
-
 from graphql_service.src.mutation_resolvers import (
     add_subscription_resolver,
     extend_subscription_resolver,
@@ -17,7 +16,6 @@ from graphql_service.src.mutation_resolvers import (
     update_user_password,
     delete_user
 )
-
 
 @strawberry.type
 class Subscription:
@@ -30,42 +28,34 @@ class Subscription:
 class OptOutPolicyResponse:
     policy: str
 
-
 @strawberry.type
 class AddSubscriptionResponse:
     result_info: str
-
 
 @strawberry.type
 class UpdateSubscriptionResponse:
     result_info: str
 
-
 @strawberry.type
 class DeleteSubscriptionResponse:
     result_info: str
-
 
 @strawberry.type
 class ActivateSubscriptionResponse:
     result_info: str
 
-
 @strawberry.type
 class DeactivateSubscriptionResponse:
     result_info: str
-
 
 @strawberry.type
 class ExtendSubscriptionResponse:
     result_info: str
 
-
 @strawberry.type
 class User:
     username: str
     email: str
-
 
 @strawberry.type
 class AddUserResponse:
@@ -73,19 +63,16 @@ class AddUserResponse:
     message: str
     user: Optional[User]
 
-
 @strawberry.type
 class Response:
     status: str
     message: str
-
 
 @strawberry.type
 class Query:
     all_subscriptions: List[Subscription] | None = strawberry.field(resolver=get_all_subscriptions_resolver)
     opt_out_policy: OptOutPolicyResponse | None = strawberry.field(resolver=opt_out_policy_resolver)
     user_details: User | None = strawberry.field(resolver=get_user_details)
-
 
 @strawberry.type
 class Mutation:

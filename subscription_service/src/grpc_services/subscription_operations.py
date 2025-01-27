@@ -67,8 +67,8 @@ async def extend_subscription(session: AsyncSession, user_id: int, period: str):
     except SQLAlchemyError as e:
         return ExtendSubscriptionResponse(message=f"Failed to extend subscription: {str(e)}.")
 
-async def delete_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
+async def delete_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
     if not subscription:
         return DeleteSubscriptionResponse(message="No subscription with this email.")
     

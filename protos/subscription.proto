@@ -36,7 +36,7 @@ message ExtendSubscriptionResponse {
 }
 
 message DeleteSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message DeleteSubscriptionResponse {
   string message = 1;
