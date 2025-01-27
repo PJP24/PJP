@@ -3,6 +3,7 @@ from user_service.src.db.models import User
 from sqlalchemy.future import select
 from sqlalchemy import update, delete
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from typing import List
 
 
 class UserCrud:
@@ -56,5 +57,17 @@ class UserCrud:
             async with self.db.session_scope() as session:
                 user = await session.scalar(select(User).where(User.email == user_email))
                 return user
+        except SQLAlchemyError as e:
+            raise e
+
+
+    async def get_user_emails(self, ids: List[int]):
+        try:
+            async with self.db.session_scope() as session:
+                stmt = select(User).filter(User.id.in_(ids))
+                result = await session.execute(stmt)
+                users = result.scalars().all()
+                emails = [user.email for user in users]
+                return emails
         except SQLAlchemyError as e:
             raise e

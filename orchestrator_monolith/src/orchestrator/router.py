@@ -1,28 +1,10 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 from orchestrator_monolith.src.orchestrator.orchestrator import Orchestrator
+from orchestrator_monolith.src.orchestrator.models import SubscriptionRequest, ExtendSubscriptionRequest, UpdatePassword, User, UserIds, EmailList
 
 fastapi_app = APIRouter(prefix="")
 
 orchestrator = Orchestrator()
-
-class User(BaseModel):
-    username: str
-    email: str
-    password: str
-
-
-class UpdatePassword(BaseModel):
-    old_password: str
-    new_password: str
-
-class SubscriptionRequest(BaseModel):
-    email: str
-    subscription_type: str
-
-class ExtendSubscriptionRequest(BaseModel):
-    email: str
-    period: str  
 
 @fastapi_app.get("/get_subscriptions")
 async def get_all_subscriptions():
@@ -91,3 +73,10 @@ async def update_password(user_id: int, passwords: UpdatePassword):
 async def get_user_id_by_email(user_email: str):
     result = await orchestrator.get_user_id_by_email(email=user_email)
     return result
+
+@fastapi_app.post("/users/emails")
+async def get_users_emails_by_id(request: UserIds) -> EmailList:
+    ids = request.ids
+    result = await orchestrator.get_users_emails_by_id(ids)
+    result_result = EmailList(**result)
+    return result_result

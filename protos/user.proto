@@ -6,6 +6,7 @@ service UserManagement {
     rpc UpdateUserPassword (UpdatePassword) returns (Response);
     rpc DeleteUser (UserId) returns (Response);
     rpc GetUserId(GetUserIdRequest) returns (GetUserIdResponse);
+    rpc GetUsersEmails (GetEmailsRequest) returns (GetEmailsResponse);
 
 }
 
@@ -51,3 +52,13 @@ message GetUserIdRequest {
 message GetUserIdResponse {
         string status = 1;
     }
+
+
+message GetEmailsRequest {
+    repeated int32 id = 1;
+}
+
+
+message GetEmailsResponse {
+    repeated string email = 1;
+}

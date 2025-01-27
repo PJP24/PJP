@@ -6,7 +6,9 @@ from user_service.src.grpc_services.generated.user_pb2 import (
     UpdatePassword,
     CreateUserResponse,
     GetUserIdRequest,
-    GetUserIdResponse
+    GetUserIdResponse,
+    GetEmailsRequest,
+    GetEmailsResponse
 )
 from user_service.src.grpc_services.generated.user_pb2_grpc import UserManagementServicer
 from grpc import RpcError
@@ -120,3 +122,8 @@ class UserManagement(UserManagementServicer):
         if user is None:
             return GetUserIdResponse(status='error')
         return GetUserIdResponse(status=str(user.id))
+    
+
+    async def GetUsersEmails(self, request: GetEmailsRequest, context) -> GetEmailsResponse:
+        users_emails = await self.user_crud.get_user_emails(request.id)
+        return GetEmailsResponse(email=users_emails)

@@ -1,4 +1,5 @@
 import grpc
+from typing import List
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
     SubscriptionServiceStub,
 )
@@ -17,6 +18,7 @@ from orchestrator_monolith.src.generated.user_pb2 import (
     CreateUserRequest,
     UpdatePassword,
     GetUserIdRequest,
+    GetEmailsRequest,
 )
 
 
@@ -86,6 +88,17 @@ class Orchestrator:
                 request = GetUserIdRequest(email=email)
                 user_data = await stub.GetUserId(request)
                 return {"status": user_data.status}
+        except Exception as e:
+            return {"error": f"Error fetching user id: {str(e)}"}
+        
+
+    async def get_users_emails_by_id(self, ids: List[int]):
+        try:
+            async with grpc.aio.insecure_channel(self.user_host) as channel:
+                stub = UserManagementStub(channel)
+                request = GetEmailsRequest(id=ids)
+                response = await stub.GetUsersEmails(request)
+                return {"emails": response.email}
         except Exception as e:
             return {"error": f"Error fetching user id: {str(e)}"}
 

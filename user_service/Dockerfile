@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd 
 RUN python -m grpc_tools.protoc -I=protos \
     --python_out=user_service/src/grpc_services/generated \
     --grpc_python_out=user_service/src/grpc_services/generated \
+    --pyi_out=user_service/src/grpc_services/generated \
     protos/user.proto
 
 COPY user_service/entrypoint.sh /usr/local/bin/entrypoint.sh
