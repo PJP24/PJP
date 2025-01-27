@@ -1,10 +1,10 @@
 syntax = "proto3" ;
 
 service UserManagement {
-    rpc create (User) returns (Response);
+    rpc create (User) returns (CreateUserResponse);
     rpc read (Id) returns (UserDetails); 
     rpc update_password (UpdatePassword) returns (Response);
-    rpc delete (DeleteUser) returns (Response);
+    rpc delete (Id) returns (Response);
 
 }
 
@@ -12,11 +12,6 @@ message UpdatePassword {
     Id user_id = 1;
     string old_password = 2;
     string new_password = 3;
-}
-
-message DeleteUser {
-    Id user_id = 1;
-    bool confirm_delete = 2;
 }
 
 message Id {
@@ -36,6 +31,13 @@ message User {
 }
 
 message Response {
-    string message = 1;
+    string status = 1;
+    string message = 2;
 }
 
+message CreateUserResponse {
+    string status = 1;
+    string message = 2;
+    string username = 3;
+    string email = 4;
+}

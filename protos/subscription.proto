@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package subscription;
 
-import "google/protobuf/timestamp.proto";
-
 service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
@@ -12,10 +10,9 @@ service SubscriptionService {
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
-  rpc GetSubscriptionsDynamoDB (GetSubscriptionsDynamoDBRequest) returns (GetSubscriptionsDynamoDBResponse);
 }
 
-// Create
+
 message CreateSubscriptionRequest {
   string email = 1;
   string subscription_type = 2;
@@ -26,13 +23,11 @@ message CreateSubscriptionResponse {
   string message = 1;
 }
 
-// Read
 message GetSubscriptionsRequest {}
 message GetSubscriptionsResponse {
   repeated Subscription subscriptions = 1;
 }
 
-// Extend
 message ExtendSubscriptionRequest {
   string email = 1;
   string period = 2; 
@@ -41,7 +36,6 @@ message ExtendSubscriptionResponse {
   string message = 1;
 }
 
-// Delete
 message DeleteSubscriptionRequest {
   string email = 1;
 }
@@ -49,7 +43,6 @@ message DeleteSubscriptionResponse {
   string message = 1;
 }
 
-// Activate
 message ActivateSubscriptionRequest {
   string email = 1;
 }
@@ -57,13 +50,11 @@ message ActivateSubscriptionResponse {
   string message = 1;
 }
 
-// OptOutPolicy
 message OptOutPolicyRequest {}
 message OptOutPolicyResponse {
   string policy = 1;
 }
 
-// Deactivate
 message DeactivateSubscriptionRequest {
   string email = 1;
 }
@@ -78,8 +69,3 @@ message Subscription {
   string end_date = 4;
 }
 
-// Read DynamoDB
-message GetSubscriptionsDynamoDBRequest {}
-message GetSubscriptionsDynamoDBResponse {
-  repeated Subscription subscriptions = 1;
-}

@@ -1,5 +1,4 @@
 .vscode/
-Subscriptions/.env
 Subscriptions/alembic/__pycache__/
 Subscriptions/alembic/versions/__pycache__/
 Subscriptions/src/db/__pycache__/
@@ -13,12 +12,11 @@ Users/src/grpc/generated/__pycache__/
 Users/src/utils/__pycache__/
 clear_docker_data.sh
 venv/
-Orchestrator_monolith/.DS_Store
-Orchestrator_monolith/src/.DS_Store
-Orchestrator_monolith/src/services/.DS_Store
-Orchestrator_monolith/src/orchestrator/.DS_Store
+orchestrator_monolith/.DS_Store
+orchestrator_monolith/src/.DS_Store
+orchestrator_monolith/src/services/.DS_Store
+orchestrator_monolith/src/orchestrator/.DS_Store
 __pycache__/
-GraphQL/.env
 subscription_service/.DS_Store
 subscription_service/alembic/.DS_Store
 # Byte-compiled / optimized / DLL files
@@ -121,9 +119,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
-env/
 venv/
 ENV/
 env.bak/
@@ -154,4 +150,5 @@ dmypy.json
 cython_debug/
 
 .vscode
-
+.idea
+.DS_Store
