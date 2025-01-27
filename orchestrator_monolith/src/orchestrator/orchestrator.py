@@ -82,11 +82,17 @@ class Orchestrator:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
 
     async def add_subscription(self, email: str, subscription_type: str):
+
+        # Има юзър с с този имейл
+        # If user with this email doesn't exist -> Error
+        # Else -> return user_id -> go on ...
+        user_id = 1
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = CreateSubscriptionRequest(
-                    email=email,
+                    user_id=user_id,
                     subscription_type=subscription_type
                 )
                 response = await stub.CreateSubscription(request)

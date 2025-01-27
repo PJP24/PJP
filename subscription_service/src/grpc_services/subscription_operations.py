@@ -15,15 +15,14 @@ from subscription_service.src.grpc_services.generated.subscription_pb2 import (
     DeactivateSubscriptionResponse,
 )
 
-def validate_email(email: str) -> bool:
-    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    return re.match(email_regex, email) is not None
-
-async def create_subscription(session: AsyncSession, email: str, subscription_type: str):
-    if not validate_email(email):
-        return CreateSubscriptionResponse(message="Invalid email.")
+async def create_subscription(session: AsyncSession, user_id: int, subscription_type: str):
     
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    
+    # Юзъра все още няма subscription
+    # If subscription with this user_id exists -> Error
+    # Else -> go on...
+
     if subscription:
         return CreateSubscriptionResponse(message="Subscription exists.")
     
@@ -31,9 +30,8 @@ async def create_subscription(session: AsyncSession, email: str, subscription_ty
         end_date = datetime.now().date() + timedelta(days=30)
     elif subscription_type == 'yearly':
         end_date = datetime.now().date() + timedelta(days=365)
-    
     try:
-        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=end_date)
+        new_subscription = Subscription(user_id=user_id, subscription_type=subscription_type, end_date=end_date)
         session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")

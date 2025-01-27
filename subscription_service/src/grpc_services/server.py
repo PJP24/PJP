@@ -21,7 +21,7 @@ class SubscriptionService(SubscriptionServiceServicer):
 
     async def CreateSubscription(self, request, context):
         async with self.database.session_scope() as session:
-            return await create_subscription(session, request.email, request.subscription_type)
+            return await create_subscription(session, request.user_id, request.subscription_type)
 
     async def ExtendSubscription(self, request, context):
         async with self.database.session_scope() as session:

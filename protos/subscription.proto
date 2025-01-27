@@ -14,9 +14,8 @@ service SubscriptionService {
 
 
 message CreateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
   string subscription_type = 2;
-  string end_date = 3;
 }
 
 message CreateSubscriptionResponse {
