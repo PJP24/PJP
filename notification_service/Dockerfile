@@ -16,4 +16,4 @@ COPY notification_service/wait-for-kafka.sh /usr/local/bin/wait-for-kafka.sh
 
 RUN chmod +x /usr/local/bin/wait-for-kafka.sh
 
-ENTRYPOINT ["/usr/local/bin/wait-for-kafka.sh"]
+CMD ["tail", "-f", "/dev/null"]

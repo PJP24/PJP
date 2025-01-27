@@ -1,55 +1,63 @@
-import json
-import os
 import asyncio
+import json
 from aiokafka import AIOKafkaConsumer
+from aiosmtplib import send
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+SMTP_SERVER = "smtp.mail.yahoo.com"
+SMTP_PORT = 465
+EMAIL_ADDRESS = "romaliiskii.v@yahoo.com"
+EMAIL_PASSWORD = "qhotzruprflfebyg"
 
 
-async def save_message_to_file(message):
-    output_dir = "received_messages"
-    os.makedirs(output_dir, exist_ok=True)
+async def send_email(email: str, message: str, username: str):
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_ADDRESS
+        msg["To"] = email
+        msg["Subject"] = f"Notification - PJP app for {username}"
+        msg.attach(MIMEText(message, "plain"))
 
-    file_name = os.path.join(output_dir, f"message_{message.offset}.txt")
+        await send(
+            msg,
+            hostname=SMTP_SERVER,
+            port=SMTP_PORT,
+            username=EMAIL_ADDRESS,
+            password=EMAIL_PASSWORD,
+            use_tls=True,
+        )
+        print(f"Email sent to {email}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
-    with open(file_name, "w") as file:
-        file.write(f"Topic: {message.topic}\n")
-        file.write(f"Partition: {message.partition}\n")
-        file.write(f"Offset: {message.offset}\n")
-        file.write(f"Key: {message.key}\n")
-        file.write(f"Value: {json.dumps(message.value)}\n")
 
-    print(f"Message saved to {file_name}")
-
-
-async def start_consumer():
-    kafka_broker = "broker:9092"
-    topic = "email_notifications"
-
+async def consume_email_notifications():
     consumer = AIOKafkaConsumer(
-        topic,
-        bootstrap_servers=kafka_broker,
+        "email_notifications",
+        bootstrap_servers="broker:9092",
+        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+        group_id="email_consumer_group",
         auto_offset_reset="earliest",
-        enable_auto_commit=True,
-        group_id="notification_service_group",
-        value_deserializer=lambda v: json.loads(v.decode("utf-8")),
     )
 
-    print(f"Listening to topic '{topic}'...")
-
+    await consumer.start()
     try:
-        await consumer.start()
+        print("Listening for email notifications...")
         async for message in consumer:
-            await save_message_to_file(message)
-    except KeyboardInterrupt:
-        print("Consumer stopped.")
-    except Exception as e:
-        print(f"Error in consumer: {e}")
+            email_data = message.value
+            email = email_data.get("email")
+            username = email_data.get("username")
+            password = email_data.get("password")
+            email_body = email_data.get("message")
+            if email and email_body:
+                await send_email(email, email_body, username)
+                print(email, email_body, username)
+            else:
+                print(f"Invalid email data: {email_data}")
     finally:
         await consumer.stop()
 
 
-def main():
-    asyncio.run(start_consumer())
-
-
 if __name__ == "__main__":
-    main()
+    asyncio.run(consume_email_notifications())
