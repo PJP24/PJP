@@ -95,21 +95,21 @@ async def activate_subscription(session: AsyncSession, user_id: int):
     except SQLAlchemyError as e:
         return ActivateSubscriptionResponse(message=f"Failed to activate subscription: {str(e)}.")
 
-async def deactivate_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-
-    if not subscription:
-        return DeactivateSubscriptionResponse(message="No subscription with this email.")
+async def deactivate_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
+    
     if not subscription.is_active:
         return DeactivateSubscriptionResponse(message="The subscription for this email is not active.")
     
     try:
         await session.execute(
             sa.update(Subscription)
-            .where(Subscription.email == email)
+            .where(Subscription.user_id == user_id)
             .values(is_active=False)
         )
-        return DeactivateSubscriptionResponse(message=f"Subscription for email {email} was deactivated.")
+        return ActivateSubscriptionResponse(message=f"Subscription for user with id {user_id} was deactivated.")
     except SQLAlchemyError as e:
         return DeactivateSubscriptionResponse(message=f"Failed to deactivate subscription: {str(e)}.")
 

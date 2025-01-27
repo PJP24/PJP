@@ -90,7 +90,6 @@ async def add_user(username: str, email: str, password: str):
             ),
         )
 
-
 async def update_user_password(user_id: int, old_password: str, new_password: str):
     from graphql_service.src.schema import Response
 
@@ -106,7 +105,6 @@ async def update_user_password(user_id: int, old_password: str, new_password: st
         return Response(
             status=response_data.get("status"), message=response_data.get("message")
         )
-
 
 async def delete_user(self, user_id: int):
     from graphql_service.src.schema import Response

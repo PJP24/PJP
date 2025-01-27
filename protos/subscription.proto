@@ -55,7 +55,7 @@ message OptOutPolicyResponse {
 }
 
 message DeactivateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message DeactivateSubscriptionResponse {
   string message = 1;

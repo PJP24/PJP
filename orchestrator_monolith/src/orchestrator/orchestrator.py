@@ -154,10 +154,15 @@ class Orchestrator:
             return {"status": "error", "message": f"Error activating subscription: {e}"}
 
     async def deactivate_subscription(self, email: str):
+        # Check if user with this email exists
+        # If user with this email doesn't exist -> Error
+        # Else -> return user_id -> go on ...
+        user_id = 1
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
-                request = DeactivateSubscriptionRequest(email=email)
+                request = DeactivateSubscriptionRequest(user_id=user_id)
                 response = await stub.DeactivateSubscription(request)
 
             return {"status": "success", "message": response.message}
