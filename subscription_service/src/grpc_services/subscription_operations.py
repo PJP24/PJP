@@ -18,13 +18,8 @@ from subscription_service.src.grpc_services.generated.subscription_pb2 import (
 async def create_subscription(session: AsyncSession, user_id: int, subscription_type: str):
     
     subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
-    
-    # Юзъра все още няма subscription
-    # If subscription with this user_id exists -> Error
-    # Else -> go on...
-
     if subscription:
-        return CreateSubscriptionResponse(message="Subscription exists.")
+        return CreateSubscriptionResponse(message="Subscription for user with this id already exists.")
     
     if subscription_type == 'monthly':
         end_date = datetime.now().date() + timedelta(days=30)
