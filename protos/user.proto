@@ -1,20 +1,22 @@
 syntax = "proto3" ;
 
 service UserManagement {
-    rpc create (User) returns (CreateUserResponse);
-    rpc read (Id) returns (UserDetails); 
-    rpc update_password (UpdatePassword) returns (Response);
-    rpc delete (Id) returns (Response);
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+    rpc GetUserDetails (UserId) returns (UserDetails); 
+    rpc UpdateUserPassword (UpdatePassword) returns (Response);
+    rpc DeleteUser (UserId) returns (Response);
+    rpc GetUserId(GetUserIdRequest) returns (GetUserIdResponse);
+    rpc GetUsersEmails (GetEmailsRequest) returns (GetEmailsResponse);
 
 }
 
 message UpdatePassword {
-    Id user_id = 1;
+    UserId user_id = 1;
     string old_password = 2;
     string new_password = 3;
 }
 
-message Id {
+message UserId {
     int32 id = 1;
 }
 
@@ -23,7 +25,7 @@ message UserDetails {
     string email = 2;
 }
 
-message User {
+message CreateUserRequest {
     string username = 1;
     string email = 2;
     string password = 3;
@@ -40,4 +42,23 @@ message CreateUserResponse {
     string message = 2;
     string username = 3;
     string email = 4;
+    int32 id = 5;
+}
+
+message GetUserIdRequest {
+    string email = 1;
+}
+
+message GetUserIdResponse {
+        string status = 1;
+    }
+
+
+message GetEmailsRequest {
+    repeated int32 id = 1;
+}
+
+
+message GetEmailsResponse {
+    repeated string email = 1;
 }

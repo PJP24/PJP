@@ -67,7 +67,7 @@ async def deactivate_subscription_resolver(email: str):
         raise Exception(f"Error deactivating subscription: {e}")
 
 async def add_user(username: str, email: str, password: str):
-    from graphql_service.src.schema import AddUserResponse, User
+    from graphql_service.src.schema import AddUserResponse, CreatedUser
     user_data = {"username": username, "email": email, "password": password}
     url = f"{BASE_URL}/add_user"
     async with httpx.AsyncClient() as client:
@@ -84,9 +84,10 @@ async def add_user(username: str, email: str, password: str):
         return AddUserResponse(
             status="success",
             message=response_data.get("message"),
-            user=User(
+            user=CreatedUser(
                 username=response_data.get("username"),
                 email=response_data.get("email"),
+                id = response_data.get("id"),
             ),
         )
 

@@ -36,3 +36,8 @@ clean-volumes:
 	@docker volume rm $(docker volume ls -q)
 
 clean: clean-containers clean-images clean-volumes
+
+clean: clean-containers clean-images
+
+clean-create: clean create
+

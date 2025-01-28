@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\"R\n\x0eUpdatePassword\x12\x14\n\x07user_id\x18\x01 \x01(\x0b\x32\x03.Id\x12\x14\n\x0cold_password\x18\x02 \x01(\t\x12\x14\n\x0cnew_password\x18\x03 \x01(\t\"\x10\n\x02Id\x12\n\n\x02id\x18\x01 \x01(\x05\".\n\x0bUserDetails\x12\x10\n\x08username\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"S\n\x04User\x12\x10\n\x08username\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x18\n\x10\x63onfirm_password\x18\x04 \x01(\t\"+\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"V\n\x12\x43reateUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\r\n\x05\x65mail\x18\x04 \x01(\t2\x9a\x01\n\x0eUserManagement\x12$\n\x06\x63reate\x12\x05.User\x1a\x13.CreateUserResponse\x12\x19\n\x04read\x12\x03.Id\x1a\x0c.UserDetails\x12-\n\x0fupdate_password\x12\x0f.UpdatePassword\x1a\t.Response\x12\x18\n\x06\x64\x65lete\x12\x03.Id\x1a\t.Responseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\"V\n\x0eUpdatePassword\x12\x18\n\x07user_id\x18\x01 \x01(\x0b\x32\x07.UserId\x12\x14\n\x0cold_password\x18\x02 \x01(\t\x12\x14\n\x0cnew_password\x18\x03 \x01(\t\"\x14\n\x06UserId\x12\n\n\x02id\x18\x01 \x01(\x05\".\n\x0bUserDetails\x12\x10\n\x08username\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\"`\n\x11\x43reateUserRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t\x12\x10\n\x08password\x18\x03 \x01(\t\x12\x18\n\x10\x63onfirm_password\x18\x04 \x01(\t\"+\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"b\n\x12\x43reateUserResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x10\n\x08username\x18\x03 \x01(\t\x12\r\n\x05\x65mail\x18\x04 \x01(\t\x12\n\n\x02id\x18\x05 \x01(\x05\"!\n\x10GetUserIdRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"#\n\x11GetUserIdResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\"\x1e\n\x10GetEmailsRequest\x12\n\n\x02id\x18\x01 \x03(\x05\"\"\n\x11GetEmailsResponse\x12\r\n\x05\x65mail\x18\x01 \x03(\t2\xb1\x02\n\x0eUserManagement\x12\x35\n\nCreateUser\x12\x12.CreateUserRequest\x1a\x13.CreateUserResponse\x12\'\n\x0eGetUserDetails\x12\x07.UserId\x1a\x0c.UserDetails\x12\x30\n\x12UpdateUserPassword\x12\x0f.UpdatePassword\x1a\t.Response\x12 \n\nDeleteUser\x12\x07.UserId\x1a\t.Response\x12\x32\n\tGetUserId\x12\x11.GetUserIdRequest\x1a\x12.GetUserIdResponse\x12\x37\n\x0eGetUsersEmails\x12\x11.GetEmailsRequest\x1a\x12.GetEmailsResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,17 +32,25 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'user_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_UPDATEPASSWORD']._serialized_start=14
-  _globals['_UPDATEPASSWORD']._serialized_end=96
-  _globals['_ID']._serialized_start=98
-  _globals['_ID']._serialized_end=114
-  _globals['_USERDETAILS']._serialized_start=116
-  _globals['_USERDETAILS']._serialized_end=162
-  _globals['_USER']._serialized_start=164
-  _globals['_USER']._serialized_end=247
-  _globals['_RESPONSE']._serialized_start=249
-  _globals['_RESPONSE']._serialized_end=292
-  _globals['_CREATEUSERRESPONSE']._serialized_start=294
-  _globals['_CREATEUSERRESPONSE']._serialized_end=380
-  _globals['_USERMANAGEMENT']._serialized_start=383
-  _globals['_USERMANAGEMENT']._serialized_end=537
+  _globals['_UPDATEPASSWORD']._serialized_end=100
+  _globals['_USERID']._serialized_start=102
+  _globals['_USERID']._serialized_end=122
+  _globals['_USERDETAILS']._serialized_start=124
+  _globals['_USERDETAILS']._serialized_end=170
+  _globals['_CREATEUSERREQUEST']._serialized_start=172
+  _globals['_CREATEUSERREQUEST']._serialized_end=268
+  _globals['_RESPONSE']._serialized_start=270
+  _globals['_RESPONSE']._serialized_end=313
+  _globals['_CREATEUSERRESPONSE']._serialized_start=315
+  _globals['_CREATEUSERRESPONSE']._serialized_end=413
+  _globals['_GETUSERIDREQUEST']._serialized_start=415
+  _globals['_GETUSERIDREQUEST']._serialized_end=448
+  _globals['_GETUSERIDRESPONSE']._serialized_start=450
+  _globals['_GETUSERIDRESPONSE']._serialized_end=485
+  _globals['_GETEMAILSREQUEST']._serialized_start=487
+  _globals['_GETEMAILSREQUEST']._serialized_end=517
+  _globals['_GETEMAILSRESPONSE']._serialized_start=519
+  _globals['_GETEMAILSRESPONSE']._serialized_end=553
+  _globals['_USERMANAGEMENT']._serialized_start=556
+  _globals['_USERMANAGEMENT']._serialized_end=861
 # @@protoc_insertion_point(module_scope)

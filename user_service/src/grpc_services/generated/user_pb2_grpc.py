@@ -5,7 +5,7 @@ import warnings
 
 import user_pb2 as user__pb2
 
-GRPC_GENERATED_VERSION = '1.68.1'
+GRPC_GENERATED_VERSION = '1.68.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -34,50 +34,72 @@ class UserManagementStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.create = channel.unary_unary(
-                '/UserManagement/create',
-                request_serializer=user__pb2.User.SerializeToString,
+        self.CreateUser = channel.unary_unary(
+                '/UserManagement/CreateUser',
+                request_serializer=user__pb2.CreateUserRequest.SerializeToString,
                 response_deserializer=user__pb2.CreateUserResponse.FromString,
                 _registered_method=True)
-        self.read = channel.unary_unary(
-                '/UserManagement/read',
-                request_serializer=user__pb2.Id.SerializeToString,
+        self.GetUserDetails = channel.unary_unary(
+                '/UserManagement/GetUserDetails',
+                request_serializer=user__pb2.UserId.SerializeToString,
                 response_deserializer=user__pb2.UserDetails.FromString,
                 _registered_method=True)
-        self.update_password = channel.unary_unary(
-                '/UserManagement/update_password',
+        self.UpdateUserPassword = channel.unary_unary(
+                '/UserManagement/UpdateUserPassword',
                 request_serializer=user__pb2.UpdatePassword.SerializeToString,
                 response_deserializer=user__pb2.Response.FromString,
                 _registered_method=True)
-        self.delete = channel.unary_unary(
-                '/UserManagement/delete',
-                request_serializer=user__pb2.Id.SerializeToString,
+        self.DeleteUser = channel.unary_unary(
+                '/UserManagement/DeleteUser',
+                request_serializer=user__pb2.UserId.SerializeToString,
                 response_deserializer=user__pb2.Response.FromString,
+                _registered_method=True)
+        self.GetUserId = channel.unary_unary(
+                '/UserManagement/GetUserId',
+                request_serializer=user__pb2.GetUserIdRequest.SerializeToString,
+                response_deserializer=user__pb2.GetUserIdResponse.FromString,
+                _registered_method=True)
+        self.GetUsersEmails = channel.unary_unary(
+                '/UserManagement/GetUsersEmails',
+                request_serializer=user__pb2.GetEmailsRequest.SerializeToString,
+                response_deserializer=user__pb2.GetEmailsResponse.FromString,
                 _registered_method=True)
 
 
 class UserManagementServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def create(self, request, context):
+    def CreateUser(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def read(self, request, context):
+    def GetUserDetails(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def update_password(self, request, context):
+    def UpdateUserPassword(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def delete(self, request, context):
+    def DeleteUser(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetUserId(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetUsersEmails(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -86,25 +108,35 @@ class UserManagementServicer(object):
 
 def add_UserManagementServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'create': grpc.unary_unary_rpc_method_handler(
-                    servicer.create,
-                    request_deserializer=user__pb2.User.FromString,
+            'CreateUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateUser,
+                    request_deserializer=user__pb2.CreateUserRequest.FromString,
                     response_serializer=user__pb2.CreateUserResponse.SerializeToString,
             ),
-            'read': grpc.unary_unary_rpc_method_handler(
-                    servicer.read,
-                    request_deserializer=user__pb2.Id.FromString,
+            'GetUserDetails': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUserDetails,
+                    request_deserializer=user__pb2.UserId.FromString,
                     response_serializer=user__pb2.UserDetails.SerializeToString,
             ),
-            'update_password': grpc.unary_unary_rpc_method_handler(
-                    servicer.update_password,
+            'UpdateUserPassword': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateUserPassword,
                     request_deserializer=user__pb2.UpdatePassword.FromString,
                     response_serializer=user__pb2.Response.SerializeToString,
             ),
-            'delete': grpc.unary_unary_rpc_method_handler(
-                    servicer.delete,
-                    request_deserializer=user__pb2.Id.FromString,
+            'DeleteUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteUser,
+                    request_deserializer=user__pb2.UserId.FromString,
                     response_serializer=user__pb2.Response.SerializeToString,
+            ),
+            'GetUserId': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUserId,
+                    request_deserializer=user__pb2.GetUserIdRequest.FromString,
+                    response_serializer=user__pb2.GetUserIdResponse.SerializeToString,
+            ),
+            'GetUsersEmails': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetUsersEmails,
+                    request_deserializer=user__pb2.GetEmailsRequest.FromString,
+                    response_serializer=user__pb2.GetEmailsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -118,7 +150,7 @@ class UserManagement(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def create(request,
+    def CreateUser(request,
             target,
             options=(),
             channel_credentials=None,
@@ -131,8 +163,8 @@ class UserManagement(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/UserManagement/create',
-            user__pb2.User.SerializeToString,
+            '/UserManagement/CreateUser',
+            user__pb2.CreateUserRequest.SerializeToString,
             user__pb2.CreateUserResponse.FromString,
             options,
             channel_credentials,
@@ -145,7 +177,7 @@ class UserManagement(object):
             _registered_method=True)
 
     @staticmethod
-    def read(request,
+    def GetUserDetails(request,
             target,
             options=(),
             channel_credentials=None,
@@ -158,8 +190,8 @@ class UserManagement(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/UserManagement/read',
-            user__pb2.Id.SerializeToString,
+            '/UserManagement/GetUserDetails',
+            user__pb2.UserId.SerializeToString,
             user__pb2.UserDetails.FromString,
             options,
             channel_credentials,
@@ -172,7 +204,7 @@ class UserManagement(object):
             _registered_method=True)
 
     @staticmethod
-    def update_password(request,
+    def UpdateUserPassword(request,
             target,
             options=(),
             channel_credentials=None,
@@ -185,7 +217,7 @@ class UserManagement(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/UserManagement/update_password',
+            '/UserManagement/UpdateUserPassword',
             user__pb2.UpdatePassword.SerializeToString,
             user__pb2.Response.FromString,
             options,
@@ -199,7 +231,7 @@ class UserManagement(object):
             _registered_method=True)
 
     @staticmethod
-    def delete(request,
+    def DeleteUser(request,
             target,
             options=(),
             channel_credentials=None,
@@ -212,9 +244,63 @@ class UserManagement(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/UserManagement/delete',
-            user__pb2.Id.SerializeToString,
+            '/UserManagement/DeleteUser',
+            user__pb2.UserId.SerializeToString,
             user__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetUserId(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserManagement/GetUserId',
+            user__pb2.GetUserIdRequest.SerializeToString,
+            user__pb2.GetUserIdResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetUsersEmails(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UserManagement/GetUsersEmails',
+            user__pb2.GetEmailsRequest.SerializeToString,
+            user__pb2.GetEmailsResponse.FromString,
             options,
             channel_credentials,
             insecure,
