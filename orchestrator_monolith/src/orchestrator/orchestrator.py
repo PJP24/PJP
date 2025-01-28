@@ -1,8 +1,7 @@
 import grpc
 from typing import List
-from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
-    SubscriptionServiceStub,
-)
+
+from orchestrator_monolith.src.generated.subscription_pb2_grpc import SubscriptionServiceStub
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
     CreateSubscriptionRequest,
