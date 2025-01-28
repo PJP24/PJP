@@ -60,7 +60,7 @@ class Orchestrator:
                 stub = UserManagementStub(channel)
                 user_data = await stub.create(request)
 
-            email_result = await self.send_verification_email(email, username, password)
+            email_result = await self.send_verification_email(email, username)
 
             return {
                 "status": user_data.status,
