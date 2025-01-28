@@ -15,25 +15,18 @@ from subscription_service.src.grpc_services.generated.subscription_pb2 import (
     DeactivateSubscriptionResponse,
 )
 
-def validate_email(email: str) -> bool:
-    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    return re.match(email_regex, email) is not None
-
-async def create_subscription(session: AsyncSession, email: str, subscription_type: str):
-    if not validate_email(email):
-        return CreateSubscriptionResponse(message="Invalid email.")
+async def create_subscription(session: AsyncSession, user_id: int, subscription_type: str):
     
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
     if subscription:
-        return CreateSubscriptionResponse(message="Subscription exists.")
+        return CreateSubscriptionResponse(message="Subscription for user with this id already exists.")
     
     if subscription_type == 'monthly':
         end_date = datetime.now().date() + timedelta(days=30)
     elif subscription_type == 'yearly':
         end_date = datetime.now().date() + timedelta(days=365)
-    
     try:
-        new_subscription = Subscription(email=email, subscription_type=subscription_type, end_date=end_date)
+        new_subscription = Subscription(user_id=user_id, end_date=end_date)
         session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")
@@ -46,14 +39,13 @@ async def get_subscriptions(session: AsyncSession):
     response = GetSubscriptionsResponse()
 
     for sub in subscriptions:
-        response.subscriptions.add(email=sub.email, subscription_type=sub.subscription_type, is_active=sub.is_active, end_date=str(sub.end_date))
+        response.subscriptions.add(id=str(sub.id), is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
     return response
 
-async def extend_subscription(session: AsyncSession, email: str, period: str):  
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-
+async def extend_subscription(session: AsyncSession, user_id: int, period: str):  
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
     if subscription is None:
-        return ExtendSubscriptionResponse(message="No subscription with this email.")
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
     
     if period == 'month':
         new_end_date = subscription.end_date + timedelta(days=30)
@@ -65,19 +57,19 @@ async def extend_subscription(session: AsyncSession, email: str, period: str):
     try:
         await session.execute(
             sa.update(Subscription)
-            .where(Subscription.email == email)
+            .where(Subscription.user_id == user_id)
             .values(end_date=new_end_date)
         )
         await session.commit()
-        return ExtendSubscriptionResponse(message=f"Subscription for {email} extended to {new_end_date}.")
+        return ExtendSubscriptionResponse(message=f"Subscription for user with id {user_id} extended to {new_end_date}.")
     
     except SQLAlchemyError as e:
         return ExtendSubscriptionResponse(message=f"Failed to extend subscription: {str(e)}.")
 
-async def delete_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-    if not subscription:
-        return DeleteSubscriptionResponse(message="No subscription with this email.")
+async def delete_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
     
     try:
         await session.delete(subscription)
@@ -85,39 +77,39 @@ async def delete_subscription(session: AsyncSession, email: str):
     except SQLAlchemyError as e:
         return DeleteSubscriptionResponse(message=f"Failed to delete subscription: {str(e)}.")
 
-async def activate_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-
-    if not subscription:
-        return ActivateSubscriptionResponse(message="No subscription with this email.")
+async def activate_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
+    
     if subscription.is_active:
         return ActivateSubscriptionResponse(message="The subscription for this email is already active.")
     
     try:
         await session.execute(
             sa.update(Subscription)
-            .where(Subscription.email == email)
+            .where(Subscription.user_id == user_id)
             .values(is_active=True)
         )
-        return ActivateSubscriptionResponse(message=f"Subscription for email {email} was activated.")
+        return ActivateSubscriptionResponse(message=f"Subscription for user with id {user_id} was activated.")
     except SQLAlchemyError as e:
         return ActivateSubscriptionResponse(message=f"Failed to activate subscription: {str(e)}.")
 
-async def deactivate_subscription(session: AsyncSession, email: str):
-    subscription = (await session.execute(sa.select(Subscription).filter_by(email=email))).scalars().first()
-
-    if not subscription:
-        return DeactivateSubscriptionResponse(message="No subscription with this email.")
+async def deactivate_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
+    
     if not subscription.is_active:
         return DeactivateSubscriptionResponse(message="The subscription for this email is not active.")
     
     try:
         await session.execute(
             sa.update(Subscription)
-            .where(Subscription.email == email)
+            .where(Subscription.user_id == user_id)
             .values(is_active=False)
         )
-        return DeactivateSubscriptionResponse(message=f"Subscription for email {email} was deactivated.")
+        return ActivateSubscriptionResponse(message=f"Subscription for user with id {user_id} was deactivated.")
     except SQLAlchemyError as e:
         return DeactivateSubscriptionResponse(message=f"Failed to deactivate subscription: {str(e)}.")
 

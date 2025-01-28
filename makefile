@@ -32,4 +32,7 @@ clean-containers:
 clean-images:
 	@docker images -q | xargs -r docker rmi
 
-clean: clean-containers clean-images
+clean-volumes:
+	@docker volume rm $(docker volume ls -q)
+
+clean: clean-containers clean-images clean-volumes

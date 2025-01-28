@@ -14,9 +14,8 @@ service SubscriptionService {
 
 
 message CreateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
   string subscription_type = 2;
-  string end_date = 3;
 }
 
 message CreateSubscriptionResponse {
@@ -29,7 +28,7 @@ message GetSubscriptionsResponse {
 }
 
 message ExtendSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
   string period = 2; 
 }
 message ExtendSubscriptionResponse {
@@ -37,14 +36,14 @@ message ExtendSubscriptionResponse {
 }
 
 message DeleteSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message DeleteSubscriptionResponse {
   string message = 1;
 }
 
 message ActivateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message ActivateSubscriptionResponse {
   string message = 1;
@@ -56,16 +55,16 @@ message OptOutPolicyResponse {
 }
 
 message DeactivateSubscriptionRequest {
-  string email = 1;
+  int32 user_id = 1;
 }
 message DeactivateSubscriptionResponse {
   string message = 1;
 }
 
 message Subscription {
-  string email = 1;
-  string subscription_type = 2;
-  bool is_active = 3;
-  string end_date = 4;
+  string id = 1;
+  bool is_active = 2;
+  string end_date = 3;
+  string user_id = 4;
 }
 
