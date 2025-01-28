@@ -118,11 +118,11 @@ class Orchestrator:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
 
     async def add_subscription(self, email: str, subscription_type: str):
-        # Check if user with this email exists
-        # If user with this email doesn't exist -> Error
-        # Else -> return user_id -> go on ...
-        user_id = 1
-
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "User with this email not found."}
+        user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
@@ -137,11 +137,11 @@ class Orchestrator:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
     async def extend_subscription(self, email: str, period: str): 
-        # Check if user with this email exists
-        # If user with this email doesn't exist -> Error
-        # Else -> return user_id -> go on ...
-        user_id = 1
-
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "User with this email not found."}
+        user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
@@ -157,12 +157,11 @@ class Orchestrator:
             return {"status": "error", "message": f"Error extending subscription: {e}"}
 
     async def delete_subscription(self, email: str):
-
-        # Check if user with this email exists
-        # If user with this email doesn't exist -> Error
-        # Else -> return user_id -> go on ...
-        user_id = 1
-
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "User with this email not found."}
+        user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
@@ -174,12 +173,11 @@ class Orchestrator:
             return {"status": "error", "message": f"Error deleting subscription: {e}"}
 
     async def activate_subscription(self, email: str):
-    
-        # Check if user with this email exists
-        # If user with this email doesn't exist -> Error
-        # Else -> return user_id -> go on ...
-        user_id = 1
-
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "User with this email not found."}
+        user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
@@ -191,11 +189,11 @@ class Orchestrator:
             return {"status": "error", "message": f"Error activating subscription: {e}"}
 
     async def deactivate_subscription(self, email: str):
-        # Check if user with this email exists
-        # If user with this email doesn't exist -> Error
-        # Else -> return user_id -> go on ...
-        user_id = 1
-
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "User with this email not found."}
+        user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
