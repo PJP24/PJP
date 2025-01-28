@@ -1,4 +1,6 @@
 import grpc
+import json
+from kafka import KafkaProducer
 from typing import List
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
     SubscriptionServiceStub,
@@ -26,15 +28,39 @@ class Orchestrator:
     def __init__(self):
         self.user_host = "user_service_container:50051"
         self.subscription_host = "subscription_service_container:50052"
+        self.kafka_broker = "broker:9092"
+        self.producer = KafkaProducer(
+            bootstrap_servers=self.kafka_broker,
+            value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+        )
 
-    async def get_user(self, user_id: int):
+    async def send_to_kafka(self, topic: str, message: dict):
         try:
-            async with grpc.aio.insecure_channel(self.user_host) as channel:
-                stub = UserManagementStub(channel)
-                user_data = await stub.GetUserDetails(UserId(id=user_id))
-                return {"username": user_data.username, "email": user_data.email}
+            self.producer.send(topic, value=message)
+            self.producer.flush()
+            print(f"Message sent to topic '{topic}': {message}")
         except Exception as e:
-            return {"error": f"Error fetching user data: {str(e)}"}
+            print(f"Failed to send message to Kafka topic '{topic}': {e}")
+
+    async def send_verification_email(self, email: str, username: str):
+        try:
+            verification_data = {
+                "email": email,
+                "username": username,
+                "message": f"Hi, {username}! Please verify your email to complete the registration.",
+            }
+
+            await self.send_to_kafka(topic="email_notifications", message=verification_data)
+
+            return {
+                "status": "success",
+                "message": "Verification email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending verification email: {e}",
+            }
 
     async def add_user(self, username: str, email: str, password: str):
         try:
@@ -45,15 +71,26 @@ class Orchestrator:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
                 print(user_data)
+                email_result = await self.send_verification_email(email, username)
                 return {
                     "status": user_data.status,
-                    "message": user_data.message,
+                    "message": f"{user_data.message} | {email_result['message']}",
                     "username": user_data.username,
                     "email": user_data.email,
                     "id": user_data.id,
                 }
+
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
+
+    async def get_user(self, user_id: int):
+        try:
+            async with grpc.aio.insecure_channel(self.user_host) as channel:
+                stub = UserManagementStub(channel)
+                user_data = await stub.GetUserDetails(UserId(id=user_id))
+                return {"username": user_data.username, "email": user_data.email}
+        except Exception as e:
+            return {"error": f"Error fetching user data: {str(e)}"}
 
     async def update_user_password(
         self, user_id: int, old_password: str, new_password: str
