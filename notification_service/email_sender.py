@@ -8,7 +8,6 @@ SMTP_PORT = 465
 EMAIL_ADDRESS = "romaliiskii.v@yahoo.com"
 EMAIL_PASSWORD = "tarohkfnfnmamzfz"
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 

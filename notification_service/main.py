@@ -2,7 +2,6 @@ import asyncio
 import logging
 from consumer import consume_email_notifications
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 if __name__ == "__main__":

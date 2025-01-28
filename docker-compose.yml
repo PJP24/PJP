@@ -40,6 +40,26 @@ services:
     networks:
       - pjp_mynetwork
 
+#  postgresql_tasks_service:
+#    image: postgres:13-alpine
+#    ports:
+#      - "5434:5434"
+#    container_name: postgresql_tasks_container
+#    environment:
+#      - POSTGRES_USER=tasks
+#      - POSTGRES_PASSWORD=tasks123
+#      - POSTGRES_DB=tasks_db
+#    volumes:
+#      - postgresql_tasks_data:/var/lib/postgresql/data
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U test -d user_management" ]
+#      interval: 10s
+#      retries: 5
+#      start_period: 30s
+#      timeout: 10s
+#    networks:
+#      - pjp_mynetwork
+
   subscription_server_service:
     build:
       context: .
