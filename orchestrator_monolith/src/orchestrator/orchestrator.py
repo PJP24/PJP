@@ -254,3 +254,10 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
+
+
+    async def pay_subscription(self, email: str, amount: float):
+        if amount == 20:
+            return {"status": "success", "message": "Your payment was successful."}
+        return {"status": "error", "message": "Unsuccessful payment, please try again."}
+        

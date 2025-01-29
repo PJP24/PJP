@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from orchestrator_monolith.src.orchestrator.orchestrator import Orchestrator
-from orchestrator_monolith.src.orchestrator.models import SubscriptionRequest, ExtendSubscriptionRequest, UpdatePassword, User, UserIds, EmailList
+from orchestrator_monolith.src.orchestrator.models import SubscriptionRequest, ExtendSubscriptionRequest, UpdatePassword, User, UserIds, EmailList, Payment
 
 fastapi_app = APIRouter(prefix="")
 
@@ -40,6 +40,12 @@ async def deactivate_subscription(email: str):
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
+
+
+@fastapi_app.post("/pay_subscription/{email}")
+async def pay_subscription(email: str, payment: Payment):
+    result = await orchestrator.pay_subscription(email=email, amount=payment.amount)
+    return result
 
 @fastapi_app.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):
