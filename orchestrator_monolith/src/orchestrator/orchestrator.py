@@ -256,20 +256,25 @@ class Orchestrator:
             today = datetime.now()
             one_week_from_today = today + timedelta(days=7)
 
+            # This will check subscriptions expiring in exactly 7 days
             expiring_subscriptions = [
                 sub for sub in all_subscriptions
                 if datetime.strptime(sub["end_date"], "%Y-%m-%d") <= one_week_from_today
             ]
 
-            emails = []
+            emails_with_dates = []
             for sub in expiring_subscriptions:
-                user = await self.get_user(int(sub['user_id']))
-                emails.append(user['email'])
+                end_date = sub['end_date']
 
-            for email in emails:
+                user = await self.get_user(int(sub['user_id']))
+                email = user['email']
+
+                emails_with_dates.append({'email': email, 'end_date': end_date})
+
+            for email_date in emails_with_dates:
                 verification_data = {
-                    "email": email,
-                    "message": f"Hi, {email}! Your subscription is expiring. Renew it. :)",
+                    "email": email_date['email'],
+                    "message": f"Hi, {email_date['email']}! Your subscription is expiring. Renew it by {email_date['end_date']}.",
                 }
 
                 await self.send_to_kafka(topic="email_notifications", message=verification_data)
