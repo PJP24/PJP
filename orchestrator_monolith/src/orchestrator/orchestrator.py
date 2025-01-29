@@ -1,5 +1,6 @@
 import grpc
 import json
+from datetime import datetime, timedelta
 from kafka import KafkaProducer
 from typing import List
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
@@ -13,7 +14,6 @@ from orchestrator_monolith.src.generated.subscription_pb2 import (
     ActivateSubscriptionRequest,
     DeactivateSubscriptionRequest,
 )
-
 from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
 from orchestrator_monolith.src.generated.user_pb2 import (
     UserId,
@@ -22,7 +22,6 @@ from orchestrator_monolith.src.generated.user_pb2 import (
     GetUserIdRequest,
     GetEmailsRequest,
 )
-
 
 class Orchestrator:
     def __init__(self):
@@ -49,9 +48,7 @@ class Orchestrator:
                 "username": username,
                 "message": f"Hi, {username}! Please verify your email to complete the registration.",
             }
-
             await self.send_to_kafka(topic="email_notifications", message=verification_data)
-
             return {
                 "status": "success",
                 "message": "Verification email sent.",
@@ -64,9 +61,7 @@ class Orchestrator:
 
     async def add_user(self, username: str, email: str, password: str):
         try:
-            request = CreateUserRequest(
-                username=username, email=email, password=password
-            )
+            request = CreateUserRequest(username=username, email=email, password=password)
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
@@ -79,7 +74,6 @@ class Orchestrator:
                     "email": user_data.email,
                     "id": user_data.id,
                 }
-
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
 
@@ -127,7 +121,6 @@ class Orchestrator:
                 return {"status": user_data.status}
         except Exception as e:
             return {"error": f"Error fetching user id: {str(e)}"}
-        
 
     async def get_users_emails_by_id(self, ids: List[int]):
         try:
@@ -245,6 +238,8 @@ class Orchestrator:
             }
 
     async def get_opt_out_policy(self):
+        await self.send_emails_for_expiring_subscriptions()
+        
         try:
             policy_text = (
                 "Opt-Out Policy:"
@@ -254,3 +249,31 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
+
+    async def send_emails_for_expiring_subscriptions(self):
+        try:
+            all_subscriptions = await self.get_all_subscriptions()
+            today = datetime.now()
+            one_week_from_today = today + timedelta(days=7)
+
+            expiring_subscriptions = [
+                sub for sub in all_subscriptions
+                if datetime.strptime(sub["end_date"], "%Y-%m-%d") <= one_week_from_today
+            ]
+
+            emails = []
+            for sub in expiring_subscriptions:
+                user = await self.get_user(int(sub['user_id']))
+                emails.append(user['email'])
+
+            for email in emails:
+                verification_data = {
+                    "email": email,
+                    "message": f"Hi, {email}! Your subscription is expiring. Renew it. :)",
+                }
+
+                await self.send_to_kafka(topic="email_notifications", message=verification_data)
+
+        except Exception as e:
+            print(f"Error checking subscription end dates: {e}")
+            return {"status": "error", "message": f"Error checking subscription end dates: {e}"}
