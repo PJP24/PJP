@@ -1,4 +1,3 @@
-import re
 import sqlalchemy as sa
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +25,7 @@ async def create_subscription(session: AsyncSession, user_id: int, subscription_
     elif subscription_type == 'yearly':
         end_date = datetime.now().date() + timedelta(days=365)
     try:
-        new_subscription = Subscription(user_id=user_id, end_date=end_date)
+        new_subscription = Subscription(user_id=user_id, end_date=end_date, subscription_type=subscription_type)
         session.add(new_subscription)
         await session.commit()
         return CreateSubscriptionResponse(message="Created.")
