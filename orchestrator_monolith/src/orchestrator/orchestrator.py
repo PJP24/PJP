@@ -93,16 +93,22 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
-                print(user_data)
-                email_result = await self.send_verification_email(email, username)
+                if user_data.status == "success":
+                    email_result = await self.send_verification_email(email, username)
+                    return {
+                        "status": user_data.status,
+                        "message": f"{user_data.message} | {email_result['message']}",
+                        "username": user_data.username,
+                        "email": user_data.email,
+                        "id": user_data.id,
+                    }
                 return {
                     "status": user_data.status,
-                    "message": f"{user_data.message} | {email_result['message']}",
+                    "message": f"{user_data.message}",
                     "username": user_data.username,
                     "email": user_data.email,
                     "id": user_data.id,
                 }
-
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
 
@@ -118,16 +124,14 @@ class Orchestrator:
                         "username": user_data.username,
                         "email": user_data.email,
                     }
-                return (
-                    {
-                        "username": user_data.username,
-                        "email": user_data.email,
-                        "id": subscription["id"],
-                        "is_active": subscription["is_active"],
-                        "end_date": subscription["end_date"],
-                        # "subscription_type" : subscription["subscription_type"],
-                    }
-                )
+                return {
+                    "username": user_data.username,
+                    "email": user_data.email,
+                    "id": subscription["id"],
+                    "is_active": subscription["is_active"],
+                    "end_date": subscription["end_date"],
+                    # "subscription_type" : subscription["subscription_type"],
+                }
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
 
