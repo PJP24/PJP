@@ -47,6 +47,12 @@ async def pay_subscription(email: str, payment: Payment):
     result = await orchestrator.pay_subscription(email=email, amount=payment.amount)
     return result
 
+
+@fastapi_app.get("/get_subscription/{user_id}")
+async def get_subscription(user_id: int):
+    result = await orchestrator.get_subscription(user_id=user_id)
+    return result
+
 @fastapi_app.get("/user_details/{user_id}")
 async def get_user_details(user_id: int):
     result = await orchestrator.get_user(user_id=user_id)

@@ -13,6 +13,8 @@ from subscription_service.src.grpc_services.generated.subscription_pb2 import (
     DeleteSubscriptionResponse,
     ActivateSubscriptionResponse,
     DeactivateSubscriptionResponse,
+    Subscription as Subs,
+    
 )
 
 async def create_subscription(session: AsyncSession, user_id: int, subscription_type: str):
@@ -113,3 +115,18 @@ async def deactivate_subscription(session: AsyncSession, user_id: int):
     except SQLAlchemyError as e:
         return DeactivateSubscriptionResponse(message=f"Failed to deactivate subscription: {str(e)}.")
 
+async def get_subscription(session: AsyncSession, user_id: int):
+    subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
+    if subscription is None:
+        return Subs(
+        id = "",
+        is_active = False, 
+        end_date = "",
+        user_id = "",
+    )
+    return Subs(
+        id = str(subscription.id),
+        is_active = subscription.is_active, 
+        end_date = str(subscription.end_date),
+        user_id = str(subscription.user_id),
+    )
