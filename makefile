@@ -35,6 +35,9 @@ clean-images:
 clean-volumes:
 	@docker volume rm $(docker volume ls -q)
 
+clean_space:
+	@docker system prune -a -f --volumes
+
 clean: clean-containers clean-images clean-volumes
 
 stop: clean-containers clean-images

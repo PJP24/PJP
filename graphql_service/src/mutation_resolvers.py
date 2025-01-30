@@ -15,9 +15,6 @@ async def add_subscription_resolver(email: str, subscription_type: str):
     from graphql_service.src.schema import AddSubscriptionResponse
     try:
         subscription_type = validate_subscription_type(subscription_type)
-
-        amount = 20 if subscription_type == "monthly" else 100
-
         url = f"{BASE_URL}/add_subscription"
         async with httpx.AsyncClient() as client:
             request = await client.post(url, json={"email": email, "subscription_type": subscription_type})
@@ -57,9 +54,6 @@ async def delete_subscription_resolver(email: str):
 async def activate_subscription_resolver(email: str, amount: int):
     from graphql_service.src.schema import ActivateSubscriptionResponse
     try:
-        if amount not in [20, 100]:
-            raise ValueError("Amount should be either 20 for monthly or 100 for yearly subscription.")
-
         url = f"{BASE_URL}/activate_subscription/{email}"
         async with httpx.AsyncClient() as client:
             request = await client.post(url, json={"amount": amount})

@@ -23,6 +23,7 @@ class Subscription:
     is_active: str
     end_date: str
     user_id: str
+    subscription_type: str
     amount: Optional[int] = None
 
 @strawberry.type
