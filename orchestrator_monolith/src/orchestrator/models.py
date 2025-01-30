@@ -27,5 +27,10 @@ class ExtendSubscriptionRequest(BaseModel):
 class EmailList(BaseModel):
     emails: list[str]
 
+
+class Payment(BaseModel):
+    amount: float
+
 class ActivateRequest(BaseModel):
     amount: int
+

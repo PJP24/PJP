@@ -74,6 +74,21 @@ async def deactivate_subscription_resolver(email: str):
             return DeactivateSubscriptionResponse(result_info=result_info)
     except Exception as e:
         raise Exception(f"Error deactivating subscription: {e}")
+    
+async def pay_subscription_resolver(email: str, amount: float):
+    from graphql_service.src.schema import PaySubscriptionResponse
+
+    url = f"{BASE_URL}/pay_subscription/{email}"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json={"amount": amount})
+            response.raise_for_status()
+            response_data = response.json()
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
+            return PaySubscriptionResponse(status="error", message=str(e))
+        return PaySubscriptionResponse(
+            status=response_data.get("status"), message=response_data.get("message")
+        )
 
 async def add_user(username: str, email: str, password: str):
     from graphql_service.src.schema import AddUserResponse, CreatedUser

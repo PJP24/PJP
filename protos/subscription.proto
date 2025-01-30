@@ -10,6 +10,7 @@ service SubscriptionService {
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
+  rpc GetSubscription (GetSubscriptionRequest) returns (Subscription);
 }
 
 
@@ -69,3 +70,6 @@ message Subscription {
   string subscription_type = 5;
 }
 
+message GetSubscriptionRequest {
+  int32 user_id = 1;
+}

@@ -14,7 +14,8 @@ from graphql_service.src.mutation_resolvers import (
     deactivate_subscription_resolver,
     add_user,
     update_user_password,
-    delete_user
+    delete_user,
+    pay_subscription_resolver
 )
 
 @strawberry.type
@@ -56,9 +57,23 @@ class ExtendSubscriptionResponse:
     result_info: str
 
 @strawberry.type
+class PaySubscriptionResponse:
+    status: str
+    message: str
+
+
+@strawberry.type
+class UserSubscription:
+    subscription_id: str
+    subscription_is_active: str
+    subscription_end_date: str
+    # subscription_type: str
+
+@strawberry.type
 class User:
     username: str
     email: str
+    subscription: Optional[UserSubscription]
 
 @strawberry.type
 class CreatedUser:
@@ -97,3 +112,4 @@ class Mutation:
     create_user: AddUserResponse | None = strawberry.field(resolver=add_user)
     delete_user: Response | None = strawberry.field(resolver=delete_user)
     update_password: Response | None = strawberry.field(resolver=update_user_password)
+    pay_subscription: PaySubscriptionResponse | None = strawberry.field(resolver=pay_subscription_resolver)

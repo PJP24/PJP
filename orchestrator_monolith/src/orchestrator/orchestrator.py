@@ -12,6 +12,7 @@ from orchestrator_monolith.src.generated.subscription_pb2 import (
     DeleteSubscriptionRequest,
     ActivateSubscriptionRequest,
     DeactivateSubscriptionRequest,
+    GetSubscriptionRequest,
 )
 
 from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
@@ -50,7 +51,9 @@ class Orchestrator:
                 "message": f"Hi, {username}! Please verify your email to complete the registration.",
             }
 
-            await self.send_to_kafka(topic="email_notifications", message=verification_data)
+            await self.send_to_kafka(
+                topic="email_notifications", message=verification_data
+            )
 
             return {
                 "status": "success",
@@ -62,6 +65,27 @@ class Orchestrator:
                 "message": f"Error sending verification email: {e}",
             }
 
+    async def send_successful_payment_email(self, email: str, username: str):
+        try:
+            notification_data = {
+                "email": email,
+                "username": username,
+                "message": f"Hi {username}! Your subscription payment was successful.",
+            }
+
+            await self.send_to_kafka(
+                topic="successful_payment_notifications", message=notification_data
+            )
+            return {
+                "status": "success",
+                "message": "Payment confirmation email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending payment email: {e}",
+            }
+
     async def add_user(self, username: str, email: str, password: str):
         try:
             request = CreateUserRequest(
@@ -70,16 +94,22 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
-                print(user_data)
-                email_result = await self.send_verification_email(email, username)
+                if user_data.status == "success":
+                    email_result = await self.send_verification_email(email, username)
+                    return {
+                        "status": user_data.status,
+                        "message": f"{user_data.message} | {email_result['message']}",
+                        "username": user_data.username,
+                        "email": user_data.email,
+                        "id": user_data.id,
+                    }
                 return {
                     "status": user_data.status,
-                    "message": f"{user_data.message} | {email_result['message']}",
+                    "message": f"{user_data.message}",
                     "username": user_data.username,
                     "email": user_data.email,
                     "id": user_data.id,
                 }
-
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
 
@@ -88,7 +118,20 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.GetUserDetails(UserId(id=user_id))
-                return {"username": user_data.username, "email": user_data.email}
+                subscription = await self.get_subscription(user_id=user_id)
+                if not subscription:
+                    return {
+                        "username": user_data.username,
+                        "email": user_data.email,
+                    }
+                return {
+                    "username": user_data.username,
+                    "email": user_data.email,
+                    "id": subscription["id"],
+                    "is_active": subscription["is_active"],
+                    "end_date": subscription["end_date"],
+                    # "subscription_type" : subscription["subscription_type"],
+                }
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
 
@@ -127,7 +170,6 @@ class Orchestrator:
                 return {"status": user_data.status}
         except Exception as e:
             return {"error": f"Error fetching user id: {str(e)}"}
-        
 
     async def get_users_emails_by_id(self, ids: List[int]):
         try:
@@ -153,7 +195,10 @@ class Orchestrator:
                     "is_active": sub.is_active,
                     "end_date": sub.end_date,
                     "user_id": sub.user_id,
+
+
                     "subscription_type": sub.subscription_type
+
                 }
                 for sub in response.subscriptions
             ]
@@ -165,15 +210,14 @@ class Orchestrator:
     async def add_subscription(self, email: str, subscription_type: str):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
-        if user_id == 'error':
+        if user_id == "error":
             return {"status": "error", "message": "User with this email not found."}
         user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = CreateSubscriptionRequest(
-                    user_id=user_id,
-                    subscription_type=subscription_type
+                    user_id=user_id, subscription_type=subscription_type
                 )
                 response = await stub.CreateSubscription(request)
 
@@ -181,19 +225,16 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
-    async def extend_subscription(self, email: str, period: str): 
+    async def extend_subscription(self, email: str, period: str):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
-        if user_id == 'error':
+        if user_id == "error":
             return {"status": "error", "message": "User with this email not found."}
         user_id = int(user_id)
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
-                request = ExtendSubscriptionRequest(
-                    user_id=user_id,
-                    period=period 
-                )
+                request = ExtendSubscriptionRequest(user_id=user_id, period=period)
 
                 response = await stub.ExtendSubscription(request)
 
@@ -204,7 +245,7 @@ class Orchestrator:
     async def delete_subscription(self, email: str):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
-        if user_id == 'error':
+        if user_id == "error":
             return {"status": "error", "message": "User with this email not found."}
         user_id = int(user_id)
         try:
@@ -220,6 +261,9 @@ class Orchestrator:
     async def activate_subscription(self, email: str, amount: float):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
+
+        if user_id == "error":
+
 
         if user_id == 'error':
             return {"status": "error", "message": "User with this email not found."}
@@ -260,7 +304,7 @@ class Orchestrator:
     async def deactivate_subscription(self, email: str):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
-        if user_id == 'error':
+        if user_id == "error":
             return {"status": "error", "message": "User with this email not found."}
         user_id = int(user_id)
         try:
@@ -286,3 +330,42 @@ class Orchestrator:
             return policy_text
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
+
+    async def pay_subscription(self, email: str, amount: float):
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == "error":
+            return {"status": "error", "message": "Subscription not found."}
+        subscription = await self.get_subscription(user_id=int(user_id))
+        print(subscription)
+        if subscription is None:
+            return {"status": "error", "message": "Subscription not found."}
+        user = await self.get_user(int(user_id))
+        username = user["username"]
+        if amount == 20:
+            email_result = await self.send_successful_payment_email(email, username)
+            return {
+                "status": "success",
+                "message": f"Your payment was successful. | {email_result['message']}",
+            }
+        return {"status": "error", "message": "Unsuccessful payment, please try again."}
+
+    async def get_subscription(self, user_id: int):
+        try:
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetSubscriptionRequest(user_id=user_id)
+                response = await stub.GetSubscription(request)
+            if response and response.id:
+                return {
+                    "id": response.id,
+                    "is_active": response.is_active,
+                    "end_date": response.end_date,
+                    "user_id": response.user_id,
+                }
+            return None
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error getting subscription: {e}",
+            }
