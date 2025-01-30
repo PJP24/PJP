@@ -187,15 +187,22 @@ class Orchestrator:
                 stub = SubscriptionServiceStub(channel)
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
+
+
             result = [
                 {
                     "id": sub.id,
                     "is_active": sub.is_active,
                     "end_date": sub.end_date,
                     "user_id": sub.user_id,
+
+
+                    "subscription_type": sub.subscription_type
+
                 }
                 for sub in response.subscriptions
             ]
+
             return result
         except Exception as e:
             return {"status": "error", "message": f"Error fetching subscriptions: {e}"}
@@ -251,19 +258,46 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error deleting subscription: {e}"}
 
-    async def activate_subscription(self, email: str):
+    async def activate_subscription(self, email: str, amount: float):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
+
         if user_id == "error":
+
+
+        if user_id == 'error':
             return {"status": "error", "message": "User with this email not found."}
+
         user_id = int(user_id)
+
         try:
+            subscriptions = await self.get_all_subscriptions()
+            subscription = next(
+                (sub for sub in subscriptions if int(sub["user_id"]) == user_id), None
+            )
+
+            if not subscription:
+                return {"status": "error", "message": "No active subscription found for the user."}
+
+            subscription_type = subscription["subscription_type"]
+            required_amount = 20 if subscription_type == "monthly" else 100
+
+            if amount != required_amount:
+                return {"status": "error",
+                        "message": f"For a {subscription_type} subscription, the payment must be {required_amount} Mongolian tugriks."}
+
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = ActivateSubscriptionRequest(user_id=user_id)
                 response = await stub.ActivateSubscription(request)
 
-            return {"status": "success", "message": response.message}
+            return {
+                "status": "success",
+                "message": response.message,
+                "subscription_type": subscription_type,
+                "required_amount": required_amount
+            }
+
         except Exception as e:
             return {"status": "error", "message": f"Error activating subscription: {e}"}
 

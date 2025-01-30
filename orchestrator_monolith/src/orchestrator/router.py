@@ -2,6 +2,17 @@ from fastapi import APIRouter
 from orchestrator_monolith.src.orchestrator.orchestrator import Orchestrator
 from orchestrator_monolith.src.orchestrator.models import SubscriptionRequest, ExtendSubscriptionRequest, UpdatePassword, User, UserIds, EmailList, Payment
 
+from orchestrator_monolith.src.orchestrator.models import (
+    SubscriptionRequest,
+    ExtendSubscriptionRequest,
+    UpdatePassword,
+    User,
+    UserIds,
+    EmailList,
+    ActivateRequest
+)
+
+
 fastapi_app = APIRouter(prefix="")
 
 orchestrator = Orchestrator()
@@ -27,8 +38,9 @@ async def delete_subscription(email: str):
     return result
 
 @fastapi_app.post("/activate_subscription/{email}")
-async def activate_subscription(email: str):
-    result = await orchestrator.activate_subscription(email)
+async def activate_subscription(email: str, request: ActivateRequest):
+    print(f"Received email: {email}, amount: {request.amount}")  # Debugging
+    result = await orchestrator.activate_subscription(email, request.amount)
     return result
 
 @fastapi_app.post("/deactivate_subscription/{email}")
@@ -78,7 +90,6 @@ async def update_password(user_id: int, passwords: UpdatePassword):
         new_password=passwords.new_password,
     )
     return result
-
 
 
 @fastapi_app.get("/get_user_id/{user_email}")
