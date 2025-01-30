@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from subscription_service.src.db.model import Subscription
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from subscription_service.src.grpc_services.generated.subscription_pb2 import (
     CreateSubscriptionResponse,
@@ -41,6 +41,29 @@ async def get_subscriptions(session: AsyncSession):
     for sub in subscriptions:
         response.subscriptions.add(id=str(sub.id), is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id))
     return response
+
+async def get_expiring_subscriptions(session: AsyncSession):
+    today = datetime.now(timezone.utc)
+    one_week_from_today = today + timedelta(days=7)
+
+    subscriptions = (
+        await session.execute(
+            sa.select(Subscription).where(
+                Subscription.end_date.between(today, one_week_from_today)
+            )
+        )
+    ).scalars().all()
+
+    response = GetSubscriptionsResponse()
+    for sub in subscriptions:
+        response.subscriptions.add(
+            id=str(sub.id),
+            is_active=sub.is_active,
+            end_date=str(sub.end_date),
+            user_id=str(sub.user_id),
+        )
+    return response
+
 
 async def extend_subscription(session: AsyncSession, user_id: int, period: str):  
     subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()

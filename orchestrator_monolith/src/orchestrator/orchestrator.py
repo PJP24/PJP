@@ -251,34 +251,29 @@ class Orchestrator:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
     async def send_emails_for_expiring_subscriptions(self):
+
         try:
-            all_subscriptions = await self.get_all_subscriptions()
-            today = datetime.now()
-            one_week_from_today = today + timedelta(days=7)
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetSubscriptionsRequest()
+                response = await stub.GetSubscriptions(request)
 
-            # This will check subscriptions expiring in exactly 7 days
-            expiring_subscriptions = [
-                sub for sub in all_subscriptions
-                if datetime.strptime(sub["end_date"], "%Y-%m-%d") <= one_week_from_today
-            ]
+                expiring_subscriptions = [
+                    {"id": sub.id, "is_active": sub.is_active,
+                    "end_date": sub.end_date, "user_id": sub.user_id}
+                    for sub in response.subscriptions
+                ]
 
-            emails_with_dates = []
-            for sub in expiring_subscriptions:
-                end_date = sub['end_date']
+                for sub in expiring_subscriptions:
+                    end_date = sub['end_date']
+                    user = await self.get_user(int(sub['user_id']))
+                    email = user['email']
 
-                user = await self.get_user(int(sub['user_id']))
-                email = user['email']
-
-                emails_with_dates.append({'email': email, 'end_date': end_date})
-
-            for email_date in emails_with_dates:
-                verification_data = {
-                    "email": email_date['email'],
-                    "message": f"Hi, {email_date['email']}! Your subscription is expiring. Renew it by {email_date['end_date']}.",
-                }
-
-                await self.send_to_kafka(topic="email_notifications", message=verification_data)
+                    verification_data = {
+                        "email": email,
+                        "message": f"Hi, {email}! Your subscription is expiring. Renew it by {end_date}.",
+                    }
+                    await self.send_to_kafka(topic="email_notifications", message=verification_data)
 
         except Exception as e:
-            print(f"Error checking subscription end dates: {e}")
-            return {"status": "error", "message": f"Error checking subscription end dates: {e}"}
+            return {"status": "error", "message": f"Error sending emails for expiring subscriptions: {e}"}
