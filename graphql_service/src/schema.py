@@ -58,10 +58,19 @@ class PaySubscriptionResponse:
     status: str
     message: str
 
+
+@strawberry.type
+class UserSubscription:
+    subscription_id: str
+    subscription_is_active: str
+    subscription_end_date: str
+    # subscription_type: str
+
 @strawberry.type
 class User:
     username: str
     email: str
+    subscription: Optional[UserSubscription]
 
 @strawberry.type
 class CreatedUser:

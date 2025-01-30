@@ -111,7 +111,23 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.GetUserDetails(UserId(id=user_id))
-                return {"username": user_data.username, "email": user_data.email}
+                print(user_data)
+                subscription = await self.get_subscription(user_id=user_id)
+                if not subscription:
+                    return {
+                        "username": user_data.username,
+                        "email": user_data.email,
+                    }
+                return (
+                    {
+                        "username": user_data.username,
+                        "email": user_data.email,
+                        "id": subscription["id"],
+                        "is_active": subscription["is_active"],
+                        "end_date": subscription["end_date"],
+                        # "subscription_type" : subscription["subscription_type"],
+                    }
+                )
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
 
@@ -278,7 +294,6 @@ class Orchestrator:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
     async def pay_subscription(self, email: str, amount: float):
-        # Get the user details by email
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
         if user_id == "error":
@@ -287,7 +302,6 @@ class Orchestrator:
         print(subscription)
         if subscription is None:
             return {"status": "error", "message": "Subscription not found."}
-        # Get subscription by user_id - Need to create this
         if amount == 20:
             email_result = await self.send_successful_payment_email(email)
             return {

@@ -123,10 +123,12 @@ async def get_subscription(session: AsyncSession, user_id: int):
         is_active = False, 
         end_date = "",
         user_id = "",
+        # subscription_type = "",
     )
     return Subs(
         id = str(subscription.id),
         is_active = subscription.is_active, 
         end_date = str(subscription.end_date),
         user_id = str(subscription.user_id),
+        # subscription_type = subscription.subscription_type,
     )
