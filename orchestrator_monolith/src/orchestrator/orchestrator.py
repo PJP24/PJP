@@ -8,6 +8,7 @@ from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
 )
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
+    GetExpiringSubscriptionsRequest,
     CreateSubscriptionRequest,
     ExtendSubscriptionRequest,
     DeleteSubscriptionRequest,
@@ -255,8 +256,8 @@ class Orchestrator:
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
-                request = GetSubscriptionsRequest()
-                response = await stub.GetSubscriptions(request)
+                request = GetExpiringSubscriptionsRequest()
+                response = await stub.GetExpiringSubscriptions(request)
 
                 expiring_subscriptions = [
                     {"id": sub.id, "is_active": sub.is_active,
