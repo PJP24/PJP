@@ -61,6 +61,25 @@ class Orchestrator:
                 "status": "error",
                 "message": f"Error sending verification email: {e}",
             }
+        
+    
+    async def send_successful_payment_email(self, email: str):
+        try:
+            notification_data = {
+                "email": email,
+                "message": "Hi! Your subscription payment was successful."
+            }
+
+            await self.send_to_kafka(topic="successful_payment_notifications", message=notification_data)
+            return {
+                "status": "success",
+                "message": "Payment confirmation email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending payment email: {e}",
+            }     
 
     async def add_user(self, username: str, email: str, password: str):
         try:
@@ -257,7 +276,14 @@ class Orchestrator:
 
 
     async def pay_subscription(self, email: str, amount: float):
+        #Get the user details by email
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email["status"]
+        if user_id == 'error':
+            return {"status": "error", "message": "Subscription not found."}
+        # Get subscription by user_id - Need to create this 
         if amount == 20:
-            return {"status": "success", "message": "Your payment was successful."}
+            email_result = await self.send_successful_payment_email(email)
+            return {"status": "success", "message": f"Your payment was successful. | {email_result['message']}"}
         return {"status": "error", "message": "Unsuccessful payment, please try again."}
         

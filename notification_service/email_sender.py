@@ -3,10 +3,16 @@ from aiosmtplib import send
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-SMTP_SERVER = "smtp.mail.yahoo.com"
+# SMTP_SERVER = "smtp.mail.yahoo.com"
+# SMTP_PORT = 465
+# EMAIL_ADDRESS = "romaliiskii.v@yahoo.com"
+# EMAIL_PASSWORD = "tarohkfnfnmamzfz"
+
+
+SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
-EMAIL_ADDRESS = "romaliiskii.v@yahoo.com"
-EMAIL_PASSWORD = "tarohkfnfnmamzfz"
+EMAIL_ADDRESS = "aleks.dimova96@gmail.com"
+EMAIL_PASSWORD = "vcim zowc jppc lulv"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
