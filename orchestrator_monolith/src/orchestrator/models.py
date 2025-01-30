@@ -26,3 +26,6 @@ class ExtendSubscriptionRequest(BaseModel):
 
 class EmailList(BaseModel):
     emails: list[str]
+
+class ActivateRequest(BaseModel):
+    amount: int

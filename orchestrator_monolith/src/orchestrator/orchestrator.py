@@ -209,12 +209,18 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error deleting subscription: {e}"}
 
-    async def activate_subscription(self, email: str):
+    async def activate_subscription(self, email: str, amount: float):
+        if amount not in [20, 100]:
+            return {"status": "error", "message": "Invalid amount. It must be either 20 or 100."}
+
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
+
         if user_id == 'error':
             return {"status": "error", "message": "User with this email not found."}
+
         user_id = int(user_id)
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
