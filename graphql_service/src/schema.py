@@ -23,6 +23,8 @@ class Subscription:
     is_active: str
     end_date: str
     user_id: str
+    subscription_type: str
+    amount: Optional[int] = None
 
 @strawberry.type
 class OptOutPolicyResponse:
@@ -43,6 +45,7 @@ class DeleteSubscriptionResponse:
 @strawberry.type
 class ActivateSubscriptionResponse:
     result_info: str
+    amount: int
 
 @strawberry.type
 class DeactivateSubscriptionResponse:

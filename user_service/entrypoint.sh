@@ -5,8 +5,12 @@ until nc -z -v -w30 postgresql_user_service 5432; do
   sleep 5
 done
 
+
+echo "Creating new Alembic revision..."
+alembic -c /app/user_service/alembic.ini revision --autogenerate -m "Automatic migration for model changes"
+
 echo "Running Alembic User migrations..."
-alembic -c user_service/alembic.ini upgrade head
+alembic -c /app/user_service/alembic.ini upgrade head
 
 echo "Starting the server..."
 exec "$@"
