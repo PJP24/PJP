@@ -42,7 +42,7 @@ async def consume_email_notifications():
             elif message.topic == "successful_payment_notifications":
                 email_data = message.value
                 email = email_data.get("email")
-                username = 'testing'
+                username = email_data.get("username")
                 email_body = email_data.get("message")
             await send_email(email, email_body, username)
             # else:

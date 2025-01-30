@@ -65,11 +65,12 @@ class Orchestrator:
                 "message": f"Error sending verification email: {e}",
             }
 
-    async def send_successful_payment_email(self, email: str):
+    async def send_successful_payment_email(self, email: str, username: str):
         try:
             notification_data = {
                 "email": email,
-                "message": "Hi! Your subscription payment was successful.",
+                "username": username,
+                "message": f"Hi {username}! Your subscription payment was successful.",
             }
 
             await self.send_to_kafka(
@@ -117,7 +118,6 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.GetUserDetails(UserId(id=user_id))
-                print(user_data)
                 subscription = await self.get_subscription(user_id=user_id)
                 if not subscription:
                     return {
@@ -306,8 +306,10 @@ class Orchestrator:
         print(subscription)
         if subscription is None:
             return {"status": "error", "message": "Subscription not found."}
+        user = await self.get_user(int(user_id))
+        username = user["username"]
         if amount == 20:
-            email_result = await self.send_successful_payment_email(email)
+            email_result = await self.send_successful_payment_email(email, username)
             return {
                 "status": "success",
                 "message": f"Your payment was successful. | {email_result['message']}",
