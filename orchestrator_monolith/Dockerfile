@@ -14,4 +14,4 @@ RUN python -m grpc_tools.protoc -I=protos --python_out=orchestrator_monolith/src
 
 EXPOSE 8000
 
-CMD ["python", "orchestrator_monolith/main.py"]
+CMD ["sh", "-c", "python orchestrator_monolith/scheduler.py & python orchestrator_monolith/main.py"]

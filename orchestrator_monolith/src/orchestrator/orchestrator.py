@@ -1,6 +1,5 @@
 import grpc
 import json
-from datetime import datetime, timedelta
 from kafka import KafkaProducer
 from typing import List
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
@@ -238,9 +237,7 @@ class Orchestrator:
                 "message": f"Error deactivating subscription: {e}",
             }
 
-    async def get_opt_out_policy(self):
-        await self.send_emails_for_expiring_subscriptions()
-        
+    async def get_opt_out_policy(self):      
         try:
             policy_text = (
                 "Opt-Out Policy:"
