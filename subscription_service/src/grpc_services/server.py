@@ -10,6 +10,7 @@ from subscription_service.src.grpc_services.subscription_operations import (
     delete_subscription,
     activate_subscription,
     deactivate_subscription,
+    get_subscription,
 )
 
 class SubscriptionService(SubscriptionServiceServicer):
@@ -53,3 +54,8 @@ class SubscriptionService(SubscriptionServiceServicer):
             "Activate your subscription again any time."
         )
         return OptOutPolicyResponse(policy=policy_text)
+    
+    async def GetSubscription(self, request, context):
+        async with self.database.session_scope() as session:
+            subscription = await get_subscription(session, request.user_id)
+            return subscription
