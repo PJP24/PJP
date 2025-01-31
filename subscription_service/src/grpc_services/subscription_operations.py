@@ -43,14 +43,14 @@ async def get_subscriptions(session: AsyncSession):
         response.subscriptions.add(id=str(sub.id), is_active=sub.is_active, end_date=str(sub.end_date), user_id=str(sub.user_id), subscription_type=str(sub.subscription_type))
     return response
 
-async def extend_subscription(session: AsyncSession, user_id: int, period: str):  
+async def extend_subscription(session: AsyncSession, user_id: int, period: str):
     subscription = (await session.execute(sa.select(Subscription).filter_by(user_id=user_id))).scalars().first()
     if subscription is None:
         return CreateSubscriptionResponse(message="Subscription for user with this id doesn't exist.")
     
-    if period == 'month':
+    if period == 'monthly':
         new_end_date = subscription.end_date + timedelta(days=30)
-    elif period == 'year':
+    elif period == 'yearly':
         new_end_date = subscription.end_date + timedelta(days=365)
     else:
         return ExtendSubscriptionResponse(message="Invalid period. Use 'month' or 'year'.")

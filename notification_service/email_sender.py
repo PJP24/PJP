@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 SMTP_SERVER = "smtp.mail.yahoo.com"
 SMTP_PORT = 465
 EMAIL_ADDRESS = "romaliiskii.v@yahoo.com"
-EMAIL_PASSWORD = "tarohkfnfnmamzfz"
+EMAIL_PASSWORD = "dqmhvczaqirvfzks"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 

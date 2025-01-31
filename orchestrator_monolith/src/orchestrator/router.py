@@ -27,10 +27,13 @@ async def add_subscription(request: SubscriptionRequest):
     result = await orchestrator.add_subscription(request.email, request.subscription_type)
     return result
 
+
 @fastapi_app.put("/extend_subscription/{email}")
-async def extend_subscription(request: ExtendSubscriptionRequest):
-    result = await orchestrator.extend_subscription(request.email, request.period)  
+async def extend_subscription(email: str, amount: int):
+    print(f"Received email: {email}, amount: {amount}")
+    result = await orchestrator.extend_subscription(email, amount)
     return result
+
 
 @fastapi_app.delete("/delete_subscription/{email}")
 async def delete_subscription(email: str):
@@ -39,7 +42,6 @@ async def delete_subscription(email: str):
 
 @fastapi_app.post("/activate_subscription/{email}")
 async def activate_subscription(email: str, request: ActivateRequest):
-    print(f"Received email: {email}, amount: {request.amount}")  # Debugging
     result = await orchestrator.activate_subscription(email, request.amount)
     return result
 
@@ -52,12 +54,6 @@ async def deactivate_subscription(email: str):
 async def opt_out_policy():
     policy_text = await orchestrator.get_opt_out_policy()
     return {"policy": policy_text}
-
-
-@fastapi_app.post("/pay_subscription/{email}")
-async def pay_subscription(email: str, payment: Payment):
-    result = await orchestrator.pay_subscription(email=email, amount=payment.amount)
-    return result
 
 
 @fastapi_app.get("/get_subscription/{user_id}")

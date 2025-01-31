@@ -24,20 +24,18 @@ async def add_subscription_resolver(email: str, subscription_type: str):
     except Exception as e:
         raise Exception(f"Error adding subscription: {e}")
 
-async def extend_subscription_resolver(email: str, period: str):
+async def extend_subscription_resolver(email: str, amount: int):
     from graphql_service.src.schema import ExtendSubscriptionResponse
     try:
-        if period not in ["monthly", "yearly"]:
-            raise ValueError("Only 'monthly' and 'yearly' are allowed as subscription periods.")
-
-        url = f"{BASE_URL}/extend_subscription/{email}"
+        url = f"{BASE_URL}/extend_subscription/{email}?amount={amount}"
         async with httpx.AsyncClient() as client:
-            request = await client.put(url, json={"email": email, "period": period})
+            request = await client.put(url)
             request.raise_for_status()
             result_info = request.json().get("message", "Unknown result")
             return ExtendSubscriptionResponse(result_info=result_info)
     except Exception as e:
         raise Exception(f"Error extending subscription: {e}")
+
 
 async def delete_subscription_resolver(email: str):
     from graphql_service.src.schema import DeleteSubscriptionResponse
@@ -75,21 +73,6 @@ async def deactivate_subscription_resolver(email: str):
     except Exception as e:
         raise Exception(f"Error deactivating subscription: {e}")
     
-async def pay_subscription_resolver(email: str, amount: float):
-    from graphql_service.src.schema import PaySubscriptionResponse
-
-    url = f"{BASE_URL}/pay_subscription/{email}"
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(url, json={"amount": amount})
-            response.raise_for_status()
-            response_data = response.json()
-        except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            return PaySubscriptionResponse(status="error", message=str(e))
-        return PaySubscriptionResponse(
-            status=response_data.get("status"), message=response_data.get("message")
-        )
-
 async def add_user(username: str, email: str, password: str):
     from graphql_service.src.schema import AddUserResponse, CreatedUser
     user_data = {"username": username, "email": email, "password": password}

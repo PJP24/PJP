@@ -1,5 +1,9 @@
 import grpc
 import json
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 from kafka import KafkaProducer
 from typing import List
 from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
@@ -43,48 +47,49 @@ class Orchestrator:
         except Exception as e:
             print(f"Failed to send message to Kafka topic '{topic}': {e}")
 
-    async def send_verification_email(self, email: str, username: str):
-        try:
-            verification_data = {
-                "email": email,
-                "username": username,
-                "message": f"Hi, {username}! Please verify your email to complete the registration.",
-            }
+    async def activate_subscription(self, email: str, amount: float):
+        user_id_by_email = await self.get_user_id_by_email(email=email)
+        user_id = user_id_by_email.get("status")
 
-            await self.send_to_kafka(
-                topic="email_notifications", message=verification_data
-            )
+        if user_id == "error":
+            return {"status": "error", "message": "User with this email not found."}
 
-            return {
-                "status": "success",
-                "message": "Verification email sent.",
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"Error sending verification email: {e}",
-            }
+        user_id = int(user_id)
+        user = await self.get_user(user_id=user_id)
+        username = user.get("username")
 
-    async def send_successful_payment_email(self, email: str, username: str):
-        try:
-            notification_data = {
-                "email": email,
-                "username": username,
-                "message": f"Hi {username}! Your subscription payment was successful.",
-            }
+        subscriptions = await self.get_all_subscriptions()
+        subscription = next((sub for sub in subscriptions if int(sub["user_id"]) == user_id), None)
 
-            await self.send_to_kafka(
-                topic="successful_payment_notifications", message=notification_data
-            )
-            return {
-                "status": "success",
-                "message": "Payment confirmation email sent.",
-            }
-        except Exception as e:
+        if not subscription:
+            return {"status": "error", "message": "No active subscription found for the user."}
+
+        required_amount = 20 if subscription["subscription_type"] == "monthly" else 100
+
+        if amount != required_amount:
+            email_result = await self.send_unsuccessful_payment_email(email=email, username=username)
             return {
                 "status": "error",
-                "message": f"Error sending payment email: {e}",
+                "message": f"For a {subscription['subscription_type']} subscription, the payment must be {required_amount} Mongolian tugriks. | {email_result['message']}"
             }
+
+        try:
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                response = await stub.ActivateSubscription(ActivateSubscriptionRequest(user_id=user_id))
+                status = getattr(response, "status", "unknown")
+                message = getattr(response, "message", "No message provided")
+                email_result = await self.send_successful_payment_email(email=email, username=username)
+                return {
+                    "status": status,
+                    "message": f"{message} | {email_result['message']}",
+                    "subscription_type": subscription["subscription_type"],
+                    "required_amount": required_amount
+                }
+        except Exception as e:
+            logger.error(f"Error activating subscription: {e}")
+            email_result = await self.send_unsuccessful_payment_email(email=email, username=username)
+            return {"status": "error", "message": f"Error activating subscription: {e} | {email_result['message']}"}
 
     async def add_user(self, username: str, email: str, password: str):
         try:
@@ -94,18 +99,10 @@ class Orchestrator:
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
-                if user_data.status == "success":
-                    email_result = await self.send_verification_email(email, username)
-                    return {
-                        "status": user_data.status,
-                        "message": f"{user_data.message} | {email_result['message']}",
-                        "username": user_data.username,
-                        "email": user_data.email,
-                        "id": user_data.id,
-                    }
+                email_result = await self.send_verification_email(email, username)
                 return {
                     "status": user_data.status,
-                    "message": f"{user_data.message}",
+                    "message": f"{user_data.message} | {email_result['message']}",
                     "username": user_data.username,
                     "email": user_data.email,
                     "id": user_data.id,
@@ -130,14 +127,11 @@ class Orchestrator:
                     "id": subscription["id"],
                     "is_active": subscription["is_active"],
                     "end_date": subscription["end_date"],
-                    # "subscription_type" : subscription["subscription_type"],
                 }
         except Exception as e:
             return {"error": f"Error fetching user data: {str(e)}"}
 
-    async def update_user_password(
-        self, user_id: int, old_password: str, new_password: str
-    ):
+    async def update_user_password(self, user_id: int, old_password: str, new_password: str):
         try:
             request = UpdatePassword(
                 user_id=UserId(id=user_id),
@@ -187,16 +181,12 @@ class Orchestrator:
                 stub = SubscriptionServiceStub(channel)
                 request = GetSubscriptionsRequest()
                 response = await stub.GetSubscriptions(request)
-
-
             result = [
                 {
                     "id": sub.id,
                     "is_active": sub.is_active,
                     "end_date": sub.end_date,
                     "user_id": sub.user_id,
-
-
                     "subscription_type": sub.subscription_type
 
                 }
@@ -225,17 +215,28 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error adding subscription: {e}"}
 
-    async def extend_subscription(self, email: str, period: str):
+    async def extend_subscription(self, email: str, amount: int):
         user_id_by_email = await self.get_user_id_by_email(email=email)
         user_id = user_id_by_email["status"]
         if user_id == "error":
             return {"status": "error", "message": "User with this email not found."}
         user_id = int(user_id)
+
+
+        if amount == 20:
+            period = 'monthly'
+        elif amount == 100:
+            period = 'yearly'
+        else:
+            return {
+                "status": "error",
+                "message": f"Invalid payment amount. Expected 20 for 1 month or 100 for 1 year. Received: {amount}."
+            }
+
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
                 stub = SubscriptionServiceStub(channel)
                 request = ExtendSubscriptionRequest(user_id=user_id, period=period)
-
                 response = await stub.ExtendSubscription(request)
 
             return {"status": "success", "message": response.message}
@@ -257,49 +258,6 @@ class Orchestrator:
             return {"status": "success", "message": response.message}
         except Exception as e:
             return {"status": "error", "message": f"Error deleting subscription: {e}"}
-
-    async def activate_subscription(self, email: str, amount: float):
-        user_id_by_email = await self.get_user_id_by_email(email=email)
-        user_id = user_id_by_email["status"]
-
-        if user_id == "error":
-
-
-        if user_id == 'error':
-            return {"status": "error", "message": "User with this email not found."}
-
-        user_id = int(user_id)
-
-        try:
-            subscriptions = await self.get_all_subscriptions()
-            subscription = next(
-                (sub for sub in subscriptions if int(sub["user_id"]) == user_id), None
-            )
-
-            if not subscription:
-                return {"status": "error", "message": "No active subscription found for the user."}
-
-            subscription_type = subscription["subscription_type"]
-            required_amount = 20 if subscription_type == "monthly" else 100
-
-            if amount != required_amount:
-                return {"status": "error",
-                        "message": f"For a {subscription_type} subscription, the payment must be {required_amount} Mongolian tugriks."}
-
-            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
-                stub = SubscriptionServiceStub(channel)
-                request = ActivateSubscriptionRequest(user_id=user_id)
-                response = await stub.ActivateSubscription(request)
-
-            return {
-                "status": "success",
-                "message": response.message,
-                "subscription_type": subscription_type,
-                "required_amount": required_amount
-            }
-
-        except Exception as e:
-            return {"status": "error", "message": f"Error activating subscription: {e}"}
 
     async def deactivate_subscription(self, email: str):
         user_id_by_email = await self.get_user_id_by_email(email=email)
@@ -331,25 +289,6 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
-    async def pay_subscription(self, email: str, amount: float):
-        user_id_by_email = await self.get_user_id_by_email(email=email)
-        user_id = user_id_by_email["status"]
-        if user_id == "error":
-            return {"status": "error", "message": "Subscription not found."}
-        subscription = await self.get_subscription(user_id=int(user_id))
-        print(subscription)
-        if subscription is None:
-            return {"status": "error", "message": "Subscription not found."}
-        user = await self.get_user(int(user_id))
-        username = user["username"]
-        if amount == 20:
-            email_result = await self.send_successful_payment_email(email, username)
-            return {
-                "status": "success",
-                "message": f"Your payment was successful. | {email_result['message']}",
-            }
-        return {"status": "error", "message": "Unsuccessful payment, please try again."}
-
     async def get_subscription(self, user_id: int):
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
@@ -368,4 +307,68 @@ class Orchestrator:
             return {
                 "status": "error",
                 "message": f"Error getting subscription: {e}",
+            }
+
+    async def send_verification_email(self, email: str, username: str):
+        try:
+            verification_data = {
+                "email": email,
+                "username": username,
+                "message": f"Hi, {username}! Please verify your email to complete the registration.",
+            }
+
+            await self.send_to_kafka(
+                topic="email_notifications", message=verification_data
+            )
+
+            return {
+                "status": "success",
+                "message": "Verification email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending verification email: {e}",
+            }
+
+    async def send_successful_payment_email(self, email: str, username: str):
+        try:
+            notification_data = {
+                "email": email,
+                "username": username,
+                "message": f"Hi {username}! Your subscription payment was successful.",
+            }
+
+            await self.send_to_kafka(
+                topic="successful_payment_notifications", message=notification_data
+            )
+            return {
+                "status": "success",
+                "message": "Payment confirmation email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending payment email: {e}",
+            }
+
+    async def send_unsuccessful_payment_email(self, email: str, username: str):
+        try:
+            notification_data = {
+                "email": email,
+                "username": username,
+                "message": f"Hi {username}, unfortunately, your subscription payment was unsuccessful. Please try again.",
+            }
+
+            await self.send_to_kafka(
+                topic="unsuccessful_payment_notifications", message=notification_data
+            )
+            return {
+                "status": "success",
+                "message": "Payment failure email sent.",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending payment failure email: {e}",
             }
