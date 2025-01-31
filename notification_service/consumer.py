@@ -17,7 +17,7 @@ async def consume_email_notifications():
         auto_offset_reset="earliest",
     )
 
-    consumer.subscribe(["email_notifications", "successful_payment_notifications"])
+    consumer.subscribe(["email_notifications", "payment_notifications"])
 
     await consumer.start()
     try:
@@ -39,7 +39,7 @@ async def consume_email_notifications():
             #         session.add(task)
             #         await session.commit()
             #     print(f"Task saved for {email}")
-            elif message.topic == "successful_payment_notifications":
+            elif message.topic == "payment_notifications":
                 email_data = message.value
                 email = email_data.get("email")
                 username = email_data.get("username")

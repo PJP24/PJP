@@ -54,10 +54,10 @@ async def opt_out_policy():
     return {"policy": policy_text}
 
 
-@fastapi_app.post("/pay_subscription/{email}")
-async def pay_subscription(email: str, payment: Payment):
-    result = await orchestrator.pay_subscription(email=email, amount=payment.amount)
-    return result
+# @fastapi_app.post("/pay_subscription/{email}")
+# async def pay_subscription(email: str, payment: Payment):
+#     result = await orchestrator.pay_subscription(email=email, amount=payment.amount)
+#     return result
 
 
 @fastapi_app.get("/get_subscription/{user_id}")
