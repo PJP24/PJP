@@ -57,7 +57,7 @@ async def activate_subscription_resolver(email: str, amount: int):
             request = await client.post(url, json={"amount": amount})
             request.raise_for_status()
             result_info = request.json().get("message", "Unknown result")
-            return ActivateSubscriptionResponse(result_info=result_info, amount=amount)
+            return ActivateSubscriptionResponse(result_info=result_info)
     except Exception as e:
         raise Exception(f"Error activating subscription: {e}")
 

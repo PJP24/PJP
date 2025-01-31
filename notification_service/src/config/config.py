@@ -1,1 +1,1 @@
-TASKS_DB_URL = "postgresql+asyncpg://tasks:tasks123@postgres:5432/tasks_db"
+TASKS_DB_URL = "postgresql+asyncpg://tasks:tasks123@postgresql_tasks_container:5434/tasks_db"

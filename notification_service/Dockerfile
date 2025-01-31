@@ -12,5 +12,8 @@ COPY . /app/
 
 RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
-#CMD ["tail", "-f", "/dev/null"]
+COPY subscription_service/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["python", "/app/notification_service/main.py"]

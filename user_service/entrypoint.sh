@@ -7,7 +7,8 @@ done
 
 
 echo "Creating new Alembic revision..."
-alembic -c /app/user_service/alembic.ini revision --autogenerate -m "Automatic migration for model changes"
+alembic -c /app/user_service/alembic.ini revision --autogenerate -m "Update User model"
+
 
 echo "Running Alembic User migrations..."
 alembic -c /app/user_service/alembic.ini upgrade head

@@ -8,3 +8,7 @@ SELECT * FROM users;
 
 psql -U user_1 -d grpc_database
 SELECT * FROM subscriptions;
+
+
+psql -U tasks -d tasks_db
+SELECT * FROM tasks;

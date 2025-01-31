@@ -1,10 +1,14 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from contextlib import asynccontextmanager
+import logging
 
-class TasksDatabase:
+Base = declarative_base()
+
+class Database:
     def __init__(self, database_url: str):
-        self.engine = create_async_engine(database_url, echo=False, future=True)
+        self.engine = create_async_engine(database_url, echo=True, future=True)
         self.async_session = sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)
 
     @asynccontextmanager
@@ -13,6 +17,17 @@ class TasksDatabase:
             try:
                 yield session
                 await session.commit()
-            except Exception as e:
+            except Exception:
                 await session.rollback()
-                raise e
+                raise
+            finally:
+                await session.close()
+
+    async def init_db(self):
+        try:
+            async with self.engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logging.info("Database initialized successfully.")
+        except Exception as e:
+            logging.error(f"Error initializing the database: {e}")
+            raise
