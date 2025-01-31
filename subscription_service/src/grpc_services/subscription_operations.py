@@ -144,8 +144,8 @@ async def get_subscription(session: AsyncSession, user_id: int):
         id = "",
         is_active = False, 
         end_date = "",
-        user_id = "",
-        subscription_type = "",
+        user_id="",
+            subscription_type = "",
     )
     return Subs(
         id = str(subscription.id),
