@@ -54,6 +54,7 @@ async def get_user_details(user_id: int):
                         subscription_id=user_data.get("id"),
                         subscription_is_active=user_data.get("is_active"),
                         subscription_end_date=user_data.get("end_date"),
+                        subscription_type=user_data.get("subscription_type"),
                     ),
                 )
             return User(

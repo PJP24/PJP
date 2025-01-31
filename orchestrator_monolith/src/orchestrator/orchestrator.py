@@ -11,6 +11,7 @@ from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
 )
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
+    GetExpiringSubscriptionsRequest,
     CreateSubscriptionRequest,
     ExtendSubscriptionRequest,
     DeleteSubscriptionRequest,
@@ -93,9 +94,7 @@ class Orchestrator:
 
     async def add_user(self, username: str, email: str, password: str):
         try:
-            request = CreateUserRequest(
-                username=username, email=email, password=password
-            )
+            request = CreateUserRequest(username=username, email=email, password=password)
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
@@ -289,6 +288,54 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
+    async def send_emails_for_expiring_subscriptions(self):
+
+        try:
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetExpiringSubscriptionsRequest()
+                response = await stub.GetExpiringSubscriptions(request)
+
+                expiring_subscriptions = [
+                    {"id": sub.id, "is_active": sub.is_active,
+                    "end_date": sub.end_date, "user_id": sub.user_id}
+                    for sub in response.subscriptions
+                ]
+
+                for sub in expiring_subscriptions:
+                    end_date = sub['end_date']
+                    user = await self.get_user(int(sub['user_id']))
+                    email = user['email']
+
+                    verification_data = {
+                        "email": email,
+                        "message": f"Hi, {email}! Your subscription is expiring. Renew it by {end_date}.",
+                    }
+                    await self.send_to_kafka(topic="email_notifications", message=verification_data)
+
+        except Exception as e:
+            return {"status": "error", "message": f"Error sending emails for expiring subscriptions: {e}"}
+
+    # async def pay_subscription(self, email: str, amount: float):
+    #     user_id_by_email = await self.get_user_id_by_email(email=email)
+    #     user_id = user_id_by_email["status"]
+    #     if user_id == "error":
+    #         return {"status": "error", "message": "Subscription not found."}
+    #     subscription = await self.get_subscription(user_id=int(user_id))
+    #     print(subscription)
+    #     if subscription is None:
+    #         return {"status": "error", "message": "Subscription not found."}
+    #     user = await self.get_user(int(user_id))
+    #     print(f"user is : {user}")
+    #     username = user["username"]
+    #     if amount == 20:
+    #         email_result = await self.send_successful_payment_email(email, username)
+    #         return {
+    #             "status": "success",
+    #             "message": f"Your payment was successful. | {email_result['message']}",
+    #         }
+    #     return {"status": "error", "message": "Unsuccessful payment, please try again."}
+
     async def get_subscription(self, user_id: int):
         try:
             async with grpc.aio.insecure_channel(self.subscription_host) as channel:
@@ -301,6 +348,7 @@ class Orchestrator:
                     "is_active": response.is_active,
                     "end_date": response.end_date,
                     "user_id": response.user_id,
+                    "subscription_type": response.subscription_type,
                 }
             return None
         except Exception as e:
