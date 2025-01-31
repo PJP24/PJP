@@ -1,12 +1,10 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-import asyncio  # Import asyncio to run async functions
+import asyncio
 from src.orchestrator.orchestrator import Orchestrator
 
 def test_job():
-    print("Hello from APScheduler", flush=True)
     orchestrator = Orchestrator()
-    
     asyncio.run(orchestrator.send_emails_for_expiring_subscriptions())
 
 if __name__ == "__main__":
