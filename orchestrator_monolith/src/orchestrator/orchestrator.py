@@ -7,6 +7,7 @@ from orchestrator_monolith.src.generated.subscription_pb2_grpc import (
 )
 from orchestrator_monolith.src.generated.subscription_pb2 import (
     GetSubscriptionsRequest,
+    GetExpiringSubscriptionsRequest,
     CreateSubscriptionRequest,
     ExtendSubscriptionRequest,
     DeleteSubscriptionRequest,
@@ -14,7 +15,6 @@ from orchestrator_monolith.src.generated.subscription_pb2 import (
     DeactivateSubscriptionRequest,
     GetSubscriptionRequest,
 )
-
 from orchestrator_monolith.src.generated.user_pb2_grpc import UserManagementStub
 from orchestrator_monolith.src.generated.user_pb2 import (
     UserId,
@@ -23,7 +23,6 @@ from orchestrator_monolith.src.generated.user_pb2 import (
     GetUserIdRequest,
     GetEmailsRequest,
 )
-
 
 class Orchestrator:
     def __init__(self):
@@ -50,10 +49,7 @@ class Orchestrator:
                 "username": username,
                 "message": f"Hi, {username}! Please verify your email to complete the registration.",
             }
-
-            await self.send_to_kafka(
-                topic="email_notifications", message=verification_data
-            )
+            await self.send_to_kafka(topic="email_notifications", message=verification_data)
 
             return {
                 "status": "success",
@@ -110,9 +106,7 @@ class Orchestrator:
 
     async def add_user(self, username: str, email: str, password: str):
         try:
-            request = CreateUserRequest(
-                username=username, email=email, password=password
-            )
+            request = CreateUserRequest(username=username, email=email, password=password)
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
@@ -349,7 +343,7 @@ class Orchestrator:
                 "message": f"Error deactivating subscription: {e}",
             }
 
-    async def get_opt_out_policy(self):
+    async def get_opt_out_policy(self):      
         try:
             policy_text = (
                 "Opt-Out Policy:"
@@ -360,6 +354,34 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
+    async def send_emails_for_expiring_subscriptions(self):
+
+        try:
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetExpiringSubscriptionsRequest()
+                response = await stub.GetExpiringSubscriptions(request)
+
+                expiring_subscriptions = [
+                    {"id": sub.id, "is_active": sub.is_active,
+                    "end_date": sub.end_date, "user_id": sub.user_id}
+                    for sub in response.subscriptions
+                ]
+
+                for sub in expiring_subscriptions:
+                    end_date = sub['end_date']
+                    user = await self.get_user(int(sub['user_id']))
+                    email = user['email']
+
+                    verification_data = {
+                        "email": email,
+                        "message": f"Hi, {email}! Your subscription is expiring. Renew it by {end_date}.",
+                    }
+                    await self.send_to_kafka(topic="email_notifications", message=verification_data)
+
+        except Exception as e:
+            return {"status": "error", "message": f"Error sending emails for expiring subscriptions: {e}"}
+          
     # async def pay_subscription(self, email: str, amount: float):
     #     user_id_by_email = await self.get_user_id_by_email(email=email)
     #     user_id = user_id_by_email["status"]

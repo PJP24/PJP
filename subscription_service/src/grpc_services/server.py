@@ -5,6 +5,7 @@ from subscription_service.src.grpc_services.generated.subscription_pb2 import Op
 from subscription_service.src.grpc_services.subscription_operations import (
     create_subscription,
     get_subscriptions,
+    get_expiring_subscriptions,
     extend_subscription,
     delete_subscription,
     activate_subscription,
@@ -19,6 +20,10 @@ class SubscriptionService(SubscriptionServiceServicer):
     async def GetSubscriptions(self, request, context):
         async with self.database.session_scope() as session:
             return await get_subscriptions(session)
+    
+    async def GetExpiringSubscriptions(self, request, context):
+        async with self.database.session_scope() as session:
+            return await get_expiring_subscriptions(session)
 
     async def CreateSubscription(self, request, context):
         async with self.database.session_scope() as session:
