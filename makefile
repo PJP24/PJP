@@ -24,7 +24,7 @@ generate_user_protos_in_orchestrator:
 
 
 start:
-	docker-compose up --build
+	docker compose up --build
 
 clean-containers:
 	@docker ps -a -q | xargs -r docker rm -f

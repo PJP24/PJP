@@ -35,7 +35,6 @@ async def process_email_notification(db: Database, email_data: dict, topic: str,
 async def consume_email_notifications():
     db = Database(TASKS_DB_URL)  # Instantiate the database connection
     consumer = AIOKafkaConsumer(
-        "email_notifications",
         bootstrap_servers="broker:9092",
         value_deserializer=lambda m: json.loads(m.decode("utf-8")),
         auto_offset_reset="earliest",

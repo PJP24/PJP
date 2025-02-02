@@ -95,17 +95,28 @@ class Orchestrator:
     async def add_user(self, username: str, email: str, password: str):
         try:
             request = CreateUserRequest(username=username, email=email, password=password)
+
             async with grpc.aio.insecure_channel(self.user_host) as channel:
                 stub = UserManagementStub(channel)
                 user_data = await stub.CreateUser(request)
-                email_result = await self.send_verification_email(email, username)
-                return {
-                    "status": user_data.status,
-                    "message": f"{user_data.message} | {email_result['message']}",
-                    "username": user_data.username,
-                    "email": user_data.email,
-                    "id": user_data.id,
-                }
+
+                if user_data.status == "success":
+                    email_result = await self.send_verification_email(email, username)
+                    return {
+                        "status": user_data.status,
+                        "message": f"{user_data.message} | {email_result['message']}",
+                        "username": user_data.username,
+                        "email": user_data.email,
+                        "id": user_data.id,
+                    }
+                else:
+                    return {
+                        "status": user_data.status,
+                        "message": f"Error: {user_data.message}. Please try a different username or email.",
+                        "username": user_data.username,
+                        "email": user_data.email,
+                        "id": user_data.id,
+                    }
         except Exception as e:
             return {"error": f"Error adding user: {str(e)}"}
 
@@ -315,26 +326,6 @@ class Orchestrator:
 
         except Exception as e:
             return {"status": "error", "message": f"Error sending emails for expiring subscriptions: {e}"}
-
-    # async def pay_subscription(self, email: str, amount: float):
-    #     user_id_by_email = await self.get_user_id_by_email(email=email)
-    #     user_id = user_id_by_email["status"]
-    #     if user_id == "error":
-    #         return {"status": "error", "message": "Subscription not found."}
-    #     subscription = await self.get_subscription(user_id=int(user_id))
-    #     print(subscription)
-    #     if subscription is None:
-    #         return {"status": "error", "message": "Subscription not found."}
-    #     user = await self.get_user(int(user_id))
-    #     print(f"user is : {user}")
-    #     username = user["username"]
-    #     if amount == 20:
-    #         email_result = await self.send_successful_payment_email(email, username)
-    #         return {
-    #             "status": "success",
-    #             "message": f"Your payment was successful. | {email_result['message']}",
-    #         }
-    #     return {"status": "error", "message": "Unsuccessful payment, please try again."}
 
     async def get_subscription(self, user_id: int):
         try:
