@@ -43,7 +43,8 @@ async def consume_email_notifications():
     consumer.subscribe([
         "email_notifications",
         "successful_payment_notifications",
-        "unsuccessful_payment_notifications"
+        "unsuccessful_payment_notifications",
+        "expiring_subscriptions"
     ])
 
     await consumer.start()
@@ -54,7 +55,8 @@ async def consume_email_notifications():
             if message.topic in [
                 "email_notifications",
                 "successful_payment_notifications",
-                "unsuccessful_payment_notifications"
+                "unsuccessful_payment_notifications",
+                "expiring_subscriptions"
             ]:
                 async with db.session_scope() as session:
                     task = Task(

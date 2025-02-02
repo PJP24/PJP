@@ -65,18 +65,3 @@ async def get_user_details(user_id: int):
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Exception in get_user_details: {e}")
             return None
-
-
-# async def get_user_id_by_email(user_email: str):
-#     from graphql_service.src.schema import UserId
-
-#     url = f"{BASE_URL}/get_user_id/{user_email}"
-#     async with httpx.AsyncClient() as client:
-#         try:
-#             response = await client.get(url)
-#             user_data = response.json()
-#             print(user_data)
-#             return UserId(user_id=user_data.get('status', 'error'))
-#         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-#             print(f"Exception in getting user id: {e}")
-#             return None

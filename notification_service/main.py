@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from consumer import consume_email_notifications
+from notification_service.consumer import consume_email_notifications
 from notification_service.src.db.database import Database
 from notification_service.src.config.config import TASKS_DB_URL
 

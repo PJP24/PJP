@@ -45,12 +45,14 @@ async def get_subscriptions(session: AsyncSession):
 
 async def get_expiring_subscriptions(session: AsyncSession):
     today = datetime.now(timezone.utc)
-    one_week_from_today = today + timedelta(days=7)
+    time_delta = today + timedelta(days=365)
 
+    # Fetch subscriptions that are inactive and have an end_date within the range
     subscriptions = (
         await session.execute(
             sa.select(Subscription).where(
-                Subscription.end_date.between(today, one_week_from_today)
+                Subscription.is_active == True,
+                Subscription.end_date.between(today, time_delta)
             )
         )
     ).scalars().all()
@@ -64,6 +66,7 @@ async def get_expiring_subscriptions(session: AsyncSession):
             user_id=str(sub.user_id),
         )
     return response
+
 
 
 async def extend_subscription(session: AsyncSession, user_id: int, period: str):

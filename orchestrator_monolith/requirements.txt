@@ -2,6 +2,7 @@ aiofiles==24.1.0
 aiosqlite==0.20.0
 alembic==1.14.0
 annotated-types==0.7.0
+datetime
 anyio==4.6.2.post1
 asgiref==3.8.1
 asyncio==3.4.3

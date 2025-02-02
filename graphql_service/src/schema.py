@@ -65,6 +65,7 @@ class UserSubscription:
     subscription_id: str
     subscription_is_active: str
     subscription_end_date: str
+    subscription_type: str
 
 @strawberry.type
 class User:

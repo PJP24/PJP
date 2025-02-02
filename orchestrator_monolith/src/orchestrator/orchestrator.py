@@ -1,7 +1,7 @@
 import grpc
 import json
 import logging
-
+from datetime import datetime, timedelta
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 from kafka import KafkaProducer
@@ -299,33 +299,6 @@ class Orchestrator:
         except Exception as e:
             return {"status": "error", "message": f"Error fetching opt-out policy: {e}"}
 
-    async def send_emails_for_expiring_subscriptions(self):
-
-        try:
-            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
-                stub = SubscriptionServiceStub(channel)
-                request = GetExpiringSubscriptionsRequest()
-                response = await stub.GetExpiringSubscriptions(request)
-
-                expiring_subscriptions = [
-                    {"id": sub.id, "is_active": sub.is_active,
-                    "end_date": sub.end_date, "user_id": sub.user_id}
-                    for sub in response.subscriptions
-                ]
-
-                for sub in expiring_subscriptions:
-                    end_date = sub['end_date']
-                    user = await self.get_user(int(sub['user_id']))
-                    email = user['email']
-
-                    verification_data = {
-                        "email": email,
-                        "message": f"Hi, {email}! Your subscription is expiring. Renew it by {end_date}.",
-                    }
-                    await self.send_to_kafka(topic="email_notifications", message=verification_data)
-
-        except Exception as e:
-            return {"status": "error", "message": f"Error sending emails for expiring subscriptions: {e}"}
 
     async def get_subscription(self, user_id: int):
         try:
@@ -348,16 +321,18 @@ class Orchestrator:
                 "message": f"Error getting subscription: {e}",
             }
 
+
+
     async def send_verification_email(self, email: str, username: str):
         try:
-            verification_data = {
+            notification_data = {
                 "email": email,
                 "username": username,
                 "message": f"Hi, {username}! Please verify your email to complete the registration.",
             }
 
             await self.send_to_kafka(
-                topic="email_notifications", message=verification_data
+                topic="email_notifications", message=notification_data
             )
 
             return {
@@ -411,3 +386,62 @@ class Orchestrator:
                 "status": "error",
                 "message": f"Error sending payment failure email: {e}",
             }
+
+    async def send_subscription_expiration_notification(self, email: str, end_date: str):
+        try:
+            notification_data = {
+                "email": email,
+                "message": f"Hi, {email}! Your subscription is expiring on {end_date}. Renew it before {end_date}!",
+            }
+
+            await self.send_to_kafka(topic="expiring_subscriptions", message=notification_data)
+
+            return {
+                "status": "success",
+                "message": f"Notification sent to {email} about subscription expiring on {end_date}.",
+            }
+
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error sending subscription expiration notification to {email}: {e}",
+            }
+
+    async def send_emails_for_expiring_subscriptions(self):
+        try:
+            logger.info("Starting to send emails for expiring subscriptions")
+
+            async with grpc.aio.insecure_channel(self.subscription_host) as channel:
+                stub = SubscriptionServiceStub(channel)
+                request = GetExpiringSubscriptionsRequest()
+                logger.info("Fetching expiring subscriptions from subscription service...")
+                response = await stub.GetExpiringSubscriptions(request)
+
+            if not response.subscriptions:
+                logger.info("No expiring subscriptions found.")
+                return {"status": "success", "message": "No expiring subscriptions found."}
+
+            logger.info(f"Found {len(response.subscriptions)} expiring subscriptions")
+
+            for sub in response.subscriptions:
+                user = await self.get_user(int(sub.user_id))
+                if 'error' in user:
+                    logger.error(f"Error fetching user: {user['error']}")
+                    continue
+
+                email = user['email']
+                logger.info(f"Sending email to {email} about subscription expiring on {sub.end_date}")
+
+                notification_result = await self.send_subscription_expiration_notification(
+                    email=email, end_date=sub.end_date
+                )
+
+                if notification_result['status'] == 'error':
+                    return notification_result
+
+            return {"status": "success", "message": "Emails sent for expiring subscriptions."}
+
+        except Exception as e:
+            logger.error(f"Error sending expiring subscription notifications: {e}")
+            return {"status": "error", "message": f"Error sending expiring subscription notifications: {e}"}
+

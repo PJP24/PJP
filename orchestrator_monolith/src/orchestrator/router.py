@@ -19,7 +19,7 @@ orchestrator = Orchestrator()
 
 @fastapi_app.get("/get_subscriptions")
 async def get_all_subscriptions():
-    subscriptions = await orchestrator.get_all_subscriptions()    
+    subscriptions = await orchestrator.get_all_subscriptions()
     return {"subscriptions": subscriptions}
 
 @fastapi_app.post("/add_subscription")
