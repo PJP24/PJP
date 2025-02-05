@@ -5,13 +5,14 @@ package subscription;
 service SubscriptionService {
   rpc CreateSubscription (CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
   rpc GetSubscriptions (GetSubscriptionsRequest) returns (GetSubscriptionsResponse);
+  rpc GetExpiringSubscriptions (GetExpiringSubscriptionsRequest) returns (GetExpiringSubscriptionsResponse);
   rpc ExtendSubscription (ExtendSubscriptionRequest) returns (ExtendSubscriptionResponse);
   rpc OptOutPolicy (OptOutPolicyRequest) returns (OptOutPolicyResponse);
   rpc DeleteSubscription (DeleteSubscriptionRequest) returns (DeleteSubscriptionResponse);
   rpc ActivateSubscription (ActivateSubscriptionRequest) returns (ActivateSubscriptionResponse);
   rpc DeactivateSubscription (DeactivateSubscriptionRequest) returns (DeactivateSubscriptionResponse);
+  rpc GetSubscription (GetSubscriptionRequest) returns (Subscription);
 }
-
 
 message CreateSubscriptionRequest {
   int32 user_id = 1;
@@ -24,6 +25,11 @@ message CreateSubscriptionResponse {
 
 message GetSubscriptionsRequest {}
 message GetSubscriptionsResponse {
+  repeated Subscription subscriptions = 1;
+}
+
+message GetExpiringSubscriptionsRequest {}
+message GetExpiringSubscriptionsResponse {
   repeated Subscription subscriptions = 1;
 }
 
@@ -66,5 +72,9 @@ message Subscription {
   bool is_active = 2;
   string end_date = 3;
   string user_id = 4;
+  string subscription_type = 5;
 }
 
+message GetSubscriptionRequest {
+  int32 user_id = 1;
+}
