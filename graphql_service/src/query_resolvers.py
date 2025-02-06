@@ -23,16 +23,32 @@ async def get_all_subscriptions_resolver():
 
 async def opt_out_policy_resolver():
     from graphql_service.src.schema import OptOutPolicyResponse
+    print()
+    print()
+    print()
+    print()
+    print()
 
     try:
-        url = f"{BASE_URL}/opt-out-policy"
+        print(111)
+        url = "http://127.0.0.1:5000/is-authenticated"
+        print(222)
         async with httpx.AsyncClient() as client:
+            print(333)
             request = await client.get(url)
+            print(444)
             request.raise_for_status()
-            policy_text = request.json().get("policy", "Unknown policy")
+            print(555)
+            print("Response from /is-authenticated:", request.text)
+            
+            policy_url = f"{BASE_URL}/opt-out-policy"
+            policy_request = await client.get(policy_url)
+            policy_request.raise_for_status()
+            policy_text = policy_request.json().get("policy", "Unknown policy")
             return OptOutPolicyResponse(policy=policy_text)
     except Exception as e:
         raise Exception(f"Error fetching opt-out policy: {e}")
+
 
 
 async def get_user_details(user_id: int):
