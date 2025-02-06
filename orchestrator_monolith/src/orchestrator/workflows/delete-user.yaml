@@ -1,0 +1,13 @@
+variables:
+  arg1: ${user_id}
+
+root:
+  sequence:
+    elements:
+      - activity:
+          name: delete_user_activity
+          arguments:
+            - arg1
+          result: result1
+
+
