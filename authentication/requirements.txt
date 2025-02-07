@@ -1,0 +1,8 @@
+Authlib==1.4.1
+fastapi==0.115.6
+fastapi-cli==0.0.7
+httpx==0.28.1
+itsdangerous==2.2.0
+starlette==0.41.3
+uvicorn==0.32.1
+

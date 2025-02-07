@@ -1,6 +1,8 @@
 import httpx
 import os
 from dotenv import load_dotenv
+from strawberry.exceptions import GraphQLError
+from strawberry.types import Info
 
 load_dotenv()
 
@@ -35,8 +37,12 @@ async def opt_out_policy_resolver():
         raise Exception(f"Error fetching opt-out policy: {e}")
 
 
-async def get_user_details(user_id: int):
+async def get_user_details(user_id: int, info: Info):
     from graphql_service.src.schema import User, UserSubscription
+
+    token = info.context.get("token")
+    if token is None:
+        raise GraphQLError('Not authenticated.')
 
     url = f"{BASE_URL}/user_details/{user_id}"
     async with httpx.AsyncClient() as client:

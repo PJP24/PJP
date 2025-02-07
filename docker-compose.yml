@@ -140,6 +140,16 @@ services:
     networks:
       - pjp_mynetwork
 
+  authentication_service:
+    build:
+      context: .
+      dockerfile: authentication/Dockerfile
+    container_name: authentication_container
+    ports:
+      - "8001:8001"
+    networks:
+      - pjp_mynetwork
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper

@@ -2,7 +2,7 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 
 
-config = Config('orchestrator_monolith/src/orchestrator/.env')
+config = Config('authentication/.env')
 oauth = OAuth(config)
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
