@@ -2,6 +2,7 @@ aiofiles==24.1.0
 aiosqlite==0.20.0
 alembic==1.14.0
 annotated-types==0.7.0
+Authlib==1.4.1
 datetime
 anyio==4.6.2.post1
 asgiref==3.8.1
@@ -24,6 +25,7 @@ h2==4.1.0
 hpack==4.0.0
 Hypercorn==0.17.3
 hyperframe==6.0.1
+httpx==0.28.1
 idna==3.10
 iniconfig==2.0.0
 itsdangerous==2.2.0

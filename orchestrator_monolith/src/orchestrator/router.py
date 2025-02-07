@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, HTTPException
+from starlette.responses import RedirectResponse, HTMLResponse
 from orchestrator_monolith.src.orchestrator.orchestrator import Orchestrator
 from orchestrator_monolith.src.orchestrator.models import SubscriptionRequest, ExtendSubscriptionRequest, UpdatePassword, User, UserIds, EmailList, Payment
 
@@ -12,10 +13,59 @@ from orchestrator_monolith.src.orchestrator.models import (
     ActivateRequest
 )
 
+from orchestrator_monolith.src.orchestrator.oauth import google, github
 
 fastapi_app = APIRouter(prefix="")
 
 orchestrator = Orchestrator()
+
+
+@fastapi_app.get("/login")
+async def login(request: Request):
+    return HTMLResponse(
+        """
+        <p>Please choose which to use for authenticating:</p>
+        <a href='/login/google'> Google </a>
+        <br>
+        <a href='/login/github'> Github </a>
+        """
+    )
+
+
+@fastapi_app.get("/login/google")
+async def login_google(request: Request):
+    redirect_uri = request.url_for("auth_callback_google")
+    return await google.authorize_redirect(request, redirect_uri)
+
+@fastapi_app.get("/login/github")
+async def login_github(request: Request):
+    redirect_uri = request.url_for("auth_callback")
+    return await github.authorize_redirect(request, redirect_uri)
+
+@fastapi_app.get("/auth/callback")
+async def auth_callback(request: Request):
+    token = await github.authorize_access_token(request)
+    user_info = await github.get("user", token=token)
+    user = user_info.json()
+    if user:
+        request.session['user'] = dict(user)
+    print(user)
+    return RedirectResponse(url='/docs')
+
+
+@fastapi_app.get("/auth/callback/google")
+async def auth_callback_google(request: Request):
+    token = await google.authorize_access_token(request)
+    user = token.get('userinfo')
+    if user:
+        request.session['user'] = dict(user)
+    return RedirectResponse(url='/docs')
+
+@fastapi_app.get('/logout')
+async def logout(request: Request):
+    request.session.pop('user', None)
+    return 'Logged out successfully'
+
 
 @fastapi_app.get("/get_subscriptions")
 async def get_all_subscriptions():
@@ -61,7 +111,10 @@ async def get_subscription(user_id: int):
     return result
 
 @fastapi_app.get("/user_details/{user_id}")
-async def get_user_details(user_id: int):
+async def get_user_details(user_id: int, request: Request):
+    user = request.session.get('user')
+    if user is None:
+        raise HTTPException(status_code=401, detail='Not authenticated, please login first to access this.')
     result = await orchestrator.get_user(user_id=user_id)
     return result
 
@@ -73,12 +126,18 @@ async def add_user(user: User):
     return result
 
 @fastapi_app.delete("/delete_user/{user_id}")
-async def delete_user(user_id: int):
+async def delete_user(user_id: int, request: Request):
+    user = request.session.get('user')
+    if user is None:
+        raise HTTPException(status_code=401, detail='Not authenticated, please login first to access this.')
     result = await orchestrator.delete_user(user_id=user_id)
     return result
 
 @fastapi_app.patch("/update_password/{user_id}")
-async def update_password(user_id: int, passwords: UpdatePassword):
+async def update_password(user_id: int, passwords: UpdatePassword, request: Request):
+    user = request.session.get('user')
+    if user is None:
+        raise HTTPException(status_code=401, detail='Not authenticated, please login first to access this.')
     result = await orchestrator.update_user_password(
         user_id=user_id,
         old_password=passwords.old_password,
