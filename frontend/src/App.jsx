@@ -17,6 +17,8 @@ import {
 import HomePage from './pages/HomePage';
 import MainLayout from './layouts/MainLayout';
 import NotFoundPage from './pages/NotFoundPage';
+import AllSubscriptions from './pages/AllSubscriptions';
+import OptOutPolicy from './pages/OptOutPolict';
 
 const errorLink = onError(({ graphqlErrors }) => {
   if (graphqlErrors) {
@@ -42,12 +44,17 @@ const App = () => {
       <Route path='/' element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path='*' element={<NotFoundPage />} />
-        
+        <Route path='/all-subscriptions' element={<AllSubscriptions />} />
+        <Route path='/opt-out-policy' element={<OptOutPolicy />} />
       </Route>
     )
   );
 
-  return <RouterProvider router={router} />
+  return (
+    <ApolloProvider client={client}> 
+      <RouterProvider router={router} />
+    </ApolloProvider>
+)
 }
 
 export default App
