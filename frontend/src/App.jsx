@@ -23,9 +23,31 @@ const client = new ApolloClient({
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <GetSubscriptions /> 
-    </ApolloProvider>
+    <div>
+    
+      <ApolloProvider client={client}>
+        <GetSubscriptions /> 
+      </ApolloProvider>
+
+      <h2>Users - Query Actions:</h2>
+      <button onClick={() => handleUserQuery('userDetails')}>User Details</button>
+
+      <h2>Users - Mutation Actions:</h2>
+      <button onClick={() => handleUserMutation('createUser')}>Create User</button>
+      <button onClick={() => handleUserMutation('deleteUser')}>Delete User</button>
+      <button onClick={() => handleUserMutation('updatePassword')}>Update Password</button>
+
+      <h2>Subscriptions - Query Actions:</h2>
+      <button onClick={() => handleSubscriptionQuery('allSubscriptions')}>All Subscriptions</button>
+      <button onClick={() => handleSubscriptionQuery('optOutPolicy')}>Opt-Out Policy</button>
+
+      <h2>Subscriptions - Mutation Actions:</h2>
+      <button onClick={() => handleSubscriptionMutation('activateSubscription')}>Activate Subscription</button>
+      <button onClick={() => handleSubscriptionMutation('addSubscription')}>Add Subscription</button>
+      <button onClick={() => handleSubscriptionMutation('deactivateSubscription')}>Deactivate Subscription</button>
+      <button onClick={() => handleSubscriptionMutation('deleteSubscription')}>Delete Subscription</button>
+      <button onClick={() => handleSubscriptionMutation('extendSubscription')}>Extend Subscription</button>
+    </div>
   );
 }
 
