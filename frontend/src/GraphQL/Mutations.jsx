@@ -23,3 +23,11 @@ export const ACTIVATE_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const DEACTIVATE_SUBSCRIPTION = gql`
+  mutation DeactivateSubscription($email: String!) {
+    deactivateSubscription(email: $email) {
+      resultInfo
+    }
+  }
+`;

@@ -30,7 +30,7 @@ const MutationButtons = () => {
                     </button>
                 </div>
                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 mb-2">
-                    <a href="#">
+                    <a href="/deactivate-subscription">
                         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Deactivate Subscription</h5>
                     </a>
                     <button href="#" className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-indigo-700 rounded-lg hover:bg-indigo-400">
