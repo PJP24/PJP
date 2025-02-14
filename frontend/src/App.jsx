@@ -23,6 +23,7 @@ import AddSubscription from './pages/AddSubscription';
 import DeleteSubscription from './pages/DeleteSubscription';
 import ActivateSubscription from './pages/ActivateSubscription';
 import DeactivateSubscription from './pages/DeactivateSubscription';
+import ExtendSubscription from './pages/ExtendSubscription';
 
 const errorLink = onError(({ graphqlErrors }) => {
   if (graphqlErrors) {
@@ -51,6 +52,7 @@ const App = () => {
         <Route path='/all-subscriptions' element={<AllSubscriptions />} />
         <Route path='/opt-out-policy' element={<OptOutPolicy />} />
         <Route path='/add-subscription' element={<AddSubscription />} />
+        <Route path='/extend-subscription' element={<ExtendSubscription />} />
         <Route path='/delete-subscription' element={<DeleteSubscription />} />
         <Route path='/activate-subscription' element={<ActivateSubscription />} />
         <Route path='/deactivate-subscription' element={<DeactivateSubscription />} />

@@ -31,3 +31,11 @@ export const DEACTIVATE_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const EXTEND_SUBSCRIPTION = gql`
+  mutation MyMutation($amount: Int!, $email: String!) {
+    extendSubscription(amount: $amount, email: $email) {
+      resultInfo
+    }
+  }
+`;
