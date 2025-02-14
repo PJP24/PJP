@@ -21,6 +21,13 @@ import UserDetailsPage from './pages/UserDetailsPage';
 import CreateUserPage from './pages/CreateUserPage';
 import DeleteUserPage from './pages/DeleteUserPage';
 import UpdateUserPasswordPage from './pages/UpdateUserPasswordPage';
+import AllSubscriptions from './pages/AllSubscriptions';
+import OptOutPolicy from './pages/OptOutPolict';
+import AddSubscription from './pages/AddSubscription';
+import DeleteSubscription from './pages/DeleteSubscription';
+import ActivateSubscription from './pages/ActivateSubscription';
+import DeactivateSubscription from './pages/DeactivateSubscription';
+import ExtendSubscription from './pages/ExtendSubscription';
 
 const errorLink = onError(({ graphqlErrors }) => {
   if (graphqlErrors) {
@@ -43,13 +50,21 @@ const client = new ApolloClient({
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path='/' element={<MainLayout />}>
+      <Route path='/' element={<MainLayout />} >
         <Route index element={<HomePage />} />
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/user-details' element={<UserDetailsPage />} />
         <Route path='/create-user' element={<CreateUserPage />} />
         <Route path='/delete-user' element={<DeleteUserPage />} />
         <Route path='/update-password' element={<UpdateUserPasswordPage />} />
+        <Route path='/all-subscriptions' element={<AllSubscriptions />} />
+        <Route path='/opt-out-policy' element={<OptOutPolicy />} />
+        <Route path='/add-subscription' element={<AddSubscription />} />
+        <Route path='/extend-subscription' element={<ExtendSubscription />} />
+        <Route path='/delete-subscription' element={<DeleteSubscription />} />
+        <Route path='/activate-subscription' element={<ActivateSubscription />} />
+        <Route path='/deactivate-subscription' element={<DeactivateSubscription />} />
+
       </Route>
     )
   );

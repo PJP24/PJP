@@ -8,11 +8,12 @@ const QueryButtons = () => {
     <h1 className='mb-5'>Queries</h1>
     <div className='flex flex-wrap gap-4'>
     <CardButton title="Get User Details" linkName="User" linkTo="/user-details" />
-    <CardButton title="Get All Subscriptions" linkName="Subscriptions" linkTo='/' />
-    <CardButton title="Opt Out Policy" linkName="Policy" linkTo="/" />
+    <CardButton title="Get All Subscriptions" linkName="Subscriptions" linkTo='/all-subscriptions' />
+    <CardButton title="Opt Out Policy" linkName="Policy" linkTo="/opt-out-policy" />
 </div>
 </div>
   )
 }
 
 export default QueryButtons
+

@@ -13,3 +13,24 @@ export const GET_USER = gql `
   }
 }
 `
+
+export const LOAD_SUBSCRIPTIONS = gql`
+    query MyQuery {
+        allSubscriptions {
+            amount
+            endDate
+            id
+            isActive
+            subscriptionType
+            userId
+        }
+    }
+`;
+
+export const OPT_OUT_POLICY = gql`
+  query MyQuery {
+    optOutPolicy {
+      policy
+    }
+  }
+`;

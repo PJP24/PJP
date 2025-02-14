@@ -9,11 +9,12 @@ const MutationButtons = () => {
                 <CardButton title="Create User" linkName="Create" linkTo="/create-user" />
                 <CardButton title="Update Password" linkName="Update Password" linkTo="/update-password" />
                 <CardButton title="Delete User" linkName="Delete" linkTo="/delete-user" />
-                <CardButton title="Add Subscription" linkName="Add" linkTo='/' />
-                <CardButton title="Activate Subscription" linkName="Activate" linkTo="/" />
-                <CardButton title="Extend Subscription" linkName="Extend" linkTo="/" />
-                <CardButton title="Deactivate Subscription" linkName="Deactivate" linkTo="/" />
-                <CardButton title="Delete Subscription" linkName="Delete" linkTo="/" />
+                <CardButton title="Add Subscription" linkName="Add" linkTo='/add-subscription' />
+                <CardButton title="Activate Subscription" linkName="Activate" linkTo="/activate-subscription" />
+                <CardButton title="Extend Subscription" linkName="Extend" linkTo="/extend-subscription" />
+                <CardButton title="Deactivate Subscription" linkName="Deactivate" linkTo="/deactivate-subscription" />
+                <CardButton title="Delete Subscription" linkName="Delete" linkTo="/delete-subscription" />
+
 
             </div>
         </div>
