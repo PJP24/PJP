@@ -9,7 +9,6 @@ export const GET_USER = gql `
       subscriptionEndDate
       subscriptionId
       subscriptionIsActive
-      subscriptionType
     }
   }
 }

@@ -17,6 +17,10 @@ import {
 import HomePage from './pages/HomePage';
 import MainLayout from './layouts/MainLayout';
 import NotFoundPage from './pages/NotFoundPage';
+import UserDetailsPage from './pages/UserDetailsPage';
+import CreateUserPage from './pages/CreateUserPage';
+import DeleteUserPage from './pages/DeleteUserPage';
+import UpdateUserPasswordPage from './pages/UpdateUserPasswordPage';
 import AllSubscriptions from './pages/AllSubscriptions';
 import OptOutPolicy from './pages/OptOutPolict';
 import AddSubscription from './pages/AddSubscription';
@@ -49,6 +53,10 @@ const App = () => {
       <Route path='/' element={<MainLayout />} >
         <Route index element={<HomePage />} />
         <Route path='*' element={<NotFoundPage />} />
+        <Route path='/user-details' element={<UserDetailsPage />} />
+        <Route path='/create-user' element={<CreateUserPage />} />
+        <Route path='/delete-user' element={<DeleteUserPage />} />
+        <Route path='/update-password' element={<UpdateUserPasswordPage />} />
         <Route path='/all-subscriptions' element={<AllSubscriptions />} />
         <Route path='/opt-out-policy' element={<OptOutPolicy />} />
         <Route path='/add-subscription' element={<AddSubscription />} />
