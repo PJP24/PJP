@@ -19,6 +19,7 @@ import MainLayout from './layouts/MainLayout';
 import NotFoundPage from './pages/NotFoundPage';
 import AllSubscriptions from './pages/AllSubscriptions';
 import OptOutPolicy from './pages/OptOutPolict';
+import AddSubscription from './pages/AddSubscription';
 
 const errorLink = onError(({ graphqlErrors }) => {
   if (graphqlErrors) {
@@ -46,6 +47,7 @@ const App = () => {
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/all-subscriptions' element={<AllSubscriptions />} />
         <Route path='/opt-out-policy' element={<OptOutPolicy />} />
+        <Route path='/add-subscription' element={<AddSubscription />} />
       </Route>
     )
   );
