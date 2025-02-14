@@ -15,3 +15,11 @@ export const DELETE_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const ACTIVATE_SUBSCRIPTION = gql`
+  mutation ActivateSubscription($amount: Int!, $email: String!) {
+    activateSubscription(amount: $amount, email: $email) {
+      resultInfo
+    }
+  }
+`;
