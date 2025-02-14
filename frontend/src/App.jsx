@@ -20,6 +20,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import AllSubscriptions from './pages/AllSubscriptions';
 import OptOutPolicy from './pages/OptOutPolict';
 import AddSubscription from './pages/AddSubscription';
+import DeleteSubscription from './pages/DeleteSubscription';
 
 const errorLink = onError(({ graphqlErrors }) => {
   if (graphqlErrors) {
@@ -48,6 +49,7 @@ const App = () => {
         <Route path='/all-subscriptions' element={<AllSubscriptions />} />
         <Route path='/opt-out-policy' element={<OptOutPolicy />} />
         <Route path='/add-subscription' element={<AddSubscription />} />
+        <Route path='/delete-subscription' element={<DeleteSubscription />} />
       </Route>
     )
   );

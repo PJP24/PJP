@@ -7,3 +7,11 @@ export const CREATE_SUBSCRIPTION = gql`
     }
   }
 `;
+
+export const DELETE_SUBSCRIPTION = gql`
+  mutation MyMutation($email: String!) {
+    deleteSubscription(email: $email) {
+      resultInfo
+    }
+  }
+`;
